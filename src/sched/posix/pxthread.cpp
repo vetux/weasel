@@ -23,15 +23,7 @@
 
 #include <stdexcept>
 
-void PxThread::stop() {
-    throw std::runtime_error("Not Implemented");
-}
-
-void PxThread::resume() {
-    throw std::runtime_error("Not Implemented");
-}
-
-void PxThread::kill() {
+void PxThread::signal(Signal s) {
     throw std::runtime_error("Not Implemented");
 }
 

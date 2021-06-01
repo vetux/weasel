@@ -17,32 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXTHREAD_HPP
-#define WEASEL_PXTHREAD_HPP
+#ifndef WEASEL_PLATFORM_HPP
+#define WEASEL_PLATFORM_HPP
 
-#include "sched/thread.hpp"
-
-class PxThread : public Thread {
-public:
-    ~PxThread() override = default;
-
-    void signal(Signal s) override;
-
-    ExecutionState getState() override;
-
-    std::string getName() override;
-
-    int getTID() override;
-
-    float getCPU() override;
-
-    long getVirtualMemorySize() override;
-
-    long getReservedMemorySize() override;
-
-    long getSharedMemorySize() override;
-
-    int getProcess() override;
+enum Platform {
+    POSIX,
+    WIN32
 };
 
-#endif //WEASEL_PXTHREAD_HPP
+#endif //WEASEL_PLATFORM_HPP

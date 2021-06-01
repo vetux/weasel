@@ -17,32 +17,30 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXTHREAD_HPP
-#define WEASEL_PXTHREAD_HPP
+#ifndef WEASEL_SIGNAL_HPP
+#define WEASEL_SIGNAL_HPP
 
-#include "sched/thread.hpp"
-
-class PxThread : public Thread {
-public:
-    ~PxThread() override = default;
-
-    void signal(Signal s) override;
-
-    ExecutionState getState() override;
-
-    std::string getName() override;
-
-    int getTID() override;
-
-    float getCPU() override;
-
-    long getVirtualMemorySize() override;
-
-    long getReservedMemorySize() override;
-
-    long getSharedMemorySize() override;
-
-    int getProcess() override;
+//Posix conforming signals, not all values are implemented depending on the platform.
+enum Signal {
+    SIGHUP,
+    SIGINT,
+    SIGQUIT,
+    SIGILL,
+    SIGABRT,
+    SIGFPE,
+    SIGKILL,
+    SIGSEGV,
+    SIGPIPE,
+    SIGALRM,
+    SIGTERM,
+    SIGUSR1,
+    SIGUSR2,
+    SIGCHLD,
+    SIGCONT,
+    SIGSTOP,
+    SIGTSTP,
+    SIGTTIN,
+    SIGTTOU
 };
 
-#endif //WEASEL_PXTHREAD_HPP
+#endif //WEASEL_SIGNAL_HPP

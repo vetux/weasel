@@ -24,16 +24,8 @@
 
 #include <stdexcept>
 
-void PxProcess::stop() {
-    throw std::runtime_error("Not Implemented");
-}
+void PxProcess::signal(Signal s) {
 
-void PxProcess::resume() {
-    throw std::runtime_error("Not Implemented");
-}
-
-void PxProcess::kill() {
-    throw std::runtime_error("Not Implemented");
 }
 
 ExecutionState PxProcess::getState() {

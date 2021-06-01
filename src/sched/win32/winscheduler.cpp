@@ -25,6 +25,10 @@ Scheduler *Scheduler::createScheduler() {
     return new WinScheduler();
 }
 
+OperatingSystem Scheduler::getPlatform() {
+    return WIN32;
+}
+
 std::vector<Process *> WinScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }

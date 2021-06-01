@@ -25,25 +25,18 @@
 
 #include "sched/thread.hpp"
 #include "sched/executionstate.hpp"
+#include "sched/signal.hpp"
 
 class Process {
 public:
     virtual ~Process() = default;
 
     /**
-     * Stop the process
+     * Send the signal to the process.
+     *
+     * @param s The signal to be sent.
      */
-    virtual void stop() = 0;
-
-    /**
-     * Resume the stopped process
-     */
-    virtual void resume() = 0;
-
-    /**
-     * Kill the process and all its child processes / threads
-     */
-    virtual void kill() = 0;
+    virtual void signal(Signal s) = 0;
 
     /**
      * @return The state of the process main thread
@@ -61,7 +54,7 @@ public:
     virtual int getPID() = 0;
 
     /**
-     * @return The cpu usage between 0 - 1 used by the process
+     * @return The cpu usage of the process.
      */
     virtual float getCPU() = 0;
 

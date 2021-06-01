@@ -24,11 +24,9 @@
 
 class PxProcess : public Process {
 public:
-    void stop() override;
+    ~PxProcess() override = default;
 
-    void resume() override;
-
-    void kill() override;
+    void signal(Signal s) override;
 
     ExecutionState getState() override;
 

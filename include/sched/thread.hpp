@@ -23,25 +23,18 @@
 #include <string>
 
 #include "sched/executionstate.hpp"
+#include "sched/signal.hpp"
 
 class Thread {
 public:
     virtual ~Thread() = default;
 
     /**
-     * Stop the thread
+     * Send the signal to the thread.
+     *
+     * @param s The signal to be sent.
      */
-    virtual void stop() = 0;
-
-    /**
-     * Resume the stopped thread
-     */
-    virtual void resume() = 0;
-
-    /**
-     * Kill the thread
-     */
-    virtual void kill() = 0;
+    virtual void signal(Signal s) = 0;
 
     /**
      * @return The state of the thread

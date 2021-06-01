@@ -26,6 +26,8 @@
 
 class PxScheduler : public Scheduler {
 public:
+    ~PxScheduler() override = default;
+
     std::vector<Process *> getProcesses() override;
 
 private:

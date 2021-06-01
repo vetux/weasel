@@ -21,6 +21,7 @@
 #define WEASEL_SCHEDULER_HPP
 
 #include "sched/process.hpp"
+#include "sched/platform.hpp"
 
 class Scheduler {
 public:
@@ -30,6 +31,11 @@ public:
      * @return A new scheduler instance
      */
     static Scheduler *createScheduler();
+
+    /**
+     * @return The platform targeted when compiling the application.
+     */
+    static Platform getPlatform();
 
     virtual ~Scheduler() = default;
 
