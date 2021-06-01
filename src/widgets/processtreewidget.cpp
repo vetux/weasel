@@ -17,30 +17,16 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
-
-#include <QMainWindow>
-
-#include "sched/scheduler.hpp"
-
 #include "widgets/processtreewidget.hpp"
-#include "widgets/toolbarwidget.hpp"
 
-class MainWindow : public QMainWindow {
-Q_OBJECT
-public:
-    MainWindow();
+ProcessTreeWidget::ProcessTreeWidget() {
 
-    ~MainWindow() override;
+}
 
-private:
-    void setupMenuBar();
+ProcessTreeWidget::~ProcessTreeWidget() {
 
-    Scheduler *sched;
+}
 
-    ToolbarWidget *toolbar;
-    ProcessTreeWidget *procTree;
-};
+void ProcessTreeWidget::setProcesses(const std::vector<Process *> &processes) {
 
-#endif //WEASEL_MAINWINDOW_HPP
+}

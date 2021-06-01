@@ -19,10 +19,20 @@
 
 #include "widgets/mainwindow.hpp"
 
+#include <QMenuBar>
+
 MainWindow::MainWindow() {
     sched = Scheduler::createScheduler();
+    setupMenuBar();
 }
 
 MainWindow::~MainWindow() {
     delete sched;
+}
+
+void MainWindow::setupMenuBar() {
+    menuBar()->addMenu("Weasel");
+    menuBar()->addMenu("View");
+    menuBar()->addMenu("Tools");
+    menuBar()->addMenu("Help");
 }

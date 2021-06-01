@@ -17,30 +17,18 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
+#ifndef WEASEL_TOOLBARWIDGET_HPP
+#define WEASEL_TOOLBARWIDGET_HPP
 
-#include <QMainWindow>
+#include <QWidget>
 
-#include "sched/scheduler.hpp"
-
-#include "widgets/processtreewidget.hpp"
-#include "widgets/toolbarwidget.hpp"
-
-class MainWindow : public QMainWindow {
+class ToolbarWidget : public QWidget {
 Q_OBJECT
+signals:
 public:
-    MainWindow();
+    ToolbarWidget();
 
-    ~MainWindow() override;
-
-private:
-    void setupMenuBar();
-
-    Scheduler *sched;
-
-    ToolbarWidget *toolbar;
-    ProcessTreeWidget *procTree;
+    ~ToolbarWidget() override;
 };
 
-#endif //WEASEL_MAINWINDOW_HPP
+#endif //WEASEL_TOOLBARWIDGET_HPP
