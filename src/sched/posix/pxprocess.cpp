@@ -24,10 +24,6 @@
 
 #include <stdexcept>
 
-void PxProcess::signal(Signal s) {
-
-}
-
 ExecutionState PxProcess::getState() {
     throw std::runtime_error("Not Implemented");
 }

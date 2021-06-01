@@ -26,8 +26,6 @@ class PxThread : public Thread {
 public:
     ~PxThread() override = default;
 
-    void signal(Signal s) override;
-
     ExecutionState getState() override;
 
     std::string getName() override;

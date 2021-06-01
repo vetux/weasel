@@ -32,13 +32,6 @@ public:
     virtual ~Process() = default;
 
     /**
-     * Send the signal to the process.
-     *
-     * @param s The signal to be sent.
-     */
-    virtual void signal(Signal s) = 0;
-
-    /**
      * @return The state of the process main thread
      */
     virtual ExecutionState getState() = 0;

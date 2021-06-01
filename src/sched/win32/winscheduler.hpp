@@ -24,7 +24,13 @@
 
 class WinScheduler : public Scheduler {
 public:
+    ~WinScheduler() override = default;
+
     std::vector<Process *> getProcesses() override;
+
+    void signal(Process *process, Signal signal) override;
+
+    void signal(Thread *thread, Signal signal) override;
 };
 
 #endif //WEASEL_WINSCHEDULER_HPP

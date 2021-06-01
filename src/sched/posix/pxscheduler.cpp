@@ -35,3 +35,11 @@ std::vector<Process *> PxScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
+void PxScheduler::signal(Process *process, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void PxScheduler::signal(Thread *thread, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+

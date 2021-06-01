@@ -30,13 +30,6 @@ public:
     virtual ~Thread() = default;
 
     /**
-     * Send the signal to the thread.
-     *
-     * @param s The signal to be sent.
-     */
-    virtual void signal(Signal s) = 0;
-
-    /**
      * @return The state of the thread
      */
     virtual ExecutionState getState() = 0;

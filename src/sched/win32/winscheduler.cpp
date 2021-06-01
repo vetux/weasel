@@ -32,3 +32,11 @@ OperatingSystem Scheduler::getPlatform() {
 std::vector<Process *> WinScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
+
+void WinScheduler::signal(Process *process, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void WinScheduler::signal(Thread *thread, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}

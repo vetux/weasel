@@ -44,9 +44,29 @@ public:
      *
      * The scheduler is responsible for deleting the process pointers.
      *
+     * The process and thread interfaces are read only interfaces, the only way for code to change something
+     * in the process tree is through signals passing through the scheduler abstraction,
+     * or other scheduler member methods (eg process priority).
+     *
      * @return The list of currently active processes.
      */
     virtual std::vector<Process *> getProcesses() = 0;
+
+    /**
+     * Send the signal to a process.
+     *
+     * @param process The process to send the signal to
+     * @param signal The signal to send
+     */
+    virtual void signal(Process *process, Signal signal) = 0;
+
+    /**
+     * Send the signal to a thread.
+     *
+     * @param thread The thread to send the signal to
+     * @param signal The signal to send
+     */
+    virtual void signal(Thread *thread, Signal signal) = 0;
 };
 
 #endif //WEASEL_SCHEDULER_HPP

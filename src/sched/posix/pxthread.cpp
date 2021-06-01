@@ -23,10 +23,6 @@
 
 #include <stdexcept>
 
-void PxThread::signal(Signal s) {
-    throw std::runtime_error("Not Implemented");
-}
-
 ExecutionState PxThread::getState() {
     throw std::runtime_error("Not Implemented");
 }

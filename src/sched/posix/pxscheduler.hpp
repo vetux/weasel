@@ -30,6 +30,10 @@ public:
 
     std::vector<Process *> getProcesses() override;
 
+    void signal(Process *process, Signal signal) override;
+
+    void signal(Thread *thread, Signal signal) override;
+
 private:
     std::vector<PxProcess *> processes;
 };
