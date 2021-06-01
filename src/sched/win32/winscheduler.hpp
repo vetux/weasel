@@ -17,22 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
-
-#include <QMainWindow>
+#ifndef WEASEL_WINSCHEDULER_HPP
+#define WEASEL_WINSCHEDULER_HPP
 
 #include "sched/scheduler.hpp"
 
-class MainWindow : public QMainWindow {
-Q_OBJECT
+class WinScheduler : public Scheduler {
 public:
-    MainWindow();
-
-    ~MainWindow() override;
-
-private:
-    Scheduler *sched;
+    std::vector<Process *> getProcesses() override;
 };
 
-#endif //WEASEL_MAINWINDOW_HPP
+#endif //WEASEL_WINSCHEDULER_HPP

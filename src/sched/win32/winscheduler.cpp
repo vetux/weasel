@@ -17,22 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
+#include "sched/win32/winscheduler.hpp"
 
-#include <QMainWindow>
+#include <stdexcept>
 
-#include "sched/scheduler.hpp"
+Scheduler *Scheduler::createScheduler() {
+    return new WinScheduler();
+}
 
-class MainWindow : public QMainWindow {
-Q_OBJECT
-public:
-    MainWindow();
-
-    ~MainWindow() override;
-
-private:
-    Scheduler *sched;
-};
-
-#endif //WEASEL_MAINWINDOW_HPP
+std::vector<Process *> WinScheduler::getProcesses() {
+    throw std::runtime_error("Not Implemented");
+}

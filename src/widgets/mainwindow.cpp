@@ -20,9 +20,9 @@
 #include "widgets/mainwindow.hpp"
 
 MainWindow::MainWindow() {
-
+    sched = Scheduler::createScheduler();
 }
 
 MainWindow::~MainWindow() {
-
+    delete sched;
 }

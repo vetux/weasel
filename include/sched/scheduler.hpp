@@ -17,22 +17,30 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
+#ifndef WEASEL_SCHEDULER_HPP
+#define WEASEL_SCHEDULER_HPP
 
-#include <QMainWindow>
+#include "sched/process.hpp"
 
-#include "sched/scheduler.hpp"
-
-class MainWindow : public QMainWindow {
-Q_OBJECT
+class Scheduler {
 public:
-    MainWindow();
+    /**
+     * This method creates the scheduler instance suitable for the platform targeted when compiling the application.
+     *
+     * @return A new scheduler instance
+     */
+    static Scheduler *createScheduler();
 
-    ~MainWindow() override;
+    virtual ~Scheduler() = default;
 
-private:
-    Scheduler *sched;
+    /**
+     * This method polls the operating system for active processes and returns them.
+     *
+     * The scheduler is responsible for deleting the process pointers.
+     *
+     * @return The list of currently active processes.
+     */
+    virtual std::vector<Process *> getProcesses() = 0;
 };
 
-#endif //WEASEL_MAINWINDOW_HPP
+#endif //WEASEL_SCHEDULER_HPP

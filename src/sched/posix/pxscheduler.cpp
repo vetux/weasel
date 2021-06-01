@@ -1,3 +1,5 @@
+#include <vector>
+
 /**
  *  Weasel  -   Gui Process Explorer
  *  Copyright (C) 2021  Julian Zampiccoli
@@ -17,22 +19,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MAINWINDOW_HPP
-#define WEASEL_MAINWINDOW_HPP
+#include "sched/posix/pxscheduler.hpp"
 
-#include <QMainWindow>
+#include <stdexcept>
 
-#include "sched/scheduler.hpp"
+Scheduler *Scheduler::createScheduler() {
+    return new PxScheduler();
+}
 
-class MainWindow : public QMainWindow {
-Q_OBJECT
-public:
-    MainWindow();
-
-    ~MainWindow() override;
-
-private:
-    Scheduler *sched;
-};
-
-#endif //WEASEL_MAINWINDOW_HPP
+std::vector<Process *> PxScheduler::getProcesses() {
+    throw std::runtime_error("Not Implemented");
+}
