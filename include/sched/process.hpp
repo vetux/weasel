@@ -26,20 +26,36 @@
 #include "sched/thread.hpp"
 #include "sched/executionstate.hpp"
 #include "sched/signal.hpp"
+#include "sched/token.hpp"
 
 class Process {
 public:
     virtual ~Process() = default;
 
     /**
-     * @return The state of the process main thread
+     * @return The token associated with this process
      */
-    virtual ExecutionState getState() = 0;
+    virtual Token *getToken() = 0;
 
     /**
      * @return The name of the process
      */
     virtual std::string getName() = 0;
+
+    /**
+     * @return The description of the process
+     */
+    virtual std::string getDescription() = 0;
+
+    /**
+     * @return The absolute path of the process executable image
+     */
+    virtual std::string getImagePath() = 0;
+
+    /**
+     * @return The state of the process main thread
+     */
+    virtual ExecutionState getState() = 0;
 
     /**
      * @return The process id

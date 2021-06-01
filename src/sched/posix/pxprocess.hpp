@@ -26,9 +26,15 @@ class PxProcess : public Process {
 public:
     ~PxProcess() override = default;
 
-    ExecutionState getState() override;
+    Token *getToken() override;
 
     std::string getName() override;
+
+    std::string getDescription() override;
+
+    std::string getImagePath() override;
+
+    ExecutionState getState() override;
 
     int getPID() override;
 

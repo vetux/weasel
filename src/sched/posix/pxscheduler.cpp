@@ -31,7 +31,7 @@ Platform Scheduler::getPlatform() {
     return POSIX;
 }
 
-std::vector<Process *> PxScheduler::getProcesses() {
+const std::map<int, Process *> &PxScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 

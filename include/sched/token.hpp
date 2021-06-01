@@ -17,16 +17,16 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "widgets/processtreewidget.hpp"
+#ifndef WEASEL_TOKEN_HPP
+#define WEASEL_TOKEN_HPP
 
-ProcessTreeWidget::ProcessTreeWidget() {
+#include <string>
 
-}
+class Token {
+public:
+    virtual std::string getUserName() = 0;
 
-ProcessTreeWidget::~ProcessTreeWidget() {
+    virtual bool isElevated() = 0;
+};
 
-}
-
-void ProcessTreeWidget::setProcesses(const std::map<int, Process *> &processes) {
-
-}
+#endif //WEASEL_TOKEN_HPP

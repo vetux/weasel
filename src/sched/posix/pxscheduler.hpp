@@ -20,6 +20,8 @@
 #ifndef WEASEL_PXSCHEDULER_HPP
 #define WEASEL_PXSCHEDULER_HPP
 
+#include <map>
+
 #include "sched/scheduler.hpp"
 
 #include "sched/posix/pxprocess.hpp"
@@ -28,14 +30,14 @@ class PxScheduler : public Scheduler {
 public:
     ~PxScheduler() override = default;
 
-    std::vector<Process *> getProcesses() override;
+    const std::map<int, Process *> &getProcesses() override;
 
     void signal(Process *process, Signal signal) override;
 
     void signal(Thread *thread, Signal signal) override;
 
 private:
-    std::vector<PxProcess *> processes;
+    std::map<int, PxProcess *> processes;
 };
 
 #endif //WEASEL_PXSCHEDULER_HPP

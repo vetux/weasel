@@ -48,9 +48,9 @@ public:
      * in the process tree is through signals passing through the scheduler abstraction,
      * or other scheduler member methods (eg process priority).
      *
-     * @return The list of currently active processes.
+     * @return The map of currently active processes with the PID as key.
      */
-    virtual std::vector<Process *> getProcesses() = 0;
+    virtual const std::map<int, Process *> &getProcesses() = 0;
 
     /**
      * Send the signal to a process.
