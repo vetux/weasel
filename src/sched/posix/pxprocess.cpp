@@ -36,6 +36,10 @@ void PxProcess::kill() {
     throw std::runtime_error("Not Implemented");
 }
 
+ExecutionState PxProcess::getState() {
+    throw std::runtime_error("Not Implemented");
+}
+
 std::string PxProcess::getName() {
     throw std::runtime_error("Not Implemented");
 }

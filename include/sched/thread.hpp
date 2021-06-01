@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "sched/executionstate.hpp"
+
 class Thread {
 public:
     virtual ~Thread() = default;
@@ -42,6 +44,11 @@ public:
     virtual void kill() = 0;
 
     /**
+     * @return The state of the thread
+     */
+    virtual ExecutionState getState() = 0;
+
+    /**
      * @return The thread name
      */
     virtual std::string getName() = 0;
@@ -52,22 +59,22 @@ public:
     virtual int getTID() = 0;
 
     /**
-     * @return The cpu usage of this thread between 0 - 1
+     * @return The cpu usage of the thread between 0 - 1
      */
     virtual float getCPU() = 0;
 
     /**
-     * @return The number of bytes of virtual memory used by this thread.
+     * @return The number of bytes of virtual memory used by the thread.
      */
     virtual long getVirtualMemorySize() = 0;
 
     /**
-     * @return The number of bytes of reserved memory used by this thread.
+     * @return The number of bytes of reserved memory used by the thread.
      */
     virtual long getReservedMemorySize() = 0;
 
     /**
-     * @return The number of bytes of shared memory used by this thread.
+     * @return The number of bytes of shared memory used by the thread.
      */
     virtual long getSharedMemorySize() = 0;
 

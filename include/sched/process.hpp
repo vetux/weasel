@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "sched/thread.hpp"
+#include "sched/executionstate.hpp"
 
 class Process {
 public:
@@ -45,6 +46,11 @@ public:
     virtual void kill() = 0;
 
     /**
+     * @return The state of the process main thread
+     */
+    virtual ExecutionState getState() = 0;
+
+    /**
      * @return The name of the process
      */
     virtual std::string getName() = 0;
@@ -55,22 +61,22 @@ public:
     virtual int getPID() = 0;
 
     /**
-     * @return The cpu usage between 0 - 1
+     * @return The cpu usage between 0 - 1 used by the process
      */
     virtual float getCPU() = 0;
 
     /**
-     * @return The number of bytes of virtual memory.
+     * @return The number of bytes of virtual memory used by the process.
      */
     virtual long getVirtualMemorySize() = 0;
 
     /**
-     * @return The number of bytes of reserved memory.
+     * @return The number of bytes of reserved memory used by the process.
      */
     virtual long getReservedMemorySize() = 0;
 
     /**
-     * @return The number of bytes of shared memory.
+     * @return The number of bytes of shared memory used by the process.
      */
     virtual long getSharedMemorySize() = 0;
 

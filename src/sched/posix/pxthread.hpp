@@ -30,6 +30,8 @@ public:
 
     void kill() override;
 
+    ExecutionState getState() override;
+
     std::string getName() override;
 
     int getTID() override;

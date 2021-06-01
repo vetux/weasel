@@ -17,36 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXPROCESS_HPP
-#define WEASEL_PXPROCESS_HPP
+#ifndef WEASEL_EXECUTIONSTATE_HPP
+#define WEASEL_EXECUTIONSTATE_HPP
 
-#include "sched/process.hpp"
-
-class PxProcess : public Process {
-public:
-    void stop() override;
-
-    void resume() override;
-
-    void kill() override;
-
-    ExecutionState getState() override;
-
-    std::string getName() override;
-
-    int getPID() override;
-
-    float getCPU() override;
-
-    long getVirtualMemorySize() override;
-
-    long getReservedMemorySize() override;
-
-    long getSharedMemorySize() override;
-
-    int getParent() override;
-
-    std::vector<Thread *> getThreads() override;
+enum ExecutionState {
+    PAUSE, //The execution is paused
+    ACTIVE, //The execution is active
+    FINISH //The execution is finished
 };
 
-#endif //WEASEL_PXPROCESS_HPP
+#endif //WEASEL_EXECUTIONSTATE_HPP

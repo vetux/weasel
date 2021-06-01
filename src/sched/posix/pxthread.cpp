@@ -35,6 +35,10 @@ void PxThread::kill() {
     throw std::runtime_error("Not Implemented");
 }
 
+ExecutionState PxThread::getState() {
+    throw std::runtime_error("Not Implemented");
+}
+
 std::string PxThread::getName() {
     throw std::runtime_error("Not Implemented");
 }
