@@ -26,11 +26,19 @@ class WinScheduler : public Scheduler {
 public:
     ~WinScheduler() override = default;
 
-    std::vector<Process *> getProcesses() override;
+    const std::map<int, Process> &getProcesses() override;
 
     long getTotalPhysicalMemory() override;
 
     long getUsedPhysicalMemory() override;
+
+    void signal(const Process &process, Signal signal) override;
+
+    void signal(const Thread &thread, Signal signal) override;
+
+    void setPriority(const Process &process, int priority) override;
+
+    void setPriority(const Thread &thread, int priority) override;
 };
 
 #endif //WEASEL_WINSCHEDULER_HPP

@@ -25,11 +25,11 @@ Scheduler *Scheduler::createScheduler() {
     return new WinScheduler();
 }
 
-OperatingSystem Scheduler::getPlatform() {
+Platform Scheduler::getPlatform() {
     return WIN32;
 }
 
-std::vector<Process *> WinScheduler::getProcesses() {
+const std::map<int, Process> &WinScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
@@ -38,5 +38,21 @@ long WinScheduler::getTotalPhysicalMemory() {
 }
 
 long WinScheduler::getUsedPhysicalMemory() {
+    throw std::runtime_error("Not Implemented");
+}
+
+void WinScheduler::signal(const Process &process, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void WinScheduler::signal(const Thread &thread, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void WinScheduler::setPriority(const Process &process, int priority) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void WinScheduler::setPriority(const Thread &thread, int priority) {
     throw std::runtime_error("Not Implemented");
 }
