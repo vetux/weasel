@@ -23,6 +23,7 @@
 #include "sched/process.hpp"
 #include "sched/platform.hpp"
 #include "sched/signal.hpp"
+#include "sched/memory.hpp"
 
 class Scheduler {
 public:
@@ -52,14 +53,11 @@ public:
     virtual const std::map<int, Process> &getProcesses() = 0;
 
     /**
-     * @return The total amount of physical memory in bytes
+     *This method polls the operating system for memory information and returns a reference to it.
+     *
+     * @return The memory information
      */
-    virtual long getTotalPhysicalMemory() = 0;
-
-    /**
-     * @return The used amount of physical memory in bytes
-     */
-    virtual long getUsedPhysicalMemory() = 0;
+    virtual const Memory &getMemory() = 0;
 
     /**
      * Send the signal to the process
@@ -88,7 +86,7 @@ public:
     /**
      * Set the thread priority
      *
-     * @param process The thread to set the priority of
+     * @param thread The thread to set the priority of
      * @param priority The priority to set
      */
     virtual void setPriority(const Thread &thread, int priority) = 0;

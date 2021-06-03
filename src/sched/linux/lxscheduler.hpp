@@ -30,9 +30,7 @@ public:
 
     const std::map<int, Process> &getProcesses() override;
 
-    long getTotalPhysicalMemory() override;
-
-    long getUsedPhysicalMemory() override;
+    const Memory &getMemory() override;
 
     void signal(const Process &process, Signal signal) override;
 
@@ -44,6 +42,7 @@ public:
 
 private:
     std::map<int, Process> processes;
+    Memory memory;
 };
 
 #endif //WEASEL_LXSCHEDULER_HPP

@@ -33,11 +33,7 @@ const std::map<int, Process> &WinScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
-long WinScheduler::getTotalPhysicalMemory() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long WinScheduler::getUsedPhysicalMemory() {
+const Memory &WinScheduler::getMemory() {
     throw std::runtime_error("Not Implemented");
 }
 

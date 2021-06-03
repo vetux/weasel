@@ -21,7 +21,7 @@
 #define WEASEL_PLATFORM_HPP
 
 enum Platform {
-    POSIX,
+    LINUX,
     WIN32
 };
 

@@ -17,26 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_WINSCHEDULER_HPP
-#define WEASEL_WINSCHEDULER_HPP
+#ifndef WEASEL_MEMORY_HPP
+#define WEASEL_MEMORY_HPP
 
-#include "sched/scheduler.hpp"
-
-class WinScheduler : public Scheduler {
-public:
-    ~WinScheduler() override = default;
-
-    const std::map<int, Process> &getProcesses() override;
-
-    const Memory &getMemory() override;
-
-    void signal(const Process &process, Signal signal) override;
-
-    void signal(const Thread &thread, Signal signal) override;
-
-    void setPriority(const Process &process, int priority) override;
-
-    void setPriority(const Thread &thread, int priority) override;
+struct Memory {
+    long totalPhysical;
+    long usedPhysical;
 };
 
-#endif //WEASEL_WINSCHEDULER_HPP
+#endif //WEASEL_MEMORY_HPP
