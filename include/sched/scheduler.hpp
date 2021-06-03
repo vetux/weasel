@@ -53,7 +53,7 @@ public:
     virtual const std::map<int, Process> &getProcesses() = 0;
 
     /**
-     *This method polls the operating system for memory information and returns a reference to it.
+     * This method polls the operating system for memory information and returns a reference to it.
      *
      * @return The memory information
      */

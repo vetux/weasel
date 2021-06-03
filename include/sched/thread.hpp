@@ -26,12 +26,12 @@ struct Thread {
     int TID;
     int PID;
     int UID;
+
     std::string name;
+
     long memVirt;
     long memRes;
     long memShared;
-    float cpu;
-    bool isPaused;
 };
 
 #endif //WEASEL_THREAD_HPP

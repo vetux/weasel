@@ -28,16 +28,18 @@
 struct Process {
     int PID;
     int UID;
+
     std::string name;
-    std::string description;
     std::string command;
+
     int priority;
-    bool paused;
-    float cpu;
+
     long memVirt;
     long memRes;
     long memShared;
-    int parent;
+
+    int parentPID;
+
     std::vector<Thread> threads;
 };
 

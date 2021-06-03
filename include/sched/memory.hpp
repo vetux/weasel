@@ -21,8 +21,9 @@
 #define WEASEL_MEMORY_HPP
 
 struct Memory {
-    long totalPhysical;
-    long usedPhysical;
+    long total;
+    long free;
+    long available;
 };
 
 #endif //WEASEL_MEMORY_HPP
