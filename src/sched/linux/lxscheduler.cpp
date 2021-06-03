@@ -31,7 +31,7 @@ Platform Scheduler::getPlatform() {
     return POSIX;
 }
 
-const std::map<int, Process *> &LxScheduler::getProcesses() {
+const std::map<int, Process> &LxScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
@@ -40,6 +40,22 @@ long LxScheduler::getTotalPhysicalMemory() {
 }
 
 long LxScheduler::getUsedPhysicalMemory() {
+    throw std::runtime_error("Not Implemented");
+}
+
+void LxScheduler::signal(const Process &process, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void LxScheduler::signal(const Thread &thread, Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void LxScheduler::setPriority(const Process &process, int priority) {
+    throw std::runtime_error("Not Implemented");
+}
+
+void LxScheduler::setPriority(const Thread &thread, int priority) {
     throw std::runtime_error("Not Implemented");
 }
 

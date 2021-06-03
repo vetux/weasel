@@ -22,63 +22,16 @@
 
 #include <string>
 
-#include "sched/signal.hpp"
-
-class Thread {
-public:
-    virtual ~Thread() = default;
-
-    /**
-     * Send the signal to the thread.
-     *
-     * @param signal The signal to send
-     */
-    virtual void signal(Signal signal) = 0;
-
-    /**
-     * @return true if the thread is paused
-     */
-    virtual bool isPaused() = 0;
-
-    /**
-     * @return The user id of the thread owner.
-     */
-    virtual int getUID() = 0;
-
-    /**
-     * @return The thread name
-     */
-    virtual std::string getName() = 0;
-
-    /**
-     * @return The thread id
-     */
-    virtual int getTID() = 0;
-
-    /**
-     * @return The cpu usage of the thread between 0 - 1
-     */
-    virtual float getCPU() = 0;
-
-    /**
-     * @return The number of bytes of virtual memory used by the thread.
-     */
-    virtual long getVirtualMemorySize() = 0;
-
-    /**
-     * @return The number of bytes of reserved memory used by the thread.
-     */
-    virtual long getReservedMemorySize() = 0;
-
-    /**
-     * @return The number of bytes of shared memory used by the thread.
-     */
-    virtual long getSharedMemorySize() = 0;
-
-    /**
-     * @return The PID of the containing process
-     */
-    virtual int getProcess() = 0;
+struct Thread {
+    int TID;
+    int PID;
+    int UID;
+    std::string name;
+    long memVirt;
+    long memRes;
+    long memShared;
+    float cpu;
+    bool isPaused;
 };
 
 #endif //WEASEL_THREAD_HPP

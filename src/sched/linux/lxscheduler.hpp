@@ -24,20 +24,26 @@
 
 #include "sched/scheduler.hpp"
 
-#include "sched/linux/lxprocess.hpp"
-
 class LxScheduler : public Scheduler {
 public:
     ~LxScheduler() override = default;
 
-    const std::map<int, Process *> &getProcesses() override;
+    const std::map<int, Process> &getProcesses() override;
 
     long getTotalPhysicalMemory() override;
 
     long getUsedPhysicalMemory() override;
 
+    void signal(const Process &process, Signal signal) override;
+
+    void signal(const Thread &thread, Signal signal) override;
+
+    void setPriority(const Process &process, int priority) override;
+
+    void setPriority(const Thread &thread, int priority) override;
+
 private:
-    std::map<int, LxProcess *> processes;
+    std::map<int, Process> processes;
 };
 
 #endif //WEASEL_LXSCHEDULER_HPP

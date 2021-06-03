@@ -23,21 +23,22 @@
 #include <QWidget>
 
 #include "sched/process.hpp"
+#include "sched/signal.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
 signals:
 
-    void processSignalRequested(Process *proc, Signal signal);
+    void processSignalRequested(const Process &proc, Signal signal);
 
-    void threadSignalRequested(Thread *thread, Signal signal);
+    void threadSignalRequested(const Thread &thread, Signal signal);
 
 public:
     ProcessTreeWidget();
 
     ~ProcessTreeWidget() override;
 
-    void setProcesses(const std::map<int, Process *> &processes);
+    void setProcesses(const std::map<int, Process> &processes);
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

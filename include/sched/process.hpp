@@ -24,92 +24,21 @@
 #include <vector>
 
 #include "sched/thread.hpp"
-#include "sched/signal.hpp"
 
-class Process {
-public:
-    virtual ~Process() = default;
-
-    /**
-     * Send the signal to the process.
-     *
-     * @param signal The signal to send
-     */
-    virtual void signal(Signal signal) = 0;
-
-    /**
-     * Set the process priority value between +19 (low priority) to -20 (high priority).
-     *
-     * @param priority The new priority value.
-     */
-    virtual void setPriority(int priority) = 0;
-
-    /**
-     * Get the process priority value.
-     *
-     * @return The process priority value
-     */
-    virtual int getPriority() = 0;
-
-    /**
-     * @return The user id of the process owner.
-     */
-    virtual int getUID() = 0;
-
-    /**
-     * @return The name of the process
-     */
-    virtual std::string getName() = 0;
-
-    /**
-     * @return The description of the process
-     */
-    virtual std::string getDescription() = 0;
-
-    /**
-     * @return The absolute path of the process executable image
-     */
-    virtual std::string getImagePath() = 0;
-
-    /**
-     * @return true if the process is paused
-     */
-    virtual bool isPaused() = 0;
-
-    /**
-     * @return The process id
-     */
-    virtual int getPID() = 0;
-
-    /**
-     * @return The cpu usage of the process.
-     */
-    virtual float getCPU() = 0;
-
-    /**
-     * @return The number of bytes of virtual memory used by the process.
-     */
-    virtual long getVirtualMemorySize() = 0;
-
-    /**
-     * @return The number of bytes of reserved memory used by the process.
-     */
-    virtual long getReservedMemorySize() = 0;
-
-    /**
-     * @return The number of bytes of shared memory used by the process.
-     */
-    virtual long getSharedMemorySize() = 0;
-
-    /**
-     * @return The PID of the parent process if it has one, otherwise -1
-     */
-    virtual int getParent() = 0;
-
-    /**
-     * @return The list of threads associated with this process, thread 0 is always the main (Process) thread.
-     */
-    virtual std::vector<Thread *> getThreads() = 0;
+struct Process {
+    int PID;
+    int UID;
+    std::string name;
+    std::string description;
+    std::string command;
+    int priority;
+    bool paused;
+    float cpu;
+    long memVirt;
+    long memRes;
+    long memShared;
+    int parent;
+    std::vector<Thread> threads;
 };
 
 #endif //WEASEL_PROCESS_HPP
