@@ -15,7 +15,7 @@ message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 if (WIN32)
     file(GLOB_RECURSE SRC src/widgets/*.cpp src/main.cpp src/sched/win32/*.cpp)
 elseif (UNIX)
-    file(GLOB_RECURSE SRC src/widgets/*.cpp src/main.cpp src/sched/posix/*.cpp)
+    file(GLOB_RECURSE SRC src/widgets/*.cpp src/main.cpp src/sched/linux/*.cpp)
 endif ()
 
 file(GLOB_RECURSE HDR include/*.hpp)

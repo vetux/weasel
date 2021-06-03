@@ -17,27 +17,49 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXSCHEDULER_HPP
-#define WEASEL_PXSCHEDULER_HPP
+#ifndef WEASEL_LXPROCESS_HPP
+#define WEASEL_LXPROCESS_HPP
 
-#include <map>
+#include "sched/process.hpp"
 
-#include "sched/scheduler.hpp"
+#include <csignal>
 
-#include "sched/posix/pxprocess.hpp"
-
-class PxScheduler : public Scheduler {
+class LxProcess : public Process {
 public:
-    ~PxScheduler() override = default;
+    ~LxProcess() override = default;
 
-    const std::map<int, Process *> &getProcesses() override;
+    void signal(Signal signal) override;
 
-    long getTotalPhysicalMemory() override;
+    void setPriority(int priority) override;
 
-    long getUsedPhysicalMemory() override;
+    int getPriority() override;
+
+    int getUID() override;
+
+    std::string getName() override;
+
+    std::string getDescription() override;
+
+    std::string getImagePath() override;
+
+    bool isPaused() override;
+
+    int getPID() override;
+
+    float getCPU() override;
+
+    long getVirtualMemorySize() override;
+
+    long getReservedMemorySize() override;
+
+    long getSharedMemorySize() override;
+
+    int getParent() override;
+
+    std::vector<Thread *> getThreads() override;
 
 private:
-    std::map<int, PxProcess *> processes;
+    pid_t pid;
 };
 
-#endif //WEASEL_PXSCHEDULER_HPP
+#endif //WEASEL_LXPROCESS_HPP

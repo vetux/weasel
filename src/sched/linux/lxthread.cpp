@@ -1,5 +1,4 @@
 #include <string>
-#include <vector>
 
 /**
  *  Weasel  -   Gui Process Explorer
@@ -20,66 +19,47 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "sched/posix/pxprocess.hpp"
+#include "sched/linux/lxthread.hpp"
 
 #include <stdexcept>
 
-void PxProcess::signal(Signal signal) {
+void LxThread::signal(Signal signal) {
     throw std::runtime_error("Not Implemented");
 }
 
-void PxProcess::setPriority(int priority) {
+
+bool LxThread::isPaused() {
     throw std::runtime_error("Not Implemented");
 }
 
-int PxProcess::getPriority() {
+int LxThread::getUID() {
     throw std::runtime_error("Not Implemented");
 }
 
-const std::string &PxProcess::getUser() {
+std::string LxThread::getName() {
     throw std::runtime_error("Not Implemented");
 }
 
-bool PxProcess::isPaused() {
+int LxThread::getTID() {
     throw std::runtime_error("Not Implemented");
 }
 
-std::string PxProcess::getName() {
+float LxThread::getCPU() {
     throw std::runtime_error("Not Implemented");
 }
 
-std::string PxProcess::getDescription() {
+long LxThread::getVirtualMemorySize() {
     throw std::runtime_error("Not Implemented");
 }
 
-std::string PxProcess::getImagePath() {
+long LxThread::getReservedMemorySize() {
     throw std::runtime_error("Not Implemented");
 }
 
-int PxProcess::getPID() {
+long LxThread::getSharedMemorySize() {
     throw std::runtime_error("Not Implemented");
 }
 
-float PxProcess::getCPU() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxProcess::getVirtualMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxProcess::getReservedMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxProcess::getSharedMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-int PxProcess::getParent() {
-    throw std::runtime_error("Not Implemented");
-}
-
-std::vector<Thread *> PxProcess::getThreads() {
+int LxThread::getProcess() {
     throw std::runtime_error("Not Implemented");
 }

@@ -17,32 +17,24 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXPROCESS_HPP
-#define WEASEL_PXPROCESS_HPP
+#ifndef WEASEL_LXTHREAD_HPP
+#define WEASEL_LXTHREAD_HPP
 
-#include "sched/process.hpp"
+#include "sched/thread.hpp"
 
-class PxProcess : public Process {
+class LxThread : public Thread {
 public:
-    ~PxProcess() override = default;
+    ~LxThread() override = default;
 
     void signal(Signal signal) override;
 
-    void setPriority(int priority) override;
+    bool isPaused() override;
 
-    int getPriority() override;
-
-    const std::string &getUser() override;
+    int getUID() override;
 
     std::string getName() override;
 
-    std::string getDescription() override;
-
-    std::string getImagePath() override;
-
-    bool isPaused() override;
-
-    int getPID() override;
+    int getTID() override;
 
     float getCPU() override;
 
@@ -52,9 +44,7 @@ public:
 
     long getSharedMemorySize() override;
 
-    int getParent() override;
-
-    std::vector<Thread *> getThreads() override;
+    int getProcess() override;
 };
 
-#endif //WEASEL_PXPROCESS_HPP
+#endif //WEASEL_LXTHREAD_HPP

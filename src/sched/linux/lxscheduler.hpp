@@ -17,34 +17,27 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PXTHREAD_HPP
-#define WEASEL_PXTHREAD_HPP
+#ifndef WEASEL_LXSCHEDULER_HPP
+#define WEASEL_LXSCHEDULER_HPP
 
-#include "sched/thread.hpp"
+#include <map>
 
-class PxThread : public Thread {
+#include "sched/scheduler.hpp"
+
+#include "sched/linux/lxprocess.hpp"
+
+class LxScheduler : public Scheduler {
 public:
-    ~PxThread() override = default;
+    ~LxScheduler() override = default;
 
-    void signal(Signal signal) override;
+    const std::map<int, Process *> &getProcesses() override;
 
-    bool isPaused() override;
+    long getTotalPhysicalMemory() override;
 
-    const std::string &getUser() override;
+    long getUsedPhysicalMemory() override;
 
-    std::string getName() override;
-
-    int getTID() override;
-
-    float getCPU() override;
-
-    long getVirtualMemorySize() override;
-
-    long getReservedMemorySize() override;
-
-    long getSharedMemorySize() override;
-
-    int getProcess() override;
+private:
+    std::map<int, LxProcess *> processes;
 };
 
-#endif //WEASEL_PXTHREAD_HPP
+#endif //WEASEL_LXSCHEDULER_HPP

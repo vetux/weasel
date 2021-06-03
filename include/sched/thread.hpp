@@ -41,9 +41,9 @@ public:
     virtual bool isPaused() = 0;
 
     /**
-     * @return The user name of the thread owner.
+     * @return The user id of the thread owner.
      */
-    virtual const std::string &getUser() = 0;
+    virtual int getUID() = 0;
 
     /**
      * @return The thread name

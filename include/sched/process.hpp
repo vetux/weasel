@@ -52,9 +52,9 @@ public:
     virtual int getPriority() = 0;
 
     /**
-     * @return The user name of the process owner.
+     * @return The user id of the process owner.
      */
-    virtual const std::string &getUser() = 0;
+    virtual int getUID() = 0;
 
     /**
      * @return The name of the process

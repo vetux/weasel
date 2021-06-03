@@ -22,25 +22,25 @@
 
 //Posix conforming signals, not all values are implemented depending on the platform.
 enum Signal {
-    SIGHUP,
-    SIGINT,
-    SIGQUIT,
-    SIGILL,
-    SIGABRT,
-    SIGFPE,
-    SIGKILL,
-    SIGSEGV,
-    SIGPIPE,
-    SIGALRM,
-    SIGTERM,
-    SIGUSR1,
-    SIGUSR2,
-    SIGCHLD,
-    SIGCONT,
-    SIGSTOP,
-    SIGTSTP,
-    SIGTTIN,
-    SIGTTOU
+    SIGNAL_SIGHUP,
+    SIGNAL_SIGINT,
+    SIGNAL_SIGQUIT,
+    SIGNAL_SIGILL,
+    SIGNAL_SIGABRT,
+    SIGNAL_SIGFPE,
+    SIGNAL_SIGKILL,
+    SIGNAL_SIGSEGV,
+    SIGNAL_SIGPIPE,
+    SIGNAL_SIGALRM,
+    SIGNAL_SIGTERM,
+    SIGNAL_SIGUSR1,
+    SIGNAL_SIGUSR2,
+    SIGNAL_SIGCHLD,
+    SIGNAL_SIGCONT,
+    SIGNAL_SIGSTOP,
+    SIGNAL_SIGTSTP,
+    SIGNAL_SIGTTIN,
+    SIGNAL_SIGTTOU
 };
 
 #endif //WEASEL_SIGNAL_HPP

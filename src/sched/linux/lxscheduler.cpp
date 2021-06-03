@@ -1,4 +1,4 @@
-#include <string>
+#include <vector>
 
 /**
  *  Weasel  -   Gui Process Explorer
@@ -19,47 +19,27 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "sched/posix/pxthread.hpp"
+#include "sched/linux/lxscheduler.hpp"
 
 #include <stdexcept>
 
-void PxThread::signal(Signal signal) {
+Scheduler *Scheduler::createScheduler() {
+    return new LxScheduler();
+}
+
+Platform Scheduler::getPlatform() {
+    return POSIX;
+}
+
+const std::map<int, Process *> &LxScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
-
-bool PxThread::isPaused() {
+long LxScheduler::getTotalPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
 
-const std::string &PxThread::getUser() {
+long LxScheduler::getUsedPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
 
-std::string PxThread::getName() {
-    throw std::runtime_error("Not Implemented");
-}
-
-int PxThread::getTID() {
-    throw std::runtime_error("Not Implemented");
-}
-
-float PxThread::getCPU() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxThread::getVirtualMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxThread::getReservedMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-long PxThread::getSharedMemorySize() {
-    throw std::runtime_error("Not Implemented");
-}
-
-int PxThread::getProcess() {
-    throw std::runtime_error("Not Implemented");
-}
