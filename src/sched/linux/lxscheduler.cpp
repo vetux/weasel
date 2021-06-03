@@ -223,6 +223,21 @@ Thread readThread(const fs::path &statusFile) {
     return ret;
 }
 
+std::string readCommand(int PID) {
+    std::ifstream stream;
+
+    std::string filePath = LINUX_COMMAND_LINE(std::to_string(PID));
+    stream.open(filePath);
+
+    if (stream.fail()) {
+        throw std::runtime_error("Failed to read text at " + filePath + " error: " + strerror(errno));
+    }
+
+    std::string ret;
+    stream >> ret;
+    return ret;
+}
+
 Process readProcess(const fs::path &statusFile) {
     auto proc = parseProcFile(readText(statusFile));
 
@@ -232,7 +247,7 @@ Process readProcess(const fs::path &statusFile) {
     ret.UID = getUID(proc.at("Uid"));
 
     ret.name = proc.at("Name");
-    ret.command = LINUX_COMMAND_LINE(std::to_string(ret.PID));
+    ret.command = readCommand(ret.PID);
     ret.priority = getpriority(PRIO_PROCESS, ret.PID);
 
     ret.memVirt = 0;
