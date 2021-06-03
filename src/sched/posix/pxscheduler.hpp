@@ -32,9 +32,9 @@ public:
 
     const std::map<int, Process *> &getProcesses() override;
 
-    void signal(Process *process, Signal signal) override;
+    long getTotalPhysicalMemory() override;
 
-    void signal(Thread *thread, Signal signal) override;
+    long getUsedPhysicalMemory() override;
 
 private:
     std::map<int, PxProcess *> processes;

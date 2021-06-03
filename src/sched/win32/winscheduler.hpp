@@ -28,9 +28,9 @@ public:
 
     std::vector<Process *> getProcesses() override;
 
-    void signal(Process *process, Signal signal) override;
+    long getTotalPhysicalMemory() override;
 
-    void signal(Thread *thread, Signal signal) override;
+    long getUsedPhysicalMemory() override;
 };
 
 #endif //WEASEL_WINSCHEDULER_HPP

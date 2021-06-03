@@ -35,11 +35,11 @@ const std::map<int, Process *> &PxScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
-void PxScheduler::signal(Process *process, Signal signal) {
+long PxScheduler::getTotalPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
 
-void PxScheduler::signal(Thread *thread, Signal signal) {
+long PxScheduler::getUsedPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
 

@@ -26,7 +26,13 @@ class PxProcess : public Process {
 public:
     ~PxProcess() override = default;
 
-    Token *getToken() override;
+    void signal(Signal signal) override;
+
+    void setPriority(int priority) override;
+
+    int getPriority() override;
+
+    const std::string &getUser() override;
 
     std::string getName() override;
 
@@ -34,7 +40,7 @@ public:
 
     std::string getImagePath() override;
 
-    ExecutionState getState() override;
+    bool isPaused() override;
 
     int getPID() override;
 

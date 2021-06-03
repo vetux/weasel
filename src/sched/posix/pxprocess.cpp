@@ -24,11 +24,23 @@
 
 #include <stdexcept>
 
-Token *PxProcess::getToken() {
+void PxProcess::signal(Signal signal) {
     throw std::runtime_error("Not Implemented");
 }
 
-ExecutionState PxProcess::getState() {
+void PxProcess::setPriority(int priority) {
+    throw std::runtime_error("Not Implemented");
+}
+
+int PxProcess::getPriority() {
+    throw std::runtime_error("Not Implemented");
+}
+
+const std::string &PxProcess::getUser() {
+    throw std::runtime_error("Not Implemented");
+}
+
+bool PxProcess::isPaused() {
     throw std::runtime_error("Not Implemented");
 }
 

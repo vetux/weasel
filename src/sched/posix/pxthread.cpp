@@ -23,7 +23,16 @@
 
 #include <stdexcept>
 
-ExecutionState PxThread::getState() {
+void PxThread::signal(Signal signal) {
+    throw std::runtime_error("Not Implemented");
+}
+
+
+bool PxThread::isPaused() {
+    throw std::runtime_error("Not Implemented");
+}
+
+const std::string &PxThread::getUser() {
     throw std::runtime_error("Not Implemented");
 }
 

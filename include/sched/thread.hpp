@@ -22,7 +22,6 @@
 
 #include <string>
 
-#include "sched/executionstate.hpp"
 #include "sched/signal.hpp"
 
 class Thread {
@@ -30,9 +29,21 @@ public:
     virtual ~Thread() = default;
 
     /**
-     * @return The state of the thread
+     * Send the signal to the thread.
+     *
+     * @param signal The signal to send
      */
-    virtual ExecutionState getState() = 0;
+    virtual void signal(Signal signal) = 0;
+
+    /**
+     * @return true if the thread is paused
+     */
+    virtual bool isPaused() = 0;
+
+    /**
+     * @return The user name of the thread owner.
+     */
+    virtual const std::string &getUser() = 0;
 
     /**
      * @return The thread name

@@ -24,18 +24,37 @@
 #include <vector>
 
 #include "sched/thread.hpp"
-#include "sched/executionstate.hpp"
 #include "sched/signal.hpp"
-#include "sched/token.hpp"
 
 class Process {
 public:
     virtual ~Process() = default;
 
     /**
-     * @return The token associated with this process
+     * Send the signal to the process.
+     *
+     * @param signal The signal to send
      */
-    virtual Token *getToken() = 0;
+    virtual void signal(Signal signal) = 0;
+
+    /**
+     * Set the process priority value between +19 (low priority) to -20 (high priority).
+     *
+     * @param priority The new priority value.
+     */
+    virtual void setPriority(int priority) = 0;
+
+    /**
+     * Get the process priority value.
+     *
+     * @return The process priority value
+     */
+    virtual int getPriority() = 0;
+
+    /**
+     * @return The user name of the process owner.
+     */
+    virtual const std::string &getUser() = 0;
 
     /**
      * @return The name of the process
@@ -53,9 +72,9 @@ public:
     virtual std::string getImagePath() = 0;
 
     /**
-     * @return The state of the process main thread
+     * @return true if the process is paused
      */
-    virtual ExecutionState getState() = 0;
+    virtual bool isPaused() = 0;
 
     /**
      * @return The process id

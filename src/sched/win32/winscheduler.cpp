@@ -33,10 +33,10 @@ std::vector<Process *> WinScheduler::getProcesses() {
     throw std::runtime_error("Not Implemented");
 }
 
-void WinScheduler::signal(Process *process, Signal signal) {
+long WinScheduler::getTotalPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
 
-void WinScheduler::signal(Thread *thread, Signal signal) {
+long WinScheduler::getUsedPhysicalMemory() {
     throw std::runtime_error("Not Implemented");
 }
