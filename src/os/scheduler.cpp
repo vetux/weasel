@@ -172,6 +172,7 @@ void Scheduler::setPolicy(const Thread &thread,
                           uint64_t deadline,
                           uint64_t period) {
     sched_attr attr{};
+    attr.size = sizeof(struct sched_attr);
     attr.sched_policy = convertPolicy(policy);
     attr.sched_flags = 0;
     attr.sched_nice = thread.priority;
