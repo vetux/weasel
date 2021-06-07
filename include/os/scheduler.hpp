@@ -20,27 +20,14 @@
 #ifndef WEASEL_SCHEDULER_HPP
 #define WEASEL_SCHEDULER_HPP
 
-#include "sched/process.hpp"
-#include "sched/platform.hpp"
-#include "sched/signal.hpp"
-#include "sched/memory.hpp"
+#include <map>
+
+#include "os/process.hpp"
+#include "os/signal.hpp"
+#include "os/memory.hpp"
 
 class Scheduler {
 public:
-    /**
-     * This method creates the scheduler instance suitable for the platform targeted when compiling the application.
-     *
-     * @return A new scheduler instance
-     */
-    static Scheduler *createScheduler();
-
-    /**
-     * @return The platform targeted when compiling the application.
-     */
-    static Platform getPlatform();
-
-    virtual ~Scheduler() = default;
-
     /**
      * This method polls the operating system for active processes and returns a reference to them.
      *
@@ -50,14 +37,14 @@ public:
      *
      * @return The map of currently active processes with the PID as key.
      */
-    virtual const std::map<int, Process> &getProcesses() = 0;
+    const std::map<int, Process> &getProcesses();
 
     /**
      * This method polls the operating system for memory information and returns a reference to it.
      *
      * @return The memory information
      */
-    virtual const Memory &getMemory() = 0;
+    const Memory &getMemory();
 
     /**
      * Send the signal to the process
@@ -65,7 +52,7 @@ public:
      * @param process The process to send the signal to
      * @param signal The signal to send
      */
-    virtual void signal(const Process &process, Signal signal) = 0;
+    void signal(const Process &process, Signal signal);
 
     /**
      * Send the signal to the thread
@@ -73,7 +60,7 @@ public:
      * @param thread The thread to send the signal to
      * @param signal The signal to send
      */
-    virtual void signal(const Thread &thread, Signal signal) = 0;
+    void signal(const Thread &thread, Signal signal);
 
     /**
      * Set the process priority
@@ -81,7 +68,7 @@ public:
      * @param process The process to set the priority of
      * @param priority The priority to set
      */
-    virtual void setPriority(const Process &process, int priority) = 0;
+    void setPriority(const Process &process, int priority);
 
     /**
      * Set the thread priority
@@ -89,7 +76,11 @@ public:
      * @param thread The thread to set the priority of
      * @param priority The priority to set
      */
-    virtual void setPriority(const Thread &thread, int priority) = 0;
+    void setPriority(const Thread &thread, int priority);
+
+private:
+    std::map<int, Process> processes;
+    Memory memory;
 };
 
 #endif //WEASEL_SCHEDULER_HPP

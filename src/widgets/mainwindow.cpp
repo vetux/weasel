@@ -22,12 +22,10 @@
 #include <QMenuBar>
 
 MainWindow::MainWindow() {
-    sched = Scheduler::createScheduler();
     setupMenuBar();
 }
 
 MainWindow::~MainWindow() {
-    delete sched;
 }
 
 void MainWindow::setupMenuBar() {

@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "sched/thread.hpp"
+#include "os/thread.hpp"
 
 struct Process {
     int PID;

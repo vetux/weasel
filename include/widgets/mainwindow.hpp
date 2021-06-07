@@ -22,7 +22,7 @@
 
 #include <QMainWindow>
 
-#include "sched/scheduler.hpp"
+#include "os/scheduler.hpp"
 
 #include "widgets/processtreewidget.hpp"
 #include "widgets/toolbarwidget.hpp"
@@ -37,7 +37,7 @@ public:
 private:
     void setupMenuBar();
 
-    Scheduler *sched;
+    Scheduler sched;
 
     ToolbarWidget *toolbar;
     ProcessTreeWidget *procTree;

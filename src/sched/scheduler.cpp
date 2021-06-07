@@ -19,7 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "sched/linux/lxscheduler.hpp"
+#include "os/scheduler.hpp"
 
 #include <stdexcept>
 
@@ -283,15 +283,7 @@ Memory readMemory(const fs::path &memFile) {
     return ret;
 }
 
-Scheduler *Scheduler::createScheduler() {
-    return new LxScheduler();
-}
-
-Platform Scheduler::getPlatform() {
-    return LINUX;
-}
-
-const std::map<int, Process> &LxScheduler::getProcesses() {
+const std::map<int, Process> &Scheduler::getProcesses() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(LINUX_DIR_PROC)) {
         if (isPID(fl.path().filename())) {
@@ -307,12 +299,12 @@ const std::map<int, Process> &LxScheduler::getProcesses() {
     return processes;
 }
 
-const Memory &LxScheduler::getMemory() {
+const Memory &Scheduler::getMemory() {
     memory = readMemory(LINUX_MEMINFO);
     return memory;
 }
 
-void LxScheduler::signal(const Process &process, Signal signal) {
+void Scheduler::signal(const Process &process, Signal signal) {
     int r = kill(convertPID(process.PID), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
@@ -320,7 +312,7 @@ void LxScheduler::signal(const Process &process, Signal signal) {
     }
 }
 
-void LxScheduler::signal(const Thread &thread, Signal signal) {
+void Scheduler::signal(const Thread &thread, Signal signal) {
     auto r = tkill(convertPID(thread.TID), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
@@ -328,7 +320,7 @@ void LxScheduler::signal(const Thread &thread, Signal signal) {
     }
 }
 
-void LxScheduler::setPriority(const Process &process, int priority) {
+void Scheduler::setPriority(const Process &process, int priority) {
     int r = setpriority(PRIO_PROCESS, convertPID(process.PID), priority);
     if (r == -1) {
         auto err = errno;
@@ -336,7 +328,7 @@ void LxScheduler::setPriority(const Process &process, int priority) {
     }
 }
 
-void LxScheduler::setPriority(const Thread &thread, int priority) {
+void Scheduler::setPriority(const Thread &thread, int priority) {
     int r = setpriority(PRIO_PROCESS, convertPID(thread.TID), priority);
     if (r == -1) {
         auto err = errno;

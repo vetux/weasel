@@ -22,8 +22,8 @@
 
 #include <QWidget>
 
-#include "sched/process.hpp"
-#include "sched/signal.hpp"
+#include "os/process.hpp"
+#include "os/signal.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
