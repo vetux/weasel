@@ -30,8 +30,6 @@
 #include "os/procpath.hpp"
 #include "os/syscalls.hpp"
 
-#include "os/exceptions.hpp"
-
 bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';
 }
@@ -396,7 +394,9 @@ namespace ProcReader {
         parseProcFd(p);
         parseProcExe(p);
 
-        for (auto &d : std::filesystem::directory_iterator(ProcPath::getProcessTasksDirectory(pid))) {
+        std::string dir = ProcPath::getProcessTasksDirectory(pid);
+
+        for (auto &d : std::filesystem::directory_iterator(dir)) {
             auto t = readThread(p, stringToPid(d.path().filename()));
             if (t.tid == p.pid)
                 p.threads.emplace(p.threads.begin(), t);

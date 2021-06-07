@@ -36,8 +36,6 @@
 #include "os/syscalls.hpp"
 #include "os/procreader.hpp"
 
-#include "os/exceptions.hpp"
-
 namespace fs = std::filesystem;
 
 pid_t convertPID(Pid_t pid) {
@@ -126,8 +124,8 @@ void Scheduler::refresh() {
             auto proc = ProcReader::readProcess(pid);
             processes[pid] = proc;
         }
-        catch (const ProcessNotFound &e) {
-            //Dont add the no longer existing process
+        catch (const std::exception &e) {
+            // Assume process does not exist anymore
         }
     }
 
@@ -146,12 +144,7 @@ void Scheduler::signal(const Process &process, Signal signal) {
     int r = kill(convertPID(process.pid), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
-        if (err == EPERM)
-            throw PermissionError(strerror(err));
-        else if (err == ESRCH)
-            throw ProcessNotFound(strerror(err));
-        else
-            throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
+        throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
     }
 }
 
@@ -159,12 +152,7 @@ void Scheduler::signal(const Thread &thread, Signal signal) {
     auto r = tkill(convertPID(thread.tid), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
-        if (err == EPERM)
-            throw PermissionError(strerror(err));
-        else if (err == ESRCH)
-            throw ThreadNotFound(strerror(err));
-        else
-            throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
+        throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
     }
 }
 
@@ -172,12 +160,7 @@ void Scheduler::setPriority(const Process &process, int priority) {
     int r = setpriority(PRIO_PROCESS, convertPID(process.pid), priority);
     if (r == -1) {
         auto err = errno;
-        if (err == EPERM)
-            throw PermissionError(strerror(err));
-        else if (err == ESRCH)
-            throw ProcessNotFound(strerror(err));
-        else
-            throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
+        throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
     }
 }
 
@@ -185,12 +168,7 @@ void Scheduler::setPriority(const Thread &thread, int priority) {
     int r = setpriority(PRIO_PROCESS, convertPID(thread.tid), priority);
     if (r == -1) {
         auto err = errno;
-        if (err == EPERM)
-            throw PermissionError(strerror(err));
-        else if (err == ESRCH)
-            throw ThreadNotFound(strerror(err));
-        else
-            throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
+        throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
     }
 }
 
@@ -211,12 +189,7 @@ void Scheduler::setPolicy(const Thread &thread,
     int r = sched_setattr(thread.tid, &attr, 0);
     if (r == -1) {
         auto err = errno;
-        if (err == EPERM)
-            throw PermissionError(strerror(err));
-        else if (err == ESRCH)
-            throw ThreadNotFound(strerror(err));
-        else
-            throw std::runtime_error("Failed to set policy: " + std::string(strerror(err)));
+        throw std::runtime_error("Failed to set policy: " + std::string(strerror(err)));
     }
 }
 

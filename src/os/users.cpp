@@ -19,12 +19,12 @@
 
 #include "os/users.hpp"
 
-#include <stdexcept>
+#include <pwd.h>
 
-std::string Users::getUserName(Uid_t pid) {
-    throw std::runtime_error("Not Implemented");
+std::string Users::getUserName(Uid_t uid) {
+    return getpwuid(uid)->pw_name;
 }
 
 Uid_t Users::getUserId(const std::string &userName) {
-    throw std::runtime_error("Not Implemented");
+    return getpwnam(userName.c_str())->pw_uid;
 }
