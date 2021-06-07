@@ -23,23 +23,18 @@
 
 #include <stdexcept>
 
-#include <fstream>
-#include <iostream>
 #include <filesystem>
-#include <cassert>
 #include <csignal>
 #include <cstring>
-#include <sstream>
 #include <algorithm>
 
-#include <unistd.h>
-
-#include <sys/syscall.h>
 #include <sys/resource.h>
 
 #include <sched.h>
 
 #include "os/procpath.hpp"
+#include "os/syscalls.hpp"
+#include "os/procparser.hpp"
 
 namespace fs = std::filesystem;
 
@@ -90,193 +85,33 @@ int convertSignal(Signal signal) {
         case SIGNAL_SIGTTOU:
             return SIGTTOU;
         default:
-            throw std::runtime_error("Unrecognized signal");
+            throw std::runtime_error("Unrecognized signal value");
     }
 }
 
-bool isAsciiNumber(char c) {
-    return c >= '0' && c <= '9';
-}
-
-bool isPID(const std::string &name) {
-    for (auto &c : name) {
-        if (!isAsciiNumber(c))
-            return false;
+int convertPolicy(SchedulingPolicy policy) {
+    switch (policy) {
+        case OTHER:
+            return SCHED_OTHER;
+        case BATCH:
+            return SCHED_BATCH;
+        case IDLE:
+            return SCHED_IDLE;
+        case FIFO:
+            return SCHED_FIFO;
+        case RR:
+            return SCHED_RR;
+        case DEADLINE:
+            return SCHED_DEADLINE;
+        default:
+            throw std::runtime_error("Unrecognized policy value");
     }
-    return true;
-}
-
-long tkill(pid_t TID, int signal) {
-    return syscall(SYS_tkill, TID, signal);
-}
-
-std::string removeDoubleWhiteSpace(const std::string &str) {
-    auto ret = str;
-    auto space = ret.find("  ");
-    while (space != -1) {
-        ret.replace(space, 2, " ");
-        space = ret.find("  ");
-    }
-    return ret;
-}
-
-std::string removeSurroundingWhiteSpace(const std::string &str) {
-    auto ret = str;
-    auto space = ret.find(' ');
-    while (space == 0) {
-        ret.erase(space, 1);
-        space = ret.find(' ');
-    }
-    space = ret.find(' ');
-    while (!ret.empty() && space == ret.size() - 1) {
-        ret.erase(space, 1);
-        space = ret.find(' ');
-    }
-    return ret;
-}
-
-std::string removeTabs(const std::string &str) {
-    auto ret = str;
-    auto tab = ret.find('\t');
-    while (tab != -1) {
-        ret.replace(tab, 1, " ");
-        tab = ret.find('\t');
-    }
-    return ret;
-}
-
-std::map<std::string, std::string> parseProcFile(const std::string &str) {
-    std::istringstream f(str);
-
-    std::map<std::string, std::string> ret;
-
-    std::string line;
-    while (std::getline(f, line)) {
-        auto dot = line.find(':');
-        if (dot == std::string::npos)
-            throw std::runtime_error("Invalid proc file format");
-        std::string name = line.substr(0, dot);
-        std::string value = line.substr(dot + 1);
-        value = removeTabs(value);
-        value = removeDoubleWhiteSpace(value);
-        value = removeSurroundingWhiteSpace(value);
-        if (ret.find(name) != ret.end())
-            throw std::runtime_error("Invalid proc file double key");
-        ret[name] = value;
-    }
-
-    return ret;
-}
-
-std::string readText(const std::string &filePath) {
-    std::string ret;
-    std::ifstream stream;
-
-    stream.open(filePath);
-
-    if (stream.fail()) {
-        throw std::runtime_error("Failed to read text at " + filePath + " error: " + strerror(errno));
-    }
-
-    std::string tmp;
-    while (std::getline(stream, tmp)) {
-        ret += tmp + "\n";
-    }
-
-    return ret;
-}
-
-Uid_t getUID(const std::string &uid) {
-    std::string t = uid.substr(0, uid.find(' '));
-    return stringToUid(t);
-}
-
-Mem_t getBytesFromKilobyte(const std::string &mem) {
-    std::string tmp;
-    tmp = mem.substr(0, mem.find(' '));
-    return stringToMem(tmp) * 1000;
-}
-
-Thread readThread(const fs::path &statusFile) {
-    auto proc = parseProcFile(readText(statusFile));
-
-    Thread ret;
-
-    ret.TID = stringToPid(proc.at("Pid"));
-    ret.PID = stringToPid(proc.at("Tgid"));
-    ret.UID = getUID(proc.at("Uid"));
-
-    ret.name = proc.at("Name");
-
-    //TODO:Implement memory parsing
-    ret.memVirt = 0;
-    ret.memRes = 0;
-    ret.memShared = 0;
-
-    return ret;
-}
-
-std::string readCommand(Pid_t PID) {
-    std::ifstream stream;
-
-    std::string filePath = ProcPath::getCommandLineFile(PID);
-    stream.open(filePath);
-
-    if (stream.fail()) {
-        throw std::runtime_error("Failed to read text at " + filePath + " error: " + strerror(errno));
-    }
-
-    std::string ret;
-    stream >> ret;
-    return ret;
-}
-
-Process readProcess(const fs::path &statusFile) {
-    auto proc = parseProcFile(readText(statusFile));
-    Process ret;
-
-    ret.PID = stringToPid(proc.at("Pid"));
-    ret.UID = getUID(proc.at("Uid"));
-
-    ret.name = proc.at("Name");
-    ret.command = readCommand(ret.PID);
-
-    ret.priority = getpriority(PRIO_PROCESS, ret.PID);
-
-    ret.parentPID = stringToPid(proc.at("PPid"));
-
-    std::vector<fs::directory_entry> entries;
-    for (auto &fl : fs::directory_iterator(ProcPath::getProcessTasksDirectory(ret.PID))) {
-        if (isPID(fl.path().filename())) {
-            entries.emplace_back(fl);
-        }
-    }
-
-    for (auto &e : entries) {
-        ret.threads.emplace_back(
-                readThread(ProcPath::getThreadStatusFile(ret.PID, stringToPid(e.path().filename().string())))
-        );
-    }
-
-    return ret;
-}
-
-Memory readMemory(const fs::path &memFile) {
-    auto proc = parseProcFile(readText(memFile));
-
-    Memory ret{};
-
-    ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
-    ret.free = getBytesFromKilobyte(proc.at("MemFree"));
-    ret.available = getBytesFromKilobyte(proc.at("MemAvailable"));
-
-    return ret;
 }
 
 const std::map<Pid_t, Process> &Scheduler::getProcesses() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
-        if (isPID(fl.path().filename())) {
+        if (ProcParser::isPID(fl.path().filename())) {
             entries.emplace_back(fl);
         }
     }
@@ -284,14 +119,14 @@ const std::map<Pid_t, Process> &Scheduler::getProcesses() {
     for (fs::directory_entry &p : entries) {
         const auto &path = p.path();
         auto pid = stringToPid(path.filename().string());
-        auto proc = readProcess(ProcPath::getProcessStatusFile(pid));
+        auto proc = ProcParser::parseProcess(ProcPath::getProcessStatusFile(pid));
         processes[pid] = proc;
     }
     return processes;
 }
 
 const Memory &Scheduler::getMemory() {
-    memory = readMemory(ProcPath::getMemoryInfoFile());
+    memory = ProcParser::parseMemory(ProcPath::getMemoryInfoFile());
     return memory;
 }
 
@@ -327,7 +162,23 @@ void Scheduler::setPriority(const Thread &thread, int priority) {
     }
 }
 
-void Scheduler::setPolicy(const Thread &thread, SchedulingPolicy policy) {
-    throw std::runtime_error("Not Implemented");
+void Scheduler::setPolicy(const Thread &thread,
+                          SchedulingPolicy policy,
+                          uint64_t runtime,
+                          uint64_t deadline,
+                          uint64_t period) {
+    sched_attr attr{};
+    attr.sched_policy = convertPolicy(policy);
+    attr.sched_flags = 0;
+    attr.sched_nice = thread.priority;
+    attr.sched_priority = convertPolicy(policy);
+    attr.sched_runtime = runtime;
+    attr.sched_deadline = deadline;
+    attr.sched_period = period;
+    int r = sched_setattr(thread.TID, &attr, 0);
+    if (r == -1) {
+        auto err = errno;
+        throw std::runtime_error("Failed to set policy: " + std::string(strerror(err)));
+    }
 }
 

@@ -85,7 +85,11 @@ public:
      *
      * @param Process
      */
-    void setPolicy(const Thread &thread, SchedulingPolicy policy);
+    void setPolicy(const Thread &thread,
+                   SchedulingPolicy policy,
+                   uint64_t runtime,
+                   uint64_t deadline,
+                   uint64_t period);
 
 private:
     std::map<Pid_t, Process> processes;
