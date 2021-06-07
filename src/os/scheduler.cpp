@@ -111,22 +111,24 @@ int convertPolicy(SchedulingPolicy policy) {
 void Scheduler::refresh() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
-        if (ProcReader::isPID(fl.path().filename())) {
-            entries.emplace_back(fl);
+        try {
+            if (ProcReader::isPID(fl.path().filename())) {
+                entries.emplace_back(fl);
+            }
         }
+        catch (const std::exception &e) {} // Assume process does not exist anymore
     }
+
     processes.clear();
 
     for (fs::directory_entry &p : entries) {
-        const auto &path = p.path();
-        auto pid = stringToPid(path.filename().string());
         try {
+            const auto &path = p.path();
+            auto pid = stringToPid(path.filename().string());
             auto proc = ProcReader::readProcess(pid);
             processes[pid] = proc;
         }
-        catch (const std::exception &e) {
-            // Assume process does not exist anymore
-        }
+        catch (const std::exception &e) {} // Assume process does not exist anymore
     }
 
     memory = ProcReader::readMemory();

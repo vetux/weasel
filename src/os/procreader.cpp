@@ -164,193 +164,175 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
 }
 
 void parseProcCmdline(Process &proc) {
-    try {
-        proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid));
-    } catch (const std::exception &e) {} //Assume permissions error
+    proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid));
 }
 
 void parseProcEnviron(Process &proc) {
-    try {
-        proc.environ = readText(ProcPath::getProcessEnvironFile(proc.pid));
-    } catch (const std::exception &e) {} //Assume permissions error
+    proc.environ = readText(ProcPath::getProcessEnvironFile(proc.pid));
 }
 
 void parseProcIo(Process &proc) {
-    try {
-        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid)));
-        proc.rchar = std::stoul(d.at("rchar"));
-        proc.wchar = std::stoul(d.at("wchar"));
-        proc.syscr = std::stoul(d.at("syscr"));
-        proc.syscw = std::stoul(d.at("syscw"));
-        proc.read_bytes = std::stoul(d.at("read_bytes"));
-        proc.write_bytes = std::stoul(d.at("write_bytes"));
-        proc.cancelled_write_bytes = std::stoul(d.at("cancelled_write_bytes"));
-    } catch (const std::exception &e) {} //Assume permissions error
+    const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid)));
+    proc.rchar = std::stoul(d.at("rchar"));
+    proc.wchar = std::stoul(d.at("wchar"));
+    proc.syscr = std::stoul(d.at("syscr"));
+    proc.syscw = std::stoul(d.at("syscw"));
+    proc.read_bytes = std::stoul(d.at("read_bytes"));
+    proc.write_bytes = std::stoul(d.at("write_bytes"));
+    proc.cancelled_write_bytes = std::stoul(d.at("cancelled_write_bytes"));
 }
 
 void parseProcRoot(Process &proc) {
-    try {
-        proc.rootDirectory = getRealPath(ProcPath::getProcessRootDirectory(proc.pid));
-    } catch (const std::exception &e) {} //Assume permissions error
+    proc.rootDirectory = getRealPath(ProcPath::getProcessRootDirectory(proc.pid));
 }
 
 void parseProcFd(Process &proc) {
-    try {
-        const auto p = ProcPath::getProcessFdDirectory(proc.pid);
-        for (auto &f : std::filesystem::directory_iterator(p)) {
-            proc.openFiles.emplace_back(getRealPath(f.path()));
-        }
-    } catch (const std::exception &e) {} //Assume permissions error
+    const auto p = ProcPath::getProcessFdDirectory(proc.pid);
+    for (auto &f : std::filesystem::directory_iterator(p)) {
+        proc.openFiles.emplace_back(getRealPath(f.path()));
+    }
 }
 
 void parseProcExe(Process &proc) {
-    try {
-        proc.executablePath = getRealPath(ProcPath::getProcessRootDirectory(proc.pid));
-    } catch (const std::exception &e) {} //Assume permissions error
+    proc.executablePath = getRealPath(ProcPath::getProcessRootDirectory(proc.pid));
 }
 
 void parseThreadStat(Thread &thread) {
-    try {
-        auto text = readText(ProcPath::getThreadStatFile(thread.pid, thread.tid));
-        auto firstBracket = text.find_first_of('(');
-        auto lastBracket = text.find_last_of(')');
+    auto text = readText(ProcPath::getThreadStatFile(thread.pid, thread.tid));
+    auto firstBracket = text.find_first_of('(');
+    auto lastBracket = text.find_last_of(')');
 
-        thread.comm = text.substr(firstBracket + 1, lastBracket - firstBracket - 1);
+    thread.comm = text.substr(firstBracket + 1, lastBracket - firstBracket - 1);
 
-        text.erase(0, lastBracket + 1);
+    text.erase(0, lastBracket + 1);
 
-        auto split = splitString(text, " ");
+    auto split = splitString(text, " ");
 
-        thread.state = split.at(0)[0];
-        thread.ppid = std::stoi(split.at(1));
-        thread.pgrp = std::stoi(split.at(2));
-        thread.session = std::stoi(split.at(3));
-        thread.tty_nr = std::stoi(split.at(4));
-        thread.tpgid = std::stoi(split.at(5));
-        thread.flags = std::stoi(split.at(6));
-        thread.minflt = std::stoul(split.at(7));
-        thread.cminflt = std::stoul(split.at(8));
-        thread.majflt = std::stoul(split.at(9));
-        thread.cmajflt = std::stoul(split.at(10));
-        thread.utime = std::stoul(split.at(11));
-        thread.stime = std::stoul(split.at(12));
-        thread.cutime = std::stol(split.at(13));
-        thread.cstime = std::stol(split.at(14));
-        thread.priority = std::stol(split.at(15));
-        thread.nice = std::stol(split.at(16));
-        thread.num_threads = std::stol(split.at(17));
-        thread.itrealvalue = std::stol(split.at(18));
-        thread.starttime = std::stoull(split.at(19));
-        thread.vsize = std::stoul(split.at(20));
-        thread.rss = std::stol(split.at(21));
-        thread.rsslim = std::stoul(split.at(22));
-        thread.startcode = std::stoul(split.at(23));
-        thread.endcode = std::stoul(split.at(24));
-        thread.startstack = std::stoul(split.at(25));
-        thread.kstkesp = std::stoul(split.at(26));
-        thread.kstkeip = std::stoul(split.at(27));
-        thread.signal = std::stoul(split.at(28));
-        thread.blocked = std::stoul(split.at(29));
-        thread.sigignore = std::stoul(split.at(30));
-        thread.sigcatch = std::stoul(split.at(31));
-        thread.wchan = std::stoul(split.at(32));
-        thread.nswap = std::stoul(split.at(33));
-        thread.cnswap = std::stoul(split.at(34));
+    thread.state = split.at(0)[0];
+    thread.ppid = std::stoi(split.at(1));
+    thread.pgrp = std::stoi(split.at(2));
+    thread.session = std::stoi(split.at(3));
+    thread.tty_nr = std::stoi(split.at(4));
+    thread.tpgid = std::stoi(split.at(5));
+    thread.flags = std::stoi(split.at(6));
+    thread.minflt = std::stoul(split.at(7));
+    thread.cminflt = std::stoul(split.at(8));
+    thread.majflt = std::stoul(split.at(9));
+    thread.cmajflt = std::stoul(split.at(10));
+    thread.utime = std::stoul(split.at(11));
+    thread.stime = std::stoul(split.at(12));
+    thread.cutime = std::stol(split.at(13));
+    thread.cstime = std::stol(split.at(14));
+    thread.priority = std::stol(split.at(15));
+    thread.nice = std::stol(split.at(16));
+    thread.num_threads = std::stol(split.at(17));
+    thread.itrealvalue = std::stol(split.at(18));
+    thread.starttime = std::stoull(split.at(19));
+    thread.vsize = std::stoul(split.at(20));
+    thread.rss = std::stol(split.at(21));
+    thread.rsslim = std::stoul(split.at(22));
+    thread.startcode = std::stoul(split.at(23));
+    thread.endcode = std::stoul(split.at(24));
+    thread.startstack = std::stoul(split.at(25));
+    thread.kstkesp = std::stoul(split.at(26));
+    thread.kstkeip = std::stoul(split.at(27));
+    thread.signal = std::stoul(split.at(28));
+    thread.blocked = std::stoul(split.at(29));
+    thread.sigignore = std::stoul(split.at(30));
+    thread.sigcatch = std::stoul(split.at(31));
+    thread.wchan = std::stoul(split.at(32));
+    thread.nswap = std::stoul(split.at(33));
+    thread.cnswap = std::stoul(split.at(34));
 
-        if (split.size() < 36)
-            return;
+    if (split.size() < 36)
+        return;
 
-        thread.exit_signal = std::stoi(split.at(35));
+    thread.exit_signal = std::stoi(split.at(35));
 
-        if (split.size() < 37)
-            return;
+    if (split.size() < 37)
+        return;
 
-        thread.processor = std::stoi(split.at(36));
+    thread.processor = std::stoi(split.at(36));
 
-        if (split.size() < 38)
-            return;
+    if (split.size() < 38)
+        return;
 
-        thread.rt_priority = std::stoul(split.at(37));
+    thread.rt_priority = std::stoul(split.at(37));
 
-        if (split.size() < 39)
-            return;
+    if (split.size() < 39)
+        return;
 
-        thread.policy = std::stoul(split.at(38));
+    thread.policy = std::stoul(split.at(38));
 
-        if (split.size() < 40)
-            return;
+    if (split.size() < 40)
+        return;
 
-        thread.delayacct_blkio_ticks = std::stoull(split.at(39));
+    thread.delayacct_blkio_ticks = std::stoull(split.at(39));
 
-        if (split.size() < 41)
-            return;
+    if (split.size() < 41)
+        return;
 
-        thread.guest_time = std::stoul(split.at(40));
+    thread.guest_time = std::stoul(split.at(40));
 
-        if (split.size() < 42)
-            return;
+    if (split.size() < 42)
+        return;
 
-        thread.cguest_time = std::stol(split.at(41));
+    thread.cguest_time = std::stol(split.at(41));
 
-        if (split.size() < 43)
-            return;
+    if (split.size() < 43)
+        return;
 
-        thread.start_data = std::stoul(split.at(42));
+    thread.start_data = std::stoul(split.at(42));
 
-        if (split.size() < 44)
-            return;
+    if (split.size() < 44)
+        return;
 
-        thread.end_data = std::stoul(split.at(43));
+    thread.end_data = std::stoul(split.at(43));
 
-        if (split.size() < 45)
-            return;
+    if (split.size() < 45)
+        return;
 
-        thread.start_brk = std::stoul(split.at(44));
+    thread.start_brk = std::stoul(split.at(44));
 
-        if (split.size() < 46)
-            return;
+    if (split.size() < 46)
+        return;
 
-        thread.arg_start = std::stoul(split.at(45));
+    thread.arg_start = std::stoul(split.at(45));
 
-        if (split.size() < 47)
-            return;
+    if (split.size() < 47)
+        return;
 
-        thread.arg_end = std::stoul(split.at(46));
+    thread.arg_end = std::stoul(split.at(46));
 
-        if (split.size() < 48)
-            return;
+    if (split.size() < 48)
+        return;
 
-        thread.env_start = std::stoul(split.at(47));
+    thread.env_start = std::stoul(split.at(47));
 
-        if (split.size() < 49)
-            return;
+    if (split.size() < 49)
+        return;
 
-        thread.env_end = std::stoul(split.at(48));
+    thread.env_end = std::stoul(split.at(48));
 
-        if (split.size() < 50)
-            return;
+    if (split.size() < 50)
+        return;
 
-        thread.exit_code = std::stoi(split.at(49));
-    } catch (const std::exception &e) {} //Assume permissions error
+    thread.exit_code = std::stoi(split.at(49));
 }
 
 void parseThreadStatm(Thread &thread) {
-    try {
-        auto split = splitString(readText(ProcPath::getThreadStatMFile(thread.pid, thread.tid)), " ");
-        thread.size = std::stoul(split.at(0));
-        thread.resident = std::stoul(split.at(1));
-        thread.shared = std::stoul(split.at(2));
-        thread.text = std::stoul(split.at(3));
-        thread.lib = std::stoul(split.at(4));
-        thread.data = std::stoul(split.at(5));
-        thread.dt = std::stoul(split.at(6));
-    } catch (const std::exception &e) {} //Assume permissions error
+    auto split = splitString(readText(ProcPath::getThreadStatMFile(thread.pid, thread.tid)), " ");
+    thread.size = std::stoul(split.at(0));
+    thread.resident = std::stoul(split.at(1));
+    thread.shared = std::stoul(split.at(2));
+    thread.text = std::stoul(split.at(3));
+    thread.lib = std::stoul(split.at(4));
+    thread.data = std::stoul(split.at(5));
+    thread.dt = std::stoul(split.at(6));
 }
 
 void parseThreadCwd(Thread &thread) {
-    try {
-        thread.cwd = getRealPath(ProcPath::getThreadCwdFile(thread.pid, thread.tid));
-    } catch (const std::exception &e) {} //Assume permissions error
+    thread.cwd = getRealPath(ProcPath::getThreadCwdFile(thread.pid, thread.tid));
 }
 
 Uid_t getFileOwnerUid(const std::filesystem::path &p) {
@@ -408,18 +390,14 @@ namespace ProcReader {
     }
 
     Memory readMemory() {
-        try {
-            auto proc = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
+        auto proc = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
 
-            Memory ret{};
+        Memory ret{};
 
-            ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
-            ret.free = getBytesFromKilobyte(proc.at("MemFree"));
-            ret.available = getBytesFromKilobyte(proc.at("MemAvailable"));
+        ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
+        ret.free = getBytesFromKilobyte(proc.at("MemFree"));
+        ret.available = getBytesFromKilobyte(proc.at("MemAvailable"));
 
-            return ret;
-        } catch (const std::exception &e) {
-            return {}; //Assume permissions error
-        }
+        return ret;
     }
 }
