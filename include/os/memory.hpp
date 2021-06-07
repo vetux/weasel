@@ -20,10 +20,12 @@
 #ifndef WEASEL_MEMORY_HPP
 #define WEASEL_MEMORY_HPP
 
+#include "os/types.hpp"
+
 struct Memory {
-    long total;
-    long free;
-    long available;
+    Mem_t total;
+    Mem_t free;
+    Mem_t available;
 };
 
 #endif //WEASEL_MEMORY_HPP

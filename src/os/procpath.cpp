@@ -38,27 +38,27 @@ namespace ProcPath {
         return LINUX_DIR_PROC;
     }
 
-    std::string getProcessDirectory(int PID) {
+    std::string getProcessDirectory(Pid_t PID) {
         return LINUX_DIR_PROCESS(std::to_string(PID));
     }
 
-    std::string getThreadDirectory(int PID, int TID) {
+    std::string getThreadDirectory(Pid_t PID, Pid_t TID) {
         return LINUX_DIR_THREAD(std::to_string(PID), std::to_string(TID));
     }
 
-    std::string getProcessTasksDirectory(int PID) {
+    std::string getProcessTasksDirectory(Pid_t PID) {
         return LINUX_DIR_PROCESS_TASKS(std::to_string(PID));
     }
 
-    std::string getProcessStatusFile(int PID) {
+    std::string getProcessStatusFile(Pid_t PID) {
         return LINUX_STATUS_PROCESS(std::to_string(PID));
     }
 
-    std::string getThreadStatusFile(int PID, int TID) {
+    std::string getThreadStatusFile(Pid_t PID, Pid_t TID) {
         return LINUX_STATUS_THREAD(std::to_string(PID), std::to_string(TID));
     }
 
-    std::string getCommandLineFile(int PID) {
+    std::string getCommandLineFile(Pid_t PID) {
         return LINUX_COMMAND_LINE(std::to_string(PID));
     }
 

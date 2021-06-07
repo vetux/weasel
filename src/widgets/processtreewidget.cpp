@@ -27,6 +27,6 @@ ProcessTreeWidget::~ProcessTreeWidget() {
 
 }
 
-void ProcessTreeWidget::setProcesses(const std::map<int, Process> &processes) {
+void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &processes) {
 
 }

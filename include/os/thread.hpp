@@ -22,16 +22,22 @@
 
 #include <string>
 
+#include "os/schedulingpolicy.hpp"
+#include "os/types.hpp"
+
 struct Thread {
-    int TID;
-    int PID;
-    int UID;
+    Pid_t TID; // The TID of this thread
+    Pid_t PID; // The PID of the process this thread belongs to
+    Uid_t UID; // The UID of the thread owner
 
     std::string name;
 
-    long memVirt;
-    long memRes;
-    long memShared;
+    int priority; // The nice value of the thread
+    SchedulingPolicy policy; // The scheduling policy of the thread
+
+    Mem_t memVirt;
+    Mem_t memRes;
+    Mem_t memShared;
 };
 
 #endif //WEASEL_THREAD_HPP

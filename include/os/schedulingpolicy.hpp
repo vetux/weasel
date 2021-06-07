@@ -17,29 +17,16 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCPATH_HPP
-#define WEASEL_PROCPATH_HPP
+#ifndef WEASEL_SCHEDULINGPOLICY_HPP
+#define WEASEL_SCHEDULINGPOLICY_HPP
 
-#include <string>
+enum SchedulingPolicy {
+    OTHER,
+    BATCH,
+    IDLE,
+    FIFO,
+    RR,
+    DEADLINE
+};
 
-#include "os/types.hpp"
-
-namespace ProcPath {
-    std::string getProcDirectory();
-
-    std::string getProcessDirectory(Pid_t PID);
-
-    std::string getThreadDirectory(Pid_t PID, Pid_t TID);
-
-    std::string getProcessTasksDirectory(Pid_t PID);
-
-    std::string getProcessStatusFile(Pid_t PID);
-
-    std::string getThreadStatusFile(Pid_t PID, Pid_t TID);
-
-    std::string getCommandLineFile(Pid_t PID);
-
-    std::string getMemoryInfoFile();
-}
-
-#endif //WEASEL_PROCPATH_HPP
+#endif //WEASEL_SCHEDULINGPOLICY_HPP

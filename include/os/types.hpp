@@ -17,29 +17,19 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCPATH_HPP
-#define WEASEL_PROCPATH_HPP
+#ifndef WEASEL_TYPES_HPP
+#define WEASEL_TYPES_HPP
 
 #include <string>
 
-#include "os/types.hpp"
+typedef long Pid_t;
+typedef long Uid_t;
+typedef long Mem_t;
 
-namespace ProcPath {
-    std::string getProcDirectory();
+Pid_t stringToPid(const std::string &str);
 
-    std::string getProcessDirectory(Pid_t PID);
+Uid_t stringToUid(const std::string &str);
 
-    std::string getThreadDirectory(Pid_t PID, Pid_t TID);
+Mem_t stringToMem(const std::string &str);
 
-    std::string getProcessTasksDirectory(Pid_t PID);
-
-    std::string getProcessStatusFile(Pid_t PID);
-
-    std::string getThreadStatusFile(Pid_t PID, Pid_t TID);
-
-    std::string getCommandLineFile(Pid_t PID);
-
-    std::string getMemoryInfoFile();
-}
-
-#endif //WEASEL_PROCPATH_HPP
+#endif //WEASEL_TYPES_HPP

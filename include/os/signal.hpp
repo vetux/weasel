@@ -20,7 +20,6 @@
 #ifndef WEASEL_SIGNAL_HPP
 #define WEASEL_SIGNAL_HPP
 
-//Posix conforming signals, not all values are implemented depending on the platform.
 enum Signal {
     SIGNAL_SIGHUP,
     SIGNAL_SIGINT,

@@ -37,11 +37,15 @@
 #include <sys/syscall.h>
 #include <sys/resource.h>
 
+#include <sched.h>
+
 #include "os/procpath.hpp"
 
 namespace fs = std::filesystem;
 
-pid_t convertPID(int pid) {
+pid_t convertPID(Pid_t pid) {
+    if (pid > std::numeric_limits<pid_t>::max() || pid < std::numeric_limits<pid_t>::min())
+        throw std::runtime_error("Pid value is out of range");
     return static_cast<pid_t>(pid);
 }
 
@@ -102,7 +106,7 @@ bool isPID(const std::string &name) {
     return true;
 }
 
-long tkill(int TID, int signal) {
+long tkill(pid_t TID, int signal) {
     return syscall(SYS_tkill, TID, signal);
 }
 
@@ -182,15 +186,15 @@ std::string readText(const std::string &filePath) {
     return ret;
 }
 
-int getUID(const std::string &uid) {
+Uid_t getUID(const std::string &uid) {
     std::string t = uid.substr(0, uid.find(' '));
-    return std::stoi(t);
+    return stringToUid(t);
 }
 
-int getBitsFromKilobyte(const std::string &mem) {
+Mem_t getBytesFromKilobyte(const std::string &mem) {
     std::string tmp;
     tmp = mem.substr(0, mem.find(' '));
-    return std::stoi(tmp) * 8000;
+    return stringToMem(tmp) * 1000;
 }
 
 Thread readThread(const fs::path &statusFile) {
@@ -198,9 +202,10 @@ Thread readThread(const fs::path &statusFile) {
 
     Thread ret;
 
-    ret.TID = std::stoi(proc.at("Pid"));
-    ret.PID = std::stoi(proc.at("Tgid"));
+    ret.TID = stringToPid(proc.at("Pid"));
+    ret.PID = stringToPid(proc.at("Tgid"));
     ret.UID = getUID(proc.at("Uid"));
+
     ret.name = proc.at("Name");
 
     //TODO:Implement memory parsing
@@ -211,7 +216,7 @@ Thread readThread(const fs::path &statusFile) {
     return ret;
 }
 
-std::string readCommand(int PID) {
+std::string readCommand(Pid_t PID) {
     std::ifstream stream;
 
     std::string filePath = ProcPath::getCommandLineFile(PID);
@@ -228,21 +233,17 @@ std::string readCommand(int PID) {
 
 Process readProcess(const fs::path &statusFile) {
     auto proc = parseProcFile(readText(statusFile));
-
     Process ret;
 
-    ret.PID = std::stoi(proc.at("Pid"));
+    ret.PID = stringToPid(proc.at("Pid"));
     ret.UID = getUID(proc.at("Uid"));
 
     ret.name = proc.at("Name");
     ret.command = readCommand(ret.PID);
+
     ret.priority = getpriority(PRIO_PROCESS, ret.PID);
 
-    ret.memVirt = 0;
-    ret.memRes = 0;
-    ret.memShared = 0;
-
-    ret.parentPID = std::stoi(proc.at("PPid"));
+    ret.parentPID = stringToPid(proc.at("PPid"));
 
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcessTasksDirectory(ret.PID))) {
@@ -253,7 +254,7 @@ Process readProcess(const fs::path &statusFile) {
 
     for (auto &e : entries) {
         ret.threads.emplace_back(
-                readThread(ProcPath::getThreadStatusFile(ret.PID, std::stoi(e.path().filename().string())))
+                readThread(ProcPath::getThreadStatusFile(ret.PID, stringToPid(e.path().filename().string())))
         );
     }
 
@@ -265,14 +266,14 @@ Memory readMemory(const fs::path &memFile) {
 
     Memory ret{};
 
-    ret.total = getBitsFromKilobyte(proc.at("MemTotal"));
-    ret.free = getBitsFromKilobyte(proc.at("MemFree"));
-    ret.available = getBitsFromKilobyte(proc.at("MemAvailable"));
+    ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
+    ret.free = getBytesFromKilobyte(proc.at("MemFree"));
+    ret.available = getBytesFromKilobyte(proc.at("MemAvailable"));
 
     return ret;
 }
 
-const std::map<int, Process> &Scheduler::getProcesses() {
+const std::map<Pid_t, Process> &Scheduler::getProcesses() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
         if (isPID(fl.path().filename())) {
@@ -282,8 +283,9 @@ const std::map<int, Process> &Scheduler::getProcesses() {
     processes.clear();
     for (fs::directory_entry &p : entries) {
         const auto &path = p.path();
-        auto proc = readProcess(ProcPath::getProcessStatusFile(std::stoi(path.filename().string())));
-        processes[proc.PID] = proc;
+        auto pid = stringToPid(path.filename().string());
+        auto proc = readProcess(ProcPath::getProcessStatusFile(pid));
+        processes[pid] = proc;
     }
     return processes;
 }
@@ -323,5 +325,9 @@ void Scheduler::setPriority(const Thread &thread, int priority) {
         auto err = errno;
         throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
     }
+}
+
+void Scheduler::setPolicy(const Thread &thread, SchedulingPolicy policy) {
+    throw std::runtime_error("Not Implemented");
 }
 

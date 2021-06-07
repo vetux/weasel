@@ -37,7 +37,7 @@ public:
      *
      * @return The map of currently active processes with the PID as key.
      */
-    const std::map<int, Process> &getProcesses();
+    const std::map<Pid_t, Process> &getProcesses();
 
     /**
      * This method polls the operating system for memory information and returns a reference to it.
@@ -47,7 +47,7 @@ public:
     const Memory &getMemory();
 
     /**
-     * Send the signal to the process
+     * Send the signal to the process.
      *
      * @param process The process to send the signal to
      * @param signal The signal to send
@@ -55,7 +55,7 @@ public:
     void signal(const Process &process, Signal signal);
 
     /**
-     * Send the signal to the thread
+     * Send the signal to the thread.
      *
      * @param thread The thread to send the signal to
      * @param signal The signal to send
@@ -63,23 +63,32 @@ public:
     void signal(const Thread &thread, Signal signal);
 
     /**
-     * Set the process priority
+     * Set the process nice value.
      *
-     * @param process The process to set the priority of
-     * @param priority The priority to set
+     * The priority value is in the range -20 to 19, with -20 being the highest priority and 19 being the lowest priority.
+     *
+     * @param process The process to set the priority of.
+     * @param priority The priority to set.
      */
     void setPriority(const Process &process, int priority);
 
     /**
-     * Set the thread priority
+     * Set the thread nice value.
      *
      * @param thread The thread to set the priority of
      * @param priority The priority to set
      */
     void setPriority(const Thread &thread, int priority);
 
+    /**
+     * Set the scheduling policy of the thread.
+     *
+     * @param Process
+     */
+    void setPolicy(const Thread &thread, SchedulingPolicy policy);
+
 private:
-    std::map<int, Process> processes;
+    std::map<Pid_t, Process> processes;
     Memory memory;
 };
 

@@ -38,7 +38,7 @@ public:
 
     ~ProcessTreeWidget() override;
 
-    void setProcesses(const std::map<int, Process> &processes);
+    void setProcesses(const std::map<Pid_t, Process> &processes);
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

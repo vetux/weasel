@@ -24,21 +24,22 @@
 #include <vector>
 
 #include "os/thread.hpp"
+#include "os/types.hpp"
 
 struct Process {
-    int PID;
-    int UID;
+    Pid_t PID;
+    Uid_t UID;
 
     std::string name;
     std::string command;
 
-    int priority;
+    int priority; // The process nice value
 
-    long memVirt;
-    long memRes;
-    long memShared;
+    Mem_t memVirt;
+    Mem_t memRes;
+    Mem_t memShared;
 
-    int parentPID;
+    Pid_t parentPID; // The parent process PID or -1 if no parent.
 
     std::vector<Thread> threads;
 };
