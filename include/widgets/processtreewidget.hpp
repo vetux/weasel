@@ -33,6 +33,10 @@ signals:
 
     void threadSignalRequested(const Thread &thread, Signal signal);
 
+    void processPriorityChangeRequested(const Process &proc, int priority);
+
+    void threadPriorityChangeRequested(const Thread &thread, int priority);
+
 public:
     ProcessTreeWidget();
 
