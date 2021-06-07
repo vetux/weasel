@@ -17,24 +17,24 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCPARSER_HPP
-#define WEASEL_PROCPARSER_HPP
+#ifndef WEASEL_EXCEPTIONS_HPP
+#define WEASEL_EXCEPTIONS_HPP
 
-#include <filesystem>
 #include <stdexcept>
 
-#include "os/thread.hpp"
-#include "os/process.hpp"
-#include "os/memory.hpp"
+class PermissionError : public std::runtime_error {
+public:
+    explicit PermissionError(const std::string &message = "") : std::runtime_error(message) {};
+};
 
-namespace ProcParser {
-    bool isPID(const std::string &name);
+class ProcessNotFound : public std::runtime_error {
+public:
+    explicit ProcessNotFound(const std::string &message = "") : std::runtime_error(message) {};
+};
 
-    Thread parseThread(const std::filesystem::path &statusFile);
+class ThreadNotFound : public std::runtime_error {
+public:
+    explicit ThreadNotFound(const std::string &message = "") : std::runtime_error(message) {};
+};
 
-    Process parseProcess(const std::filesystem::path &statusFile);
-
-    Memory parseMemory(const std::filesystem::path &memFile);
-}
-
-#endif //WEASEL_PROCPARSER_HPP
+#endif //WEASEL_EXCEPTIONS_HPP

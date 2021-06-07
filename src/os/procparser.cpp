@@ -28,6 +28,8 @@
 #include "os/procpath.hpp"
 #include "os/syscalls.hpp"
 
+#include "os/exceptions.hpp"
+
 bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';
 }
@@ -177,7 +179,10 @@ namespace ProcParser {
         ret.priority = getpriority(PRIO_PROCESS, ret.TID);
         auto err = errno;
         if (ret.priority == -1 && err != 0) {
-            throw std::runtime_error("Failed to get priority");
+            if (err == ESRCH)
+                throw ThreadNotFound();
+            else
+                throw std::runtime_error("Failed to get priority");
         }
 
         sched_attr attr{};
@@ -207,7 +212,10 @@ namespace ProcParser {
         ret.priority = getpriority(PRIO_PROCESS, ret.PID);
         auto err = errno;
         if (ret.priority == -1 && err != 0) {
-            throw std::runtime_error("Failed to get priority");
+            if (err == ESRCH)
+                throw ProcessNotFound();
+            else
+                throw std::runtime_error("Failed to get priority");
         }
 
         //TODO:Implement memory parsing
@@ -225,9 +233,14 @@ namespace ProcParser {
         }
 
         for (auto &e : entries) {
-            ret.threads.emplace_back(
-                    parseThread(ProcPath::getThreadStatusFile(ret.PID, stringToPid(e.path().filename().string())))
-            );
+            try {
+                ret.threads.emplace_back(
+                        parseThread(ProcPath::getThreadStatusFile(ret.PID, stringToPid(e.path().filename().string())))
+                );
+            }
+            catch (const ThreadNotFound &e) {
+                //Do not add the no longer existing thread
+            }
         }
 
         return ret;
