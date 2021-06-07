@@ -26,6 +26,7 @@
 #include <sys/resource.h>
 
 #include "os/procpath.hpp"
+#include "os/syscalls.hpp"
 
 bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';
@@ -133,6 +134,25 @@ std::string readCommand(Pid_t PID) {
     return ret;
 }
 
+SchedulingPolicy convertPolicy(uint32_t policy) {
+    switch (policy) {
+        case SCHED_OTHER:
+            return OTHER;
+        case SCHED_BATCH:
+            return BATCH;
+        case SCHED_IDLE:
+            return IDLE;
+        case SCHED_FIFO:
+            return FIFO;
+        case SCHED_RR:
+            return RR;
+        case SCHED_DEADLINE:
+            return DEADLINE;
+        default:
+            throw std::runtime_error("Invalid policy value");
+    }
+}
+
 namespace ProcParser {
     bool isPID(const std::string &name) {
         for (auto &c : name) {
@@ -153,6 +173,18 @@ namespace ProcParser {
 
         ret.name = proc.at("Name");
 
+        errno = 0;
+        ret.priority = getpriority(PRIO_PROCESS, ret.TID);
+        auto err = errno;
+        if (ret.priority == -1 && err != 0) {
+            throw std::runtime_error("Failed to get priority");
+        }
+
+        sched_attr attr{};
+        sched_getattr(ret.TID, &attr, sizeof(struct sched_attr), 0);
+
+        ret.policy = convertPolicy(attr.sched_policy);
+
         //TODO:Implement memory parsing
         ret.memVirt = 0;
         ret.memRes = 0;
@@ -171,7 +203,12 @@ namespace ProcParser {
         ret.name = proc.at("Name");
         ret.command = readCommand(ret.PID);
 
+        errno = 0;
         ret.priority = getpriority(PRIO_PROCESS, ret.PID);
+        auto err = errno;
+        if (ret.priority == -1 && err != 0) {
+            throw std::runtime_error("Failed to get priority");
+        }
 
         //TODO:Implement memory parsing
         ret.memVirt = 0;
