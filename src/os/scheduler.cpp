@@ -37,21 +37,9 @@
 #include <sys/syscall.h>
 #include <sys/resource.h>
 
+#include "os/procpath.hpp"
+
 namespace fs = std::filesystem;
-
-#define LINUX_DIR_PROC std::string("/proc")
-
-#define LINUX_DIR_PROCESS(PID) LINUX_DIR_PROC + "/" + PID
-#define LINUX_DIR_PROCESS_TASKS(PID) LINUX_DIR_PROCESS(PID) + "/task"
-
-#define LINUX_DIR_THREAD(PID, TID) LINUX_DIR_PROCESS(PID) + "/task/" + TID
-
-#define LINUX_STATUS_PROCESS(PID) LINUX_DIR_PROCESS(PID) + "/status"
-#define LINUX_STATUS_THREAD(PID, TID) LINUX_DIR_THREAD(PID, TID) + "/status"
-
-#define LINUX_COMMAND_LINE(PID) LINUX_DIR_PROCESS(PID) + "/cmdline"
-
-#define LINUX_MEMINFO LINUX_DIR_PROC + "/meminfo"
 
 pid_t convertPID(int pid) {
     return static_cast<pid_t>(pid);
@@ -226,7 +214,7 @@ Thread readThread(const fs::path &statusFile) {
 std::string readCommand(int PID) {
     std::ifstream stream;
 
-    std::string filePath = LINUX_COMMAND_LINE(std::to_string(PID));
+    std::string filePath = ProcPath::getCommandLineFile(PID);
     stream.open(filePath);
 
     if (stream.fail()) {
@@ -257,15 +245,16 @@ Process readProcess(const fs::path &statusFile) {
     ret.parentPID = std::stoi(proc.at("PPid"));
 
     std::vector<fs::directory_entry> entries;
-    for (auto &fl : fs::directory_iterator(LINUX_DIR_PROCESS_TASKS(std::to_string(ret.PID)))) {
+    for (auto &fl : fs::directory_iterator(ProcPath::getProcessTasksDirectory(ret.PID))) {
         if (isPID(fl.path().filename())) {
             entries.emplace_back(fl);
         }
     }
 
     for (auto &e : entries) {
-        ret.threads.emplace_back(readThread(LINUX_STATUS_THREAD(std::to_string(ret.PID),
-                                                                e.path().filename().string())));
+        ret.threads.emplace_back(
+                readThread(ProcPath::getThreadStatusFile(ret.PID, std::stoi(e.path().filename().string())))
+        );
     }
 
     return ret;
@@ -285,7 +274,7 @@ Memory readMemory(const fs::path &memFile) {
 
 const std::map<int, Process> &Scheduler::getProcesses() {
     std::vector<fs::directory_entry> entries;
-    for (auto &fl : fs::directory_iterator(LINUX_DIR_PROC)) {
+    for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
         if (isPID(fl.path().filename())) {
             entries.emplace_back(fl);
         }
@@ -293,14 +282,14 @@ const std::map<int, Process> &Scheduler::getProcesses() {
     processes.clear();
     for (fs::directory_entry &p : entries) {
         const auto &path = p.path();
-        auto proc = readProcess(LINUX_STATUS_PROCESS(path.filename().string()));
+        auto proc = readProcess(ProcPath::getProcessStatusFile(std::stoi(path.filename().string())));
         processes[proc.PID] = proc;
     }
     return processes;
 }
 
 const Memory &Scheduler::getMemory() {
-    memory = readMemory(LINUX_MEMINFO);
+    memory = readMemory(ProcPath::getMemoryInfoFile());
     return memory;
 }
 
