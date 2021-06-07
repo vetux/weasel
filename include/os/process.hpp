@@ -36,7 +36,7 @@ struct Process {
     // /proc/[pid]/environ
     std::string environ{};
 
-    // /proc/[pid]/task/[tid]/io
+    // /proc/[pid]/io
     unsigned long rchar{};
     unsigned long wchar{};
     unsigned long syscr{};
@@ -45,13 +45,13 @@ struct Process {
     unsigned long write_bytes{};
     unsigned long cancelled_write_bytes{};
 
-    // /proc/[pid]/task/[tid]/root
+    // /proc/[pid]/root
     std::string rootDirectory{};
 
-    // /proc/[pid]/task/[tid]/fd/
+    // /proc/[pid]/fd/
     std::vector<std::string> openFiles{};
 
-    // /proc/[pid]/task/[tid]/exe
+    // /proc/[pid]/exe
     std::string executablePath{};
 
     std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
