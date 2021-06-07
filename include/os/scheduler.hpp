@@ -83,13 +83,17 @@ public:
     /**
      * Set the scheduling policy of the thread.
      *
-     * @param Process
+     * @param thread The thread to set the policy of.
+     * @param policy The policy to set.
+     * @param runtime If policy is DEADLINE the runtime value in nanoseconds.
+     * @param deadline If policy is DEADLINE the deadline value in nanoseconds.
+     * @param period If policy is DEADLINE the period value in nanoseconds.
      */
     void setPolicy(const Thread &thread,
                    SchedulingPolicy policy,
-                   uint64_t runtime,
-                   uint64_t deadline,
-                   uint64_t period);
+                   uint64_t runtime = 0,
+                   uint64_t deadline = 0,
+                   uint64_t period = 0);
 
 private:
     std::map<Pid_t, Process> processes;
