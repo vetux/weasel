@@ -19,10 +19,14 @@
 
 #include "widgets/toolbarwidget.hpp"
 
-ToolbarWidget::ToolbarWidget() {
+ToolbarWidget::ToolbarWidget(QWidget *parent) {
 
 }
 
 ToolbarWidget::~ToolbarWidget() {
+
+}
+
+void ToolbarWidget::setMemory(const Memory &memory) {
 
 }

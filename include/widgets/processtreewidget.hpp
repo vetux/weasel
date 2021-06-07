@@ -38,7 +38,7 @@ signals:
     void threadPriorityChangeRequested(const Thread &thread, int priority);
 
 public:
-    ProcessTreeWidget();
+    explicit ProcessTreeWidget(QWidget *parent = nullptr);
 
     ~ProcessTreeWidget() override;
 

@@ -22,13 +22,17 @@
 
 #include <QWidget>
 
+#include "os/memory.hpp"
+
 class ToolbarWidget : public QWidget {
 Q_OBJECT
 signals:
 public:
-    ToolbarWidget();
+    explicit ToolbarWidget(QWidget *parent = nullptr);
 
     ~ToolbarWidget() override;
+
+    void setMemory(const Memory &memory);
 };
 
 #endif //WEASEL_TOOLBARWIDGET_HPP

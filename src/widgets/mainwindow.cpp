@@ -21,8 +21,12 @@
 
 #include <QMenuBar>
 
-MainWindow::MainWindow() {
+MainWindow::MainWindow(int pollingInterval) {
+    toolbar = new ToolbarWidget(this);
+    procTree = new ProcessTreeWidget(this);
     setupMenuBar();
+    connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
+    pollTimer.start(pollingInterval);
 }
 
 MainWindow::~MainWindow() {
@@ -33,4 +37,10 @@ void MainWindow::setupMenuBar() {
     menuBar()->addMenu("View");
     menuBar()->addMenu("Tools");
     menuBar()->addMenu("Help");
+}
+
+void MainWindow::onPollTimeOut() {
+    sched.refresh();
+    procTree->setProcesses(sched.getProcesses());
+    toolbar->setMemory(sched.getMemory());
 }

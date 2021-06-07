@@ -21,6 +21,7 @@
 #define WEASEL_MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include <QTimer>
 
 #include "os/scheduler.hpp"
 
@@ -30,12 +31,18 @@
 class MainWindow : public QMainWindow {
 Q_OBJECT
 public:
-    MainWindow();
+    explicit MainWindow(int pollingInterval = 1000);
 
     ~MainWindow() override;
 
+private slots:
+
+    void onPollTimeOut();
+
 private:
     void setupMenuBar();
+
+    QTimer pollTimer;
 
     Scheduler sched;
 

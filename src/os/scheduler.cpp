@@ -108,7 +108,7 @@ int convertPolicy(SchedulingPolicy policy) {
     }
 }
 
-const std::map<Pid_t, Process> &Scheduler::getProcesses() {
+void Scheduler::refresh() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
         if (ProcParser::isPID(fl.path().filename())) {
@@ -122,11 +122,15 @@ const std::map<Pid_t, Process> &Scheduler::getProcesses() {
         auto proc = ProcParser::parseProcess(ProcPath::getProcessStatusFile(pid));
         processes[pid] = proc;
     }
+
+    memory = ProcParser::parseMemory(ProcPath::getMemoryInfoFile());
+}
+
+const std::map<Pid_t, Process> &Scheduler::getProcesses() {
     return processes;
 }
 
 const Memory &Scheduler::getMemory() {
-    memory = ProcParser::parseMemory(ProcPath::getMemoryInfoFile());
     return memory;
 }
 

@@ -29,8 +29,11 @@
 class Scheduler {
 public:
     /**
-     * This method polls the operating system for active processes and returns a reference to them.
-     *
+     * This method updates the data.
+     */
+    void refresh();
+
+    /**
      * The process and thread interfaces are plain data objects.
      *
      * To modify the process tree methods on the scheduler interface have to be used.
@@ -40,8 +43,6 @@ public:
     const std::map<Pid_t, Process> &getProcesses();
 
     /**
-     * This method polls the operating system for memory information and returns a reference to it.
-     *
      * @return The memory information
      */
     const Memory &getMemory();

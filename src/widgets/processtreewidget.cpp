@@ -19,7 +19,7 @@
 
 #include "widgets/processtreewidget.hpp"
 
-ProcessTreeWidget::ProcessTreeWidget() {
+ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) {
 
 }
 
