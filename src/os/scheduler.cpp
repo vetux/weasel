@@ -34,7 +34,7 @@
 
 #include "os/procpath.hpp"
 #include "os/syscalls.hpp"
-#include "os/procparser.hpp"
+#include "os/procreader.hpp"
 
 #include "os/exceptions.hpp"
 
@@ -113,16 +113,17 @@ int convertPolicy(SchedulingPolicy policy) {
 void Scheduler::refresh() {
     std::vector<fs::directory_entry> entries;
     for (auto &fl : fs::directory_iterator(ProcPath::getProcDirectory())) {
-        if (ProcParser::isPID(fl.path().filename())) {
+        if (ProcReader::isPID(fl.path().filename())) {
             entries.emplace_back(fl);
         }
     }
     processes.clear();
+
     for (fs::directory_entry &p : entries) {
         const auto &path = p.path();
         auto pid = stringToPid(path.filename().string());
         try {
-            auto proc = ProcParser::parseProcess(ProcPath::getProcessStatusFile(pid));
+            auto proc = ProcReader::readProcess(pid);
             processes[pid] = proc;
         }
         catch (const ProcessNotFound &e) {
@@ -130,7 +131,7 @@ void Scheduler::refresh() {
         }
     }
 
-    memory = ProcParser::parseMemory(ProcPath::getMemoryInfoFile());
+    memory = ProcReader::readMemory();
 }
 
 const std::map<Pid_t, Process> &Scheduler::getProcesses() {
@@ -142,7 +143,7 @@ const Memory &Scheduler::getMemory() {
 }
 
 void Scheduler::signal(const Process &process, Signal signal) {
-    int r = kill(convertPID(process.PID), convertSignal(signal));
+    int r = kill(convertPID(process.pid), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
         if (err == EPERM)
@@ -155,7 +156,7 @@ void Scheduler::signal(const Process &process, Signal signal) {
 }
 
 void Scheduler::signal(const Thread &thread, Signal signal) {
-    auto r = tkill(convertPID(thread.TID), convertSignal(signal));
+    auto r = tkill(convertPID(thread.tid), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
         if (err == EPERM)
@@ -168,7 +169,7 @@ void Scheduler::signal(const Thread &thread, Signal signal) {
 }
 
 void Scheduler::setPriority(const Process &process, int priority) {
-    int r = setpriority(PRIO_PROCESS, convertPID(process.PID), priority);
+    int r = setpriority(PRIO_PROCESS, convertPID(process.pid), priority);
     if (r == -1) {
         auto err = errno;
         if (err == EPERM)
@@ -181,7 +182,7 @@ void Scheduler::setPriority(const Process &process, int priority) {
 }
 
 void Scheduler::setPriority(const Thread &thread, int priority) {
-    int r = setpriority(PRIO_PROCESS, convertPID(thread.TID), priority);
+    int r = setpriority(PRIO_PROCESS, convertPID(thread.tid), priority);
     if (r == -1) {
         auto err = errno;
         if (err == EPERM)
@@ -207,7 +208,7 @@ void Scheduler::setPolicy(const Thread &thread,
     attr.sched_runtime = runtime;
     attr.sched_deadline = deadline;
     attr.sched_period = period;
-    int r = sched_setattr(thread.TID, &attr, 0);
+    int r = sched_setattr(thread.tid, &attr, 0);
     if (r == -1) {
         auto err = errno;
         if (err == EPERM)

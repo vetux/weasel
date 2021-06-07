@@ -17,8 +17,8 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCPARSER_HPP
-#define WEASEL_PROCPARSER_HPP
+#ifndef WEASEL_PROCREADER_HPP
+#define WEASEL_PROCREADER_HPP
 
 #include <filesystem>
 #include <stdexcept>
@@ -27,14 +27,14 @@
 #include "os/process.hpp"
 #include "os/memory.hpp"
 
-namespace ProcParser {
+namespace ProcReader {
     bool isPID(const std::string &name);
 
-    Thread parseThread(const std::filesystem::path &statusFile);
+    Thread readThread(Process &process, Pid_t tid);
 
-    Process parseProcess(const std::filesystem::path &statusFile);
+    Process readProcess(Pid_t pid);
 
-    Memory parseMemory(const std::filesystem::path &memFile);
+    Memory readMemory();
 }
 
-#endif //WEASEL_PROCPARSER_HPP
+#endif //WEASEL_PROCREADER_HPP

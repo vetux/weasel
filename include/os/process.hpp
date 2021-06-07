@@ -27,21 +27,34 @@
 #include "os/types.hpp"
 
 struct Process {
-    Pid_t PID;
-    Uid_t UID;
+    Pid_t pid{}; // The process id, equal to threads[0].tid
+    Uid_t uid{}; // User ID retrieved via stat()
 
-    std::string name;
-    std::string command;
+    // /proc/[pid]/cmdline
+    std::string commandLine{};
 
-    int priority; // The process nice value
+    // /proc/[pid]/environ
+    std::string environ{};
 
-    Mem_t memVirt;
-    Mem_t memRes;
-    Mem_t memShared;
+    // /proc/[pid]/task/[tid]/io
+    unsigned long rchar{};
+    unsigned long wchar{};
+    unsigned long syscr{};
+    unsigned long syscw{};
+    unsigned long read_bytes{};
+    unsigned long write_bytes{};
+    unsigned long cancelled_write_bytes{};
 
-    Pid_t parentPID; // The parent process PID or -1 if no parent.
+    // /proc/[pid]/task/[tid]/root
+    std::string rootDirectory{};
 
-    std::vector<Thread> threads;
+    // /proc/[pid]/task/[tid]/fd/
+    std::vector<std::string> openFiles{};
+
+    // /proc/[pid]/task/[tid]/exe
+    std::string executablePath{};
+
+    std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
 };
 
 #endif //WEASEL_PROCESS_HPP

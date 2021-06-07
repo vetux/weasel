@@ -38,7 +38,7 @@ public:
      *
      * To modify the process tree methods on the scheduler interface have to be used.
      *
-     * @return The map of currently active processes with the PID as key.
+     * @return The map of currently active processes with the pid as key.
      */
     const std::map<Pid_t, Process> &getProcesses();
 
