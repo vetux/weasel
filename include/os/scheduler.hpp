@@ -96,6 +96,11 @@ public:
                    uint64_t deadline = 0,
                    uint64_t period = 0);
 
+    /**
+     * @return The page size in bytes
+     */
+    static int getPageSize();
+
 private:
     std::map<Pid_t, Process> processes;
     Memory memory;

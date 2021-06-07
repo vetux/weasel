@@ -219,3 +219,7 @@ void Scheduler::setPolicy(const Thread &thread,
             throw std::runtime_error("Failed to set policy: " + std::string(strerror(err)));
     }
 }
+
+int Scheduler::getPageSize() {
+    return getpagesize();
+}
