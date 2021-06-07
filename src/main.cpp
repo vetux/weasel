@@ -23,7 +23,14 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    
+    QApplication::setOrganizationName("Xenotux");
+    QApplication::setApplicationDisplayName("Weasel");
+    QApplication::setApplicationName("weasel");
+    QApplication::setApplicationVersion("v0.0.1");
+
     MainWindow win;
     win.show();
-    return app.exec();
+
+    return QApplication::exec();
 }
