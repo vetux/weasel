@@ -17,22 +17,25 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "widgets/toolbarwidget.hpp"
+#ifndef WEASEL_MEMORYBARWIDGET_HPP
+#define WEASEL_MEMORYBARWIDGET_HPP
 
-ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
-    setLayout(new QHBoxLayout());
-    refreshButton = new QPushButton();
-    memBar = new MemoryBarWidget();
-    refreshButton->setText("Refresh");
-    layout()->addWidget(refreshButton);
-    layout()->addWidget(memBar);
-    layout()->setMargin(0);
-}
+#include <QWidget>
+#include <QProgressBar>
+#include <QLabel>
 
-ToolbarWidget::~ToolbarWidget() {
+#include "os/memory.hpp"
 
-}
+class MemoryBarWidget : public QWidget {
+public:
+    MemoryBarWidget();
 
-void ToolbarWidget::setMemory(const Memory &memory) {
-    memBar->setMemory(memory);
-}
+    void setMemory(const Memory &mem);
+
+private:
+    QProgressBar *memoryTotalBar;
+    QProgressBar *memoryAvailableBar;
+    QLabel *memoryText;
+};
+
+#endif //WEASEL_MEMORYBARWIDGET_HPP

@@ -46,6 +46,8 @@ private:
 
     Scheduler sched;
 
+    QWidget *mainWidget;
+
     ToolbarWidget *toolbar;
     ProcessTreeWidget *procTree;
 };

@@ -22,9 +22,23 @@
 #include <QMenuBar>
 
 MainWindow::MainWindow(int pollingInterval) {
-    toolbar = new ToolbarWidget(this);
-    procTree = new ProcessTreeWidget(this);
+    mainWidget = new QWidget();
+    auto *l = new QVBoxLayout();
+
+    toolbar = new ToolbarWidget();
+    procTree = new ProcessTreeWidget();
+
+    l->addWidget(toolbar);
+    l->addWidget(procTree,1);
+
+    mainWidget->setLayout(l);
+
+    setCentralWidget(mainWidget);
+
     setupMenuBar();
+
+    onPollTimeOut();
+
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
     pollTimer.start(pollingInterval);
 }

@@ -21,8 +21,14 @@
 #define WEASEL_TOOLBARWIDGET_HPP
 
 #include <QWidget>
+#include <QProgressBar>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 #include "os/memory.hpp"
+
+#include "widgets/memorybarwidget.hpp"
 
 class ToolbarWidget : public QWidget {
 Q_OBJECT
@@ -33,6 +39,10 @@ public:
     ~ToolbarWidget() override;
 
     void setMemory(const Memory &memory);
+
+private:
+    QPushButton *refreshButton;
+    MemoryBarWidget *memBar;
 };
 
 #endif //WEASEL_TOOLBARWIDGET_HPP
