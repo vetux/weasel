@@ -21,6 +21,8 @@
 #define WEASEL_PROCESSTREEWIDGET_HPP
 
 #include <QWidget>
+#include <QTreeView>
+#include <QStandardItemModel>
 
 #include "os/process.hpp"
 #include "os/signal.hpp"
@@ -43,6 +45,16 @@ public:
     ~ProcessTreeWidget() override;
 
     void setProcesses(const std::map<Pid_t, Process> &processes);
+
+private slots:
+
+    void clicked();
+
+    void doubleCLicked(const QModelIndex &index);
+
+private:
+    QTreeView *treeView;
+    QStandardItemModel model;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

@@ -40,6 +40,8 @@ MainWindow::MainWindow(int pollingInterval) {
     onPollTimeOut();
 
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
+    connect(toolbar, SIGNAL(refreshPressed()), this, SLOT(refreshPressed()));
+
     pollTimer.start(pollingInterval);
 }
 
@@ -53,6 +55,12 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::onPollTimeOut() {
+    sched.refresh();
+    procTree->setProcesses(sched.getProcesses());
+    toolbar->setMemory(sched.getMemory());
+}
+
+void MainWindow::refreshPressed() {
     sched.refresh();
     procTree->setProcesses(sched.getProcesses());
     toolbar->setMemory(sched.getMemory());

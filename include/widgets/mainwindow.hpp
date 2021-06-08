@@ -39,6 +39,8 @@ private slots:
 
     void onPollTimeOut();
 
+    void refreshPressed();
+
 private:
     void setupMenuBar();
 

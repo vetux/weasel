@@ -27,6 +27,8 @@ ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
     layout()->addWidget(refreshButton);
     layout()->addWidget(memBar);
     layout()->setMargin(0);
+
+    connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));
 }
 
 ToolbarWidget::~ToolbarWidget() {

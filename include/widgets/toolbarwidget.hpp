@@ -33,6 +33,9 @@
 class ToolbarWidget : public QWidget {
 Q_OBJECT
 signals:
+
+    void refreshPressed();
+
 public:
     explicit ToolbarWidget(QWidget *parent = nullptr);
 
