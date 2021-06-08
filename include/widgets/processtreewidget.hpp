@@ -55,6 +55,9 @@ private slots:
 private:
     QTreeView *treeView;
     QStandardItemModel model;
+
+    std::map<Pid_t, QStandardItem *> itemMapping;
+    std::map<Pid_t, Process> processes;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP
