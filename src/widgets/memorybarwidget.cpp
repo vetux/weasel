@@ -26,6 +26,7 @@
 
 MemoryBarWidget::MemoryBarWidget() {
     auto l = new QHBoxLayout();
+    l->setMargin(0);
     memoryTotalBar = new QProgressBar();
     memoryAvailableBar = new QProgressBar();
     memoryText = new QLabel();
