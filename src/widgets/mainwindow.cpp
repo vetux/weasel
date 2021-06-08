@@ -29,7 +29,7 @@ MainWindow::MainWindow(int pollingInterval) {
     procTree = new ProcessTreeWidget();
 
     l->addWidget(toolbar);
-    l->addWidget(procTree,1);
+    l->addWidget(procTree, 1);
 
     mainWidget->setLayout(l);
 
@@ -43,8 +43,7 @@ MainWindow::MainWindow(int pollingInterval) {
     pollTimer.start(pollingInterval);
 }
 
-MainWindow::~MainWindow() {
-}
+MainWindow::~MainWindow() {}
 
 void MainWindow::setupMenuBar() {
     menuBar()->addMenu("Weasel");

@@ -27,34 +27,37 @@
 MemoryBarWidget::MemoryBarWidget() {
     auto l = new QHBoxLayout();
     l->setMargin(0);
-    memoryTotalBar = new QProgressBar();
+    memoryFreeBar = new QProgressBar();
     memoryAvailableBar = new QProgressBar();
     memoryText = new QLabel();
     memoryText->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
     auto al = new QHBoxLayout();
     al->setMargin(0);
     al->setContentsMargins(0, 0, 5, 0);
     al->addWidget(memoryText);
     memoryAvailableBar->setLayout(al);
+
     auto ml = new QHBoxLayout();
     ml->setMargin(0);
     ml->addWidget(memoryAvailableBar);
-    memoryTotalBar->setLayout(ml);
-    memoryTotalBar->setStyleSheet(
-            "QProgressBar {color:transparent;} QProgressBar::chunk { background-color: orange; width: 2px;  margin-left: 1px; margin-right: 1px;}");
+    memoryFreeBar->setLayout(ml);
+    memoryFreeBar->setStyleSheet(
+            "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: orange; width: 2px; margin-left: 1px; margin-right: 1px;}");
     memoryAvailableBar->setStyleSheet(
-            "QProgressBar {background:transparent; color:transparent; } QProgressBar::chunk { background-color: green; width: 2px; margin-left: 1px; margin-right: 1px;}");
-    memoryTotalBar->setRange(0, 100);
+            "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: green; width: 2px;  margin-left: 1px; margin-right: 1px;}");
     memoryAvailableBar->setRange(0, 100);
-    l->addWidget(memoryTotalBar);
+    memoryFreeBar->setRange(0, 100);
+    l->addWidget(memoryFreeBar);
     setLayout(l);
 }
 
 void MemoryBarWidget::setMemory(const Memory &mem) {
-    float u = static_cast<float>(mem.total - mem.free) / mem.total;
-    float av = static_cast<float>(mem.available) / mem.total;
-    memoryTotalBar->setValue(static_cast<int>(100 * u));
-    memoryAvailableBar->setValue(static_cast<int>(100 * av));
+    float availableScale = static_cast<float>(mem.total - mem.available) / mem.total;
+    float freeScale = static_cast<float>(mem.total - mem.free) / mem.total;
+
+    memoryAvailableBar->setValue(static_cast<int>(100 * availableScale));
+    memoryFreeBar->setValue(static_cast<int>(100 * freeScale));
 
     std::string str;
 

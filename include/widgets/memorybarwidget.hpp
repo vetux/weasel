@@ -33,7 +33,7 @@ public:
     void setMemory(const Memory &mem);
 
 private:
-    QProgressBar *memoryTotalBar;
+    QProgressBar *memoryFreeBar;
     QProgressBar *memoryAvailableBar;
     QLabel *memoryText;
 };
