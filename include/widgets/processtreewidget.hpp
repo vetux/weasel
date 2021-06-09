@@ -52,9 +52,12 @@ private slots:
 
     void doubleCLicked(const QModelIndex &index);
 
+    void customContextMenu(const QPoint &pos);
+
 private:
-    QTreeView *treeView;
     QStandardItemModel model;
+    
+    QTreeView *treeView;
 
     std::map<Pid_t, QStandardItem *> itemMapping;
     std::map<Pid_t, Process> processes;

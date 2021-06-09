@@ -21,6 +21,7 @@
 
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QMenu>
 
 #include "os/users.hpp"
 
@@ -37,6 +38,9 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
     treeView = new QTreeView();
 
+    treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    treeView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+
     model.setColumnCount(4);
     model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
 
@@ -46,6 +50,11 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
             SLOT(doubleCLicked(const QModelIndex &)));
 
     connect(treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(clicked()));
+
+    connect(treeView,
+            SIGNAL(customContextMenuRequested(const QPoint &)),
+            this,
+            SLOT(customContextMenu(const QPoint &)));
 
     layout()->addWidget(treeView);
 }
@@ -128,4 +137,16 @@ void ProcessTreeWidget::clicked() {
 
 void ProcessTreeWidget::doubleCLicked(const QModelIndex &index) {
 
+}
+
+void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
+    QModelIndex index = treeView->indexAt(pos);
+    if (index.isValid()) {
+        auto *contextMenu = new QMenu(treeView);
+        contextMenu->addAction("Test");
+        contextMenu->addAction("Test");
+        contextMenu->addMenu("TestMenu")->addAction("Test");
+        contextMenu->exec(treeView->viewport()->mapToGlobal(pos));
+        delete contextMenu;
+    }
 }
