@@ -56,10 +56,10 @@ private slots:
 
 private:
     QStandardItemModel model;
-    
+
     QTreeView *treeView;
 
-    std::map<Pid_t, QStandardItem *> itemMapping;
+    std::map<Pid_t, std::vector<QStandardItem *>> itemMapping;
     std::map<Pid_t, Process> processes;
 };
 

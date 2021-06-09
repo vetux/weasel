@@ -22,8 +22,82 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
+#include <set>
 
 #include "os/users.hpp"
+
+struct TreeNode {
+    QStandardItem *parent;
+    std::vector<QStandardItem *> items;
+    Process process;
+    std::vector<TreeNode> children;
+};
+
+bool findNodeRecursive(const TreeNode &tree, Pid_t pid, TreeNode &output) {
+    if (tree.process.pid == pid) {
+        output = tree;
+        return true;
+    }
+
+    for (auto &child : tree.children) {
+        if (findNodeRecursive(child, pid, output))
+            return true;
+    }
+
+    return false;
+}
+
+TreeNode createNodeRecursive(QStandardItem *parent,
+                             const Process &process,
+                             const std::map<Pid_t, Process> &flatMap,
+                             const std::map<Pid_t, std::vector<QStandardItem *>> &itemMapping) {
+    TreeNode ret;
+    ret.parent = parent;
+    ret.process = process;
+    auto it = itemMapping.find(process.pid);
+    if (it != itemMapping.end())
+        ret.items = it->second;
+
+    for (auto &pair : flatMap) {
+        if (pair.second.threads.at(0).ppid == process.pid) {
+            ret.children.emplace_back(
+                    createNodeRecursive(itemMapping.at(process.pid).at(0),
+                                        pair.second,
+                                        flatMap,
+                                        itemMapping));
+        }
+    }
+
+    return ret;
+}
+
+void eraseNodeRecursive(const TreeNode &node,
+                        std::map<Pid_t, Process> &processes,
+                        QStandardItemModel &model) {
+    for (auto &child : node.children) {
+        eraseNodeRecursive(child, processes, model);
+    }
+
+    node.items.at(0)->removeRows(0, node.children.size());
+
+    processes.erase(node.process.pid);
+}
+
+TreeNode getTree(QStandardItem *rootItem,
+                 const std::map<Pid_t, Process> &flatMap,
+                 const std::map<Pid_t, std::vector<QStandardItem *>> &itemMapping) {
+    if (flatMap.empty())
+        return {};
+    Process init;
+    bool initSet = false;
+    for (auto &pair : flatMap) {
+        if (!initSet || pair.second.pid < init.pid) {
+            initSet = true;
+            init = pair.second;
+        }
+    }
+    return createNodeRecursive(rootItem, init, flatMap, itemMapping);
+}
 
 QList<QStandardItem *> getRow(const std::map<Pid_t, Process> &p, const Thread &thread) {
     QList<QStandardItem *> ret;
@@ -64,62 +138,57 @@ ProcessTreeWidget::~ProcessTreeWidget() {
 }
 
 void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
-    bool deadProcesses = false;
+    QStandardItem *itemsRoot = model.invisibleRootItem();
+
+    TreeNode tree = getTree(itemsRoot, processes, itemMapping);
+
+    std::vector<Pid_t> del;
     for (auto &existingProcess : processes) {
-        if (p.find(existingProcess.first) == p.end()) {
-            deadProcesses = true;
-            break;
+        auto it = p.find(existingProcess.first);
+        if (it == p.end() || it->second.threads.at(0).starttime != existingProcess.second.threads.at(0).starttime) {
+            del.emplace_back(existingProcess.first);
         }
     }
+
+    for (auto pid : del) {
+        if (processes.find(pid) == processes.end())
+            continue;
+        TreeNode pr;
+        assert(findNodeRecursive(tree, pid, pr));
+        eraseNodeRecursive(pr, processes, model);
+        pr.parent->removeRow(pr.items.at(0)->row());
+    }
+
+    del.clear();
 
     std::vector<Pid_t> newProcesses;
 
-    if (deadProcesses) {
-        processes.clear();
-        itemMapping.clear();
-        model.clear();
-        model.setColumnCount(4);
-        model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
-        for (auto &pair : p)
+    for (auto &pair : p) {
+        if (processes.find(pair.first) == processes.end()) {
             newProcesses.emplace_back(pair.first);
-    } else {
-        for (auto &pair : p) {
-            auto it = processes.find(pair.first);
-            if (processes.find(pair.first) == processes.end()) {
-                newProcesses.emplace_back(pair.first);
-            } else {
-                auto existingProcess = processes.at(pair.first);
-                if (existingProcess.threads.at(0).starttime != pair.second.threads.at(0).starttime) {
-                    processes.erase(pair.first);
-                    delete itemMapping.at(pair.first);
-                    itemMapping.erase(pair.first);
-                    newProcesses.emplace_back(pair.first);
-                }
-            }
         }
     }
-
-    std::vector<Pid_t> del;
-
-    QStandardItem *itemsRoot = model.invisibleRootItem();
 
     while (!newProcesses.empty()) {
         for (auto &pid : newProcesses) {
             auto proc = p.at(pid);
             auto ppid = proc.threads.at(0).ppid;
+
+            QList<QStandardItem *> l = getRow(p, proc.threads.at(0));
             if (ppid > 0) {
                 if (itemMapping.find(ppid) != itemMapping.end()) {
-                    QList<QStandardItem *> l = getRow(p, proc.threads.at(0));
-                    itemMapping.at(ppid)->appendRow(l);
-                    itemMapping[pid] = l[0];
-                    del.emplace_back(pid);
+                    itemMapping.at(ppid).at(0)->appendRow(l);
+                } else {
+                    continue;
                 }
             } else {
-                QList<QStandardItem *> l = getRow(p, proc.threads.at(0));
                 itemsRoot->appendRow(l);
-                itemMapping[pid] = l[0];
-                del.emplace_back(pid);
             }
+
+            for (auto *pntr : l)
+                itemMapping[pid].emplace_back(pntr);
+
+            del.emplace_back(pid);
         }
 
         for (auto pid : del)
