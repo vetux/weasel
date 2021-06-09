@@ -38,7 +38,6 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     treeView = new QTreeView();
 
     model.setColumnCount(4);
-
     model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
 
     treeView->setModel(&model);
@@ -56,38 +55,42 @@ ProcessTreeWidget::~ProcessTreeWidget() {
 }
 
 void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
-    std::vector<Pid_t> del;
+    bool deadProcesses = false;
     for (auto &existingProcess : processes) {
         if (p.find(existingProcess.first) == p.end()) {
-            del.emplace_back(existingProcess.first);
+            deadProcesses = true;
+            break;
         }
     }
-
-    for (auto pid : del) {
-        auto row = itemMapping.at(pid)->row(); //TODO/FIX: Returns 0 after calling model.removeRow
-        model.removeRow(row);
-        processes.erase(pid);
-        itemMapping.erase(pid);
-    }
-
-    del.clear();
 
     std::vector<Pid_t> newProcesses;
 
-    for (auto &pair : p) {
-        auto it = processes.find(pair.first);
-        if (processes.find(pair.first) == processes.end()) {
+    if (deadProcesses) {
+        processes.clear();
+        itemMapping.clear();
+        model.clear();
+        model.setColumnCount(4);
+        model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
+        for (auto &pair : p)
             newProcesses.emplace_back(pair.first);
-        } else {
-            auto existingProcess = processes.at(pair.first);
-            if (existingProcess.threads.at(0).starttime != pair.second.threads.at(0).starttime) {
-                processes.erase(pair.first);
-                delete itemMapping.at(pair.first);
-                itemMapping.erase(pair.first);
+    } else {
+        for (auto &pair : p) {
+            auto it = processes.find(pair.first);
+            if (processes.find(pair.first) == processes.end()) {
                 newProcesses.emplace_back(pair.first);
+            } else {
+                auto existingProcess = processes.at(pair.first);
+                if (existingProcess.threads.at(0).starttime != pair.second.threads.at(0).starttime) {
+                    processes.erase(pair.first);
+                    delete itemMapping.at(pair.first);
+                    itemMapping.erase(pair.first);
+                    newProcesses.emplace_back(pair.first);
+                }
             }
         }
     }
+
+    std::vector<Pid_t> del;
 
     QStandardItem *itemsRoot = model.invisibleRootItem();
 
