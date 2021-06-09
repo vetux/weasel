@@ -27,6 +27,17 @@
 #include "os/process.hpp"
 #include "os/signal.hpp"
 
+struct TreeNode {
+    Process process;
+
+    TreeNode *parent = nullptr;
+    std::vector<TreeNode> children;
+
+    QList<QStandardItem *> items;
+};
+
+bool operator==(const TreeNode &lhs, const TreeNode &rhs);
+
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
 signals:
@@ -59,8 +70,7 @@ private:
 
     QTreeView *treeView;
 
-    std::map<Pid_t, std::vector<QStandardItem *>> itemMapping;
-    std::map<Pid_t, Process> processes;
+    TreeNode tree;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP
