@@ -24,9 +24,12 @@
 
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QHBoxLayout());
+
     refreshButton = new QPushButton();
     memBar = new MemoryBarWidget();
+
     refreshButton->setText("Refresh");
+
     layout()->addWidget(refreshButton);
     layout()->addWidget(memBar);
     layout()->setMargin(0);
@@ -41,6 +44,7 @@ ToolbarWidget::~ToolbarWidget() {
 void ToolbarWidget::setSystemStatus(const SystemStatus &system) {
     float available = static_cast<float>(system.available) / system.total;
     float free = static_cast<float>(system.free) / system.total;
+
     memBar->setAvailable(available);
     memBar->setFree(free);
 
