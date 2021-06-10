@@ -30,21 +30,12 @@
 #include "os/procpath.hpp"
 #include "os/syscalls.hpp"
 
-bool isAsciiNumber(char c) {
+inline bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';
 }
 
-bool isAsciiNumber(const std::string &s) {
-    for (auto c: s)
-        if (!isAsciiNumber(c))
-            return false;
-    return true;
-}
-
 Mem_t getBytesFromKilobyte(const std::string &mem) {
-    std::string tmp;
-    tmp = mem.substr(0, mem.find(' '));
-    return stringToMem(tmp) * 1000;
+    return stringToMem(mem.substr(0, mem.find(' '))) * 1000;
 }
 
 SchedulingPolicy convertPolicy(uint32_t policy) {
@@ -84,52 +75,50 @@ std::string readText(const std::string &filePath) {
     return ret;
 }
 
-std::string removeDoubleWhiteSpace(const std::string &str) {
-    auto ret = str;
-    auto space = ret.find("  ");
-    while (space != -1) {
-        ret.replace(space, 2, " ");
-        space = ret.find("  ");
-    }
-    return ret;
-}
-
-std::string removeSurroundingWhiteSpace(const std::string &str) {
-    auto ret = str;
-    auto space = ret.find(' ');
+void removeSurroundingWhiteSpace(std::string &str) {
+    //Preceding
+    auto space = str.find_first_of(' ');
     while (space == 0) {
-        ret.erase(space, 1);
-        space = ret.find(' ');
+        str.erase(space, 1);
+        space = str.find_first_of(' ');
     }
-    space = ret.find(' ');
-    while (!ret.empty() && space == ret.size() - 1) {
-        ret.erase(space, 1);
-        space = ret.find(' ');
+
+    //Trailing
+    space = str.find_last_of(' ');
+    while (!str.empty() && space == str.size() - 1) {
+        str.erase(space, 1);
+        space = str.find_last_of(' ');
     }
-    return ret;
 }
 
-std::string removeTabs(const std::string &str) {
-    auto ret = str;
-    auto tab = ret.find('\t');
-    while (tab != -1) {
-        ret.replace(tab, 1, " ");
-        tab = ret.find('\t');
+void replace(std::string &str, const std::string &v, const std::string &r) {
+    size_t pos = str.find(v);
+    while (pos != std::string::npos) {
+        str.replace(pos, v.size(), r);
+        pos = str.find(v);
     }
-    return ret;
 }
 
 std::vector<std::string> splitString(const std::string &str, const std::string &delimiter) {
+    if (str.empty())
+        return {};
+
     std::vector<std::string> ret;
-    auto s = str;
-    auto pos = str.find(delimiter);
+
+    size_t startPos = 0;
+    size_t pos = str.find(delimiter);
     while (pos != std::string::npos) {
         if (pos != 0) {
-            ret.emplace_back(s.substr(0, pos));
+            ret.emplace_back(str.substr(startPos, pos));
         }
-        s.erase(0, pos + delimiter.size());
-        pos = s.find(delimiter);
+
+        if (pos == str.size() - 1)
+            break;
+
+        startPos = pos;
+        pos = str.find(delimiter, pos + 1);
     }
+
     return ret;
 }
 
@@ -141,22 +130,22 @@ std::string getRealPath(const std::string &symLinkPath) {
 }
 
 std::map<std::string, std::string> parseProcStr(const std::string &str) {
-    std::istringstream f(str);
-
     std::map<std::string, std::string> ret;
 
+    std::istringstream f(str);
     std::string line;
     while (std::getline(f, line)) {
         auto dot = line.find(':');
         if (dot == std::string::npos)
             throw std::runtime_error("Invalid proc file format");
+
         std::string name = line.substr(0, dot);
         std::string value = line.substr(dot + 1);
-        value = removeTabs(value);
-        value = removeDoubleWhiteSpace(value);
-        value = removeSurroundingWhiteSpace(value);
-        if (ret.find(name) != ret.end())
-            throw std::runtime_error("Invalid proc file double key");
+
+        replace(value, "\t", " ");
+        replace(value, "  ", " ");
+        removeSurroundingWhiteSpace(value);
+
         ret[name] = value;
     }
 
