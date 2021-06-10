@@ -13,7 +13,7 @@ message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
 file(GLOB_RECURSE HDR include/*.hpp)
-file(GLOB_RECURSE HDR_GUI include/widgets/*.hpp)
+file(GLOB_RECURSE HDR_GUI include/gui/widgets/*.hpp)
 
 file(GLOB_RECURSE SRC src/*.cpp)
 

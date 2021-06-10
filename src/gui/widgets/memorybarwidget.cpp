@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "widgets/memorybarwidget.hpp"
+#include "gui/widgets/memorybarwidget.hpp"
 
 #include <sstream>
 #include <iomanip>

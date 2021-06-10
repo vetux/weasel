@@ -20,7 +20,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "widgets/toolbarwidget.hpp"
+#include "gui/widgets/toolbarwidget.hpp"
 
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QHBoxLayout());

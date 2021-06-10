@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "widgets/processtreeitem.hpp"
+#include "gui/processtreeitem.hpp"
 
 ProcessTreeItem::ProcessTreeItem(const Thread &thread) {
 

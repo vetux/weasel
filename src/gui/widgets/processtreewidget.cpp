@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "widgets/processtreewidget.hpp"
+#include "gui/widgets/processtreewidget.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>

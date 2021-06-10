@@ -28,7 +28,7 @@
 
 #include "os/systemstatus.hpp"
 
-#include "widgets/memorybarwidget.hpp"
+#include "gui/widgets/memorybarwidget.hpp"
 
 class ToolbarWidget : public QWidget {
 Q_OBJECT

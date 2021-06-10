@@ -25,8 +25,8 @@
 
 #include "os/scheduler.hpp"
 
-#include "widgets/processtreewidget.hpp"
-#include "widgets/toolbarwidget.hpp"
+#include "gui/widgets/processtreewidget.hpp"
+#include "gui/widgets/toolbarwidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
