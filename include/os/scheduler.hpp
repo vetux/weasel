@@ -24,7 +24,7 @@
 
 #include "os/process.hpp"
 #include "os/signal.hpp"
-#include "os/memory.hpp"
+#include "os/systemstatus.hpp"
 
 class Scheduler {
 public:
@@ -43,9 +43,9 @@ public:
     const std::map<Pid_t, Process> &getProcesses();
 
     /**
-     * @return The memory information
+     * @return The system information
      */
-    const Memory &getMemory();
+    const SystemStatus &getSystemStatus();
 
     /**
      * Send the signal to the process.
@@ -103,7 +103,7 @@ public:
 
 private:
     std::map<Pid_t, Process> processes;
-    Memory memory;
+    SystemStatus system;
 };
 
 #endif //WEASEL_SCHEDULER_HPP

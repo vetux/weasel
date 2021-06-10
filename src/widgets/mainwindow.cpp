@@ -57,11 +57,11 @@ void MainWindow::setupMenuBar() {
 void MainWindow::onPollTimeOut() {
     sched.refresh();
     procTree->setProcesses(sched.getProcesses());
-    toolbar->setMemory(sched.getMemory());
+    toolbar->setSystemStatus(sched.getSystemStatus());
 }
 
 void MainWindow::refreshPressed() {
     sched.refresh();
     procTree->setProcesses(sched.getProcesses());
-    toolbar->setMemory(sched.getMemory());
+    toolbar->setSystemStatus(sched.getSystemStatus());
 }

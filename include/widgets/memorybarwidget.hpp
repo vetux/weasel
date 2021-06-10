@@ -24,13 +24,15 @@
 #include <QProgressBar>
 #include <QLabel>
 
-#include "os/memory.hpp"
-
 class MemoryBarWidget : public QWidget {
 public:
     MemoryBarWidget();
 
-    void setMemory(const Memory &mem);
+    void setFree(float freeMemory);
+
+    void setAvailable(float availableMemory);
+
+    void setText(const QString &text);
 
 private:
     QProgressBar *memoryFreeBar;

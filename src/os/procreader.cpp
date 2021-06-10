@@ -410,10 +410,10 @@ namespace ProcReader {
         return p;
     }
 
-    Memory readMemory() {
+    SystemStatus readSystem() {
         auto proc = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
 
-        Memory ret{};
+        SystemStatus ret{};
 
         ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
         ret.free = getBytesFromKilobyte(proc.at("MemFree"));

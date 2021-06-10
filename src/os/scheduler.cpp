@@ -131,15 +131,15 @@ void Scheduler::refresh() {
         catch (const std::exception &e) {} // Assume process does not exist anymore
     }
 
-    memory = ProcReader::readMemory();
+    system = ProcReader::readSystem();
 }
 
 const std::map<Pid_t, Process> &Scheduler::getProcesses() {
     return processes;
 }
 
-const Memory &Scheduler::getMemory() {
-    return memory;
+const SystemStatus &Scheduler::getSystemStatus() {
+    return system;
 }
 
 void Scheduler::signal(const Process &process, Signal signal) {

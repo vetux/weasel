@@ -17,6 +17,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <sstream>
+#include <iomanip>
+
 #include "widgets/toolbarwidget.hpp"
 
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
@@ -35,6 +38,21 @@ ToolbarWidget::~ToolbarWidget() {
 
 }
 
-void ToolbarWidget::setMemory(const Memory &memory) {
-    memBar->setMemory(memory);
+void ToolbarWidget::setSystemStatus(const SystemStatus &system) {
+    float available = static_cast<float>(system.available) / system.total;
+    float free = static_cast<float>(system.free) / system.total;
+    memBar->setAvailable(available);
+    memBar->setFree(free);
+
+    std::string text;
+
+    std::stringstream stream;
+    stream << std::fixed << std::setprecision(2) << (float) (system.total - system.available) / (float) 1000000000;
+    text += stream.str() + "G/";
+
+    stream = {};
+    stream << std::fixed << std::setprecision(2) << (float) system.total / (float) 1000000000;
+    text += stream.str() + "G";
+
+    memBar->setText(text.c_str());
 }

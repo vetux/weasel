@@ -17,15 +17,26 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_MEMORY_HPP
-#define WEASEL_MEMORY_HPP
+#ifndef WEASEL_SYSTEMSTATUS_HPP
+#define WEASEL_SYSTEMSTATUS_HPP
+
+#include <vector>
 
 #include "os/types.hpp"
 
-struct Memory {
+struct SystemStatus {
+    struct Core {
+
+    };
+
+    // /proc/stat
+    Core cpu;
+    std::vector<Core> cores;
+
+    // /proc/meminfo
     Mem_t total;
     Mem_t free;
     Mem_t available;
 };
 
-#endif //WEASEL_MEMORY_HPP
+#endif //WEASEL_SYSTEMSTATUS_HPP

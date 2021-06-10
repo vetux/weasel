@@ -25,7 +25,7 @@
 
 #include "os/thread.hpp"
 #include "os/process.hpp"
-#include "os/memory.hpp"
+#include "os/systemstatus.hpp"
 
 namespace ProcReader {
     bool isPID(const std::string &name);
@@ -34,7 +34,7 @@ namespace ProcReader {
 
     Process readProcess(Pid_t pid);
 
-    Memory readMemory();
+    SystemStatus readSystem();
 }
 
 #endif //WEASEL_PROCREADER_HPP

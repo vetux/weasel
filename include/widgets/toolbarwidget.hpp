@@ -26,7 +26,7 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "os/memory.hpp"
+#include "os/systemstatus.hpp"
 
 #include "widgets/memorybarwidget.hpp"
 
@@ -41,7 +41,7 @@ public:
 
     ~ToolbarWidget() override;
 
-    void setMemory(const Memory &memory);
+    void setSystemStatus(const SystemStatus &system);
 
 private:
     QPushButton *refreshButton;

@@ -52,22 +52,14 @@ MemoryBarWidget::MemoryBarWidget() {
     setLayout(l);
 }
 
-void MemoryBarWidget::setMemory(const Memory &mem) {
-    float availableScale = static_cast<float>(mem.total - mem.available) / mem.total;
-    float freeScale = static_cast<float>(mem.total - mem.free) / mem.total;
+void MemoryBarWidget::setAvailable(float availableMemory) {
+    memoryAvailableBar->setValue(static_cast<int>(100 * (1.0f - availableMemory)));
+}
 
-    memoryAvailableBar->setValue(static_cast<int>(100 * availableScale));
-    memoryFreeBar->setValue(static_cast<int>(100 * freeScale));
+void MemoryBarWidget::setFree(float freeMemory) {
+    memoryFreeBar->setValue(static_cast<int>(100 * (1.0f - freeMemory)));
+}
 
-    std::string str;
-
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << (float) (mem.total - mem.available) / (float) 1000000000;
-    str += stream.str() + "G/";
-
-    stream = {};
-    stream << std::fixed << std::setprecision(2) << (float) mem.total / (float) 1000000000;
-    str += stream.str() + "G";
-
-    memoryText->setText(str.c_str());
+void MemoryBarWidget::setText(const QString &text) {
+    memoryText->setText(text);
 }
