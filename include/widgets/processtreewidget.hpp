@@ -31,7 +31,7 @@ struct TreeNode {
     Process process;
 
     TreeNode *parent = nullptr;
-    std::vector<TreeNode> children;
+    std::vector<TreeNode *> children;
 
     QList<QStandardItem *> items;
 };

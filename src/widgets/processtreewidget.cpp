@@ -29,8 +29,8 @@
 std::vector<Pid_t> getPidRecursive(TreeNode &tree) {
     std::vector<Pid_t> ret;
     ret.emplace_back(tree.process.pid);
-    for (auto child : tree.children) {
-        auto tmp = getPidRecursive(child);
+    for (auto *child : tree.children) {
+        auto tmp = getPidRecursive(*child);
         for (auto t : tmp)
             ret.emplace_back(t);
     }
@@ -57,33 +57,34 @@ bool findNodeRecursive(TreeNode &tree, Pid_t pid, TreeNode *&output) {
         return true;
     }
 
-    for (auto &child : tree.children) {
-        if (findNodeRecursive(child, pid, output))
+    for (auto *child : tree.children) {
+        if (findNodeRecursive(*child, pid, output))
             return true;
     }
 
     return false;
 }
 
-TreeNode createNode(TreeNode &parent, const Process &process) {
-    TreeNode ret;
-    ret.parent = &parent;
-    ret.process = process;
-    ret.items = getRow(process);
-    parent.items.at(0)->appendRow(ret.items);
+TreeNode *createNode(TreeNode &parent, const Process &process) {
+    auto *ret = new TreeNode();
+    ret->parent = &parent;
+    ret->process = process;
+    ret->items = getRow(process);
+    parent.items.at(0)->appendRow(ret->items);
     parent.children.emplace_back(ret);
     return ret;
 }
 
-void eraseNodeRecursive(TreeNode &tree, TreeNode &node) {
-    for (auto &child : node.children) {
+void eraseNodeRecursive(TreeNode &tree, TreeNode *node) {
+    for (auto *child : node->children) {
         eraseNodeRecursive(tree, child);
     }
-    node.items.at(0)->removeRows(0, node.children.size());
-    node.parent->items.at(0)->removeRow(node.items.at(0)->row());
-    auto it = std::find(node.parent->children.begin(), node.parent->children.end(), node);
-    assert(it != node.parent->children.end());
-    node.parent->children.erase(it);
+    node->items.at(0)->removeRows(0, node->children.size());
+    node->parent->items.at(0)->removeRow(node->items.at(0)->row());
+    auto it = std::find(node->parent->children.begin(), node->parent->children.end(), node);
+    assert(it != node->parent->children.end());
+    node->parent->children.erase(it);
+    delete node;
 }
 
 ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
@@ -143,7 +144,7 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
             continue;
         TreeNode *n;
         if (findNodeRecursive(tree, deadPid, n)) {
-            eraseNodeRecursive(tree, *n);
+            eraseNodeRecursive(tree, n);
         }
     }
 
