@@ -25,6 +25,7 @@
 #include <QLabel>
 
 class MemoryBarWidget : public QWidget {
+Q_OBJECT
 public:
     MemoryBarWidget();
 
