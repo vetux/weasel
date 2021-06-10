@@ -23,10 +23,10 @@
 
 MainWindow::MainWindow(int pollingInterval) {
     mainWidget = new QWidget();
-    auto *l = new QVBoxLayout();
-
     toolbar = new ToolbarWidget();
     procTree = new ProcessTreeWidget();
+
+    auto *l = new QVBoxLayout();
 
     l->addWidget(toolbar);
     l->addWidget(procTree, 1);
@@ -37,7 +37,7 @@ MainWindow::MainWindow(int pollingInterval) {
 
     setupMenuBar();
 
-    onPollTimeOut();
+    refresh();
 
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
     connect(toolbar, SIGNAL(refreshPressed()), this, SLOT(refreshPressed()));
@@ -55,12 +55,14 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::onPollTimeOut() {
-    sched.refresh();
-    procTree->setProcesses(sched.getProcesses());
-    toolbar->setSystemStatus(sched.getSystemStatus());
+    refresh();
 }
 
 void MainWindow::refreshPressed() {
+    refresh();
+}
+
+void MainWindow::refresh() {
     sched.refresh();
     procTree->setProcesses(sched.getProcesses());
     toolbar->setSystemStatus(sched.getSystemStatus());

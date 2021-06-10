@@ -44,6 +44,8 @@ private slots:
 private:
     void setupMenuBar();
 
+    void refresh();
+
     QTimer pollTimer;
 
     Scheduler sched;
