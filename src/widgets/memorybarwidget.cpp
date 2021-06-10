@@ -24,32 +24,33 @@
 
 #include <QHBoxLayout>
 
+#define STYLE(color) "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: "#color"; width: 2px; margin-left: 1px; margin-right: 1px;}"
+
 MemoryBarWidget::MemoryBarWidget() {
-    auto l = new QHBoxLayout();
-    l->setMargin(0);
     memoryFreeBar = new QProgressBar();
     memoryAvailableBar = new QProgressBar();
     memoryText = new QLabel();
+
     memoryText->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-    auto al = new QHBoxLayout();
-    al->setMargin(0);
-    al->setContentsMargins(0, 0, 5, 0);
-    al->addWidget(memoryText);
-    memoryAvailableBar->setLayout(al);
+    memoryFreeBar->setStyleSheet(STYLE("orange"));
+    memoryAvailableBar->setStyleSheet(STYLE("green"));
 
-    auto ml = new QHBoxLayout();
-    ml->setMargin(0);
-    ml->addWidget(memoryAvailableBar);
-    memoryFreeBar->setLayout(ml);
-    memoryFreeBar->setStyleSheet(
-            "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: orange; width: 2px; margin-left: 1px; margin-right: 1px;}");
-    memoryAvailableBar->setStyleSheet(
-            "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: green; width: 2px;  margin-left: 1px; margin-right: 1px;}");
     memoryAvailableBar->setRange(0, 100);
     memoryFreeBar->setRange(0, 100);
-    l->addWidget(memoryFreeBar);
-    setLayout(l);
+
+    memoryAvailableBar->setLayout(new QHBoxLayout());
+    memoryAvailableBar->layout()->setMargin(0);
+    memoryAvailableBar->layout()->setContentsMargins(0, 0, 5, 0);
+    memoryAvailableBar->layout()->addWidget(memoryText);
+
+    memoryFreeBar->setLayout(new QHBoxLayout());
+    memoryFreeBar->layout()->setMargin(0);
+    memoryFreeBar->layout()->addWidget(memoryAvailableBar);
+
+    setLayout(new QHBoxLayout());
+    layout()->setMargin(0);
+    layout()->addWidget(memoryFreeBar);
 }
 
 void MemoryBarWidget::setAvailable(float availableMemory) {
