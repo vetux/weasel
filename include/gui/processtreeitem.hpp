@@ -22,11 +22,22 @@
 
 #include <QStandardItem>
 
+#include "os/process.hpp"
 #include "os/thread.hpp"
 
 class ProcessTreeItem : public QStandardItem {
 public:
-    ProcessTreeItem(const Thread &thread);
+    explicit ProcessTreeItem(const Process &process);
+
+    ~ProcessTreeItem() override;
+
+    const Process &getProcess();
+
+    const QList<QStandardItem *> &getRow();
+
+private:
+    Process process;
+    QList<QStandardItem *> rowItems;
 };
 
 #endif //WEASEL_PROCESSTREEITEM_HPP

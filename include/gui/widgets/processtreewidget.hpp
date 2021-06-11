@@ -27,16 +27,7 @@
 #include "os/process.hpp"
 #include "os/signal.hpp"
 
-struct TreeNode {
-    Process process;
-
-    TreeNode *parent = nullptr;
-    std::vector<TreeNode *> children;
-
-    QList<QStandardItem *> items;
-};
-
-bool operator==(const TreeNode &lhs, const TreeNode &rhs);
+#include "gui/processtreeitem.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
@@ -69,8 +60,6 @@ private:
     QStandardItemModel model;
 
     QTreeView *treeView;
-
-    TreeNode tree;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

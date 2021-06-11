@@ -26,65 +26,40 @@
 
 #include "os/users.hpp"
 
-std::vector<Pid_t> getPidRecursive(TreeNode &tree) {
+std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
     std::vector<Pid_t> ret;
-    ret.emplace_back(tree.process.pid);
-    for (auto *child : tree.children) {
+    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
+    if (node != nullptr) {
+        ret.emplace_back(node->getProcess().pid);
+    }
+
+    QStandardItem *child = item.child(0);
+    for (int row = 0; child != nullptr; child = item.child(row++)) {
         auto tmp = getPidRecursive(*child);
         for (auto t : tmp)
             ret.emplace_back(t);
     }
+
     return ret;
 }
 
-bool operator==(const TreeNode &lhs, const TreeNode &rhs) {
-    return lhs.process.pid == rhs.process.pid
-           && lhs.process.threads.at(0).starttime == rhs.process.threads.at(0).starttime;
-}
-
-QList<QStandardItem *> getRow(const Process &proc) {
-    QList<QStandardItem *> ret;
-    ret.append(new QStandardItem(QString("%0").arg(proc.threads.at(0).comm.c_str())));
-    ret.append(new QStandardItem(QString("%0").arg(proc.threads.at(0).pid)));
-    ret.append(new QStandardItem(QString("%0").arg(Users::getUserName(proc.threads.at(0).uid).c_str())));
-    ret.append(new QStandardItem(QString("%0").arg(proc.commandLine.c_str())));
-    return ret;
-}
-
-bool findNodeRecursive(TreeNode &tree, Pid_t pid, TreeNode *&output) {
-    if (tree.process.pid == pid) {
-        output = &tree;
-        return true;
+bool findNodeRecursive(QStandardItem &item, Pid_t pid, ProcessTreeItem *&output) {
+    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
+    if (node != nullptr) {
+        if (node->getProcess().pid == pid) {
+            output = node;
+            return true;
+        }
     }
 
-    for (auto *child : tree.children) {
-        if (findNodeRecursive(*child, pid, output))
+    QStandardItem *child = item.child(0);
+    for (int row = 0; child != nullptr; child = item.child(row++)) {
+        if (findNodeRecursive(*child, pid, output)) {
             return true;
+        }
     }
 
     return false;
-}
-
-TreeNode *createNode(TreeNode &parent, const Process &process) {
-    auto *ret = new TreeNode();
-    ret->parent = &parent;
-    ret->process = process;
-    ret->items = getRow(process);
-    parent.items.at(0)->appendRow(ret->items);
-    parent.children.emplace_back(ret);
-    return ret;
-}
-
-void eraseNodeRecursive(TreeNode &tree, TreeNode *node) {
-    for (auto *child : node->children) {
-        eraseNodeRecursive(tree, child);
-    }
-    node->items.at(0)->removeRows(0, node->children.size());
-    node->parent->items.at(0)->removeRow(node->items.at(0)->row());
-    auto it = std::find(node->parent->children.begin(), node->parent->children.end(), node);
-    assert(it != node->parent->children.end());
-    node->parent->children.erase(it);
-    delete node;
 }
 
 ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
@@ -110,8 +85,6 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
             SLOT(customContextMenu(const QPoint &)));
 
     layout()->addWidget(treeView);
-
-    tree.items.append(model.invisibleRootItem());
 }
 
 ProcessTreeWidget::~ProcessTreeWidget() {
@@ -119,12 +92,14 @@ ProcessTreeWidget::~ProcessTreeWidget() {
 }
 
 void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
+    auto *tree = model.invisibleRootItem();
+
     std::vector<Pid_t> deadProcesses;
 
     for (auto &pair : p) {
-        TreeNode *n;
-        if (findNodeRecursive(tree, pair.first, n)) {
-            if (n->process.threads.at(0).starttime != pair.second.threads.at(0).starttime) {
+        ProcessTreeItem *n;
+        if (findNodeRecursive(*tree, pair.first, n)) {
+            if (n->getProcess().threads.at(0).starttime != pair.second.threads.at(0).starttime) {
                 deadProcesses.emplace_back(pair.first);
             }
         } else {
@@ -132,7 +107,7 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
         }
     }
 
-    auto pids = getPidRecursive(tree);
+    auto pids = getPidRecursive(*tree);
     for (auto pid : pids) {
         if (p.find(pid) == p.end()) {
             deadProcesses.emplace_back(pid);
@@ -142,17 +117,17 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     for (auto deadPid : deadProcesses) {
         if (deadPid == 0)
             continue;
-        TreeNode *n;
-        if (findNodeRecursive(tree, deadPid, n)) {
-            eraseNodeRecursive(tree, n);
+        ProcessTreeItem *n;
+        if (findNodeRecursive(*tree, deadPid, n)) {
+            n->parent()->removeRow(n->row());
         }
     }
 
     std::map<Pid_t, Pid_t> newProcesses;
 
     for (auto &pair : p) {
-        TreeNode *n;
-        if (!findNodeRecursive(tree, pair.first, n)) {
+        ProcessTreeItem *n;
+        if (!findNodeRecursive(*tree, pair.first, n)) {
             newProcesses[pair.first] = pair.second.threads.at(0).ppid;
         }
     }
@@ -161,12 +136,14 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     while (!newProcesses.empty()) {
         for (auto pair : newProcesses) {
             if (pair.second == 0) {
-                createNode(tree, p.at(pair.first));
+                auto *item = new ProcessTreeItem(p.at(pair.first));
+                tree->appendRow(item->getRow());
                 del.emplace_back(pair.first);
             } else {
-                TreeNode *parent;
-                if (findNodeRecursive(tree, pair.second, parent)) {
-                    createNode(*parent, p.at(pair.first));
+                ProcessTreeItem *parent;
+                if (findNodeRecursive(*tree, pair.second, parent)) {
+                    auto *item = new ProcessTreeItem(p.at(pair.first));
+                    parent->appendRow(item->getRow());
                     del.emplace_back(pair.first);
                 }
             }

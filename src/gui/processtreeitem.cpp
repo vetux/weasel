@@ -19,6 +19,29 @@
 
 #include "gui/processtreeitem.hpp"
 
-ProcessTreeItem::ProcessTreeItem(const Thread &thread) {
+#include "os/users.hpp"
 
+QList<QStandardItem *> createRow(const Process &proc) {
+    QList<QStandardItem *> ret;
+    ret.append(new QStandardItem(QString("%0").arg(proc.threads.at(0).pid)));
+    ret.append(new QStandardItem(QString("%0").arg(Users::getUserName(proc.threads.at(0).uid).c_str())));
+    ret.append(new QStandardItem(QString("%0").arg(proc.commandLine.c_str())));
+    return ret;
+}
+
+ProcessTreeItem::ProcessTreeItem(const Process &process)
+        : process(process),
+          rowItems(createRow(process)),
+          QStandardItem(QString("%0").arg(process.threads.at(0).comm.c_str())) {
+    rowItems.insert(0, this);
+}
+
+ProcessTreeItem::~ProcessTreeItem() = default;
+
+const Process &ProcessTreeItem::getProcess() {
+    return process;
+}
+
+const QList<QStandardItem *> &ProcessTreeItem::getRow() {
+    return rowItems;
 }
