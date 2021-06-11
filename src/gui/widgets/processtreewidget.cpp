@@ -28,6 +28,7 @@
 
 std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
     std::vector<Pid_t> ret;
+
     auto *node = dynamic_cast<ProcessTreeItem *>(&item);
     if (node != nullptr) {
         ret.emplace_back(node->getProcess().pid);
@@ -62,8 +63,28 @@ bool findNodeRecursive(QStandardItem &item, Pid_t pid, ProcessTreeItem *&output)
     return false;
 }
 
+std::map<Pid_t, ProcessTreeItem *> getItemsRecursive(QStandardItem &item) {
+    std::map<Pid_t, ProcessTreeItem *> ret;
+
+    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
+    if (node != nullptr) {
+        ret[node->getProcess().pid] = node;
+    }
+
+    QStandardItem *child = item.child(0);
+    for (int row = 0; child != nullptr; child = item.child(row++)) {
+        auto r = getItemsRecursive(*child);
+        for (auto pair : r) {
+            ret[pair.first] = pair.second;
+        }
+    }
+
+    return ret;
+}
+
 ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
+
     treeView = new QTreeView();
 
     treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -74,7 +95,9 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
 
     treeView->setModel(&model);
 
-    connect(treeView, SIGNAL(doubleClicked(const QModelIndex &)), this,
+    connect(treeView,
+            SIGNAL(doubleClicked(const QModelIndex &)),
+            this,
             SLOT(doubleCLicked(const QModelIndex &)));
 
     connect(treeView, SIGNAL(clicked(const QModelIndex &)), this, SLOT(clicked()));
@@ -87,47 +110,45 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     layout()->addWidget(treeView);
 }
 
-ProcessTreeWidget::~ProcessTreeWidget() {
-
-}
+ProcessTreeWidget::~ProcessTreeWidget() = default;
 
 void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     auto *tree = model.invisibleRootItem();
 
-    std::vector<Pid_t> deadProcesses;
+    std::map<Pid_t, ProcessTreeItem *> items = getItemsRecursive(*tree);
+    std::set<Pid_t> deadProcesses;
 
     for (auto &pair : p) {
-        ProcessTreeItem *n;
-        if (findNodeRecursive(*tree, pair.first, n)) {
-            if (n->getProcess().threads.at(0).starttime != pair.second.threads.at(0).starttime) {
-                deadProcesses.emplace_back(pair.first);
+        auto it = items.find(pair.first);
+        if (it != items.end()) {
+            if (it->second->getProcess().threads.at(0).starttime != pair.second.threads.at(0).starttime) {
+                deadProcesses.insert(pair.first);
             }
-        } else {
-            deadProcesses.emplace_back(pair.first);
         }
     }
 
-    auto pids = getPidRecursive(*tree);
-    for (auto pid : pids) {
-        if (p.find(pid) == p.end()) {
-            deadProcesses.emplace_back(pid);
+    for (auto pair : items) {
+        if (p.find(pair.first) == p.end()) {
+            deadProcesses.insert(pair.first);
         }
     }
 
     for (auto deadPid : deadProcesses) {
         if (deadPid == 0)
             continue;
-        ProcessTreeItem *n;
-        if (findNodeRecursive(*tree, deadPid, n)) {
-            n->parent()->removeRow(n->row());
+        auto it = items.find(deadPid);
+        if (it != items.end()) {
+            auto pids = getPidRecursive(*it->second);
+            for (Pid_t pid : pids) {
+                items.erase(pid);
+            }
+            it->second->parent()->removeRow(it->second->row());
         }
     }
 
     std::map<Pid_t, Pid_t> newProcesses;
-
     for (auto &pair : p) {
-        ProcessTreeItem *n;
-        if (!findNodeRecursive(*tree, pair.first, n)) {
+        if (items.find(pair.first) == items.end()) {
             newProcesses[pair.first] = pair.second.threads.at(0).ppid;
         }
     }
