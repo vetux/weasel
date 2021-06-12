@@ -47,6 +47,10 @@ namespace ProcPath {
         return PATH_PROC;
     }
 
+    inline std::string getProcStatFile() {
+        return PATH_PROC + PATH_STAT;
+    }
+
     inline std::string getProcessDirectory(Pid_t pid) {
         return PATH_PROC + "/" + pid;
     }

@@ -24,6 +24,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include <sstream>
 
 #include <sys/stat.h>
 
@@ -35,7 +36,8 @@ inline bool isAsciiNumber(char c) {
 }
 
 Mem_t getBytesFromKilobyte(const std::string &mem) {
-    return stringToMem(mem.substr(0, mem.find(' '))) * 1000;
+    auto str = mem.substr(0, mem.find(' '));
+    return stringToMem(str) * 1000;
 }
 
 SchedulingPolicy convertPolicy(uint32_t policy) {
@@ -70,6 +72,18 @@ std::string readText(const std::string &filePath) {
     std::string tmp;
     while (std::getline(stream, tmp)) {
         ret += tmp + "\n";
+    }
+
+    return ret;
+}
+
+std::vector<std::string> readLines(const std::string &str) {
+    std::vector<std::string> ret;
+    std::stringstream stream(str);
+
+    std::string tmp;
+    while (std::getline(stream, tmp)) {
+        ret.emplace_back(tmp);
     }
 
     return ret;
@@ -117,6 +131,11 @@ std::vector<std::string> splitString(const std::string &str, const std::string &
 
         startPos = pos;
         pos = str.find(delimiter, pos + 1);
+
+        if (pos == std::string::npos) {
+            ret.emplace_back(str.substr(startPos));
+            break;
+        }
     }
 
     return ret;
@@ -351,6 +370,46 @@ Uid_t getFileOwnerUid(const std::filesystem::path &p) {
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
+SystemStatus::Core readCore(const std::vector<std::string> &line) {
+    SystemStatus::Core ret{};
+    ret.user = std::stoul(line.at(1));
+    ret.nice = std::stoul(line.at(2));
+    ret.system = std::stoul(line.at(3));
+    ret.idle = std::stoul(line.at(4));
+
+    if (line.size() < 6)
+        return ret;
+
+    ret.iowait = std::stoul(line.at(5));
+
+    if (line.size() < 7)
+        return ret;
+
+    ret.irq = std::stoul(line.at(6));
+
+    if (line.size() < 8)
+        return ret;
+
+    ret.softirq = std::stoul(line.at(7));
+
+    if (line.size() < 9)
+        return ret;
+
+    ret.steal = std::stoul(line.at(8));
+
+    if (line.size() < 10)
+        return ret;
+
+    ret.guest = std::stoul(line.at(9));
+
+    if (line.size() < 11)
+        return ret;
+
+    ret.guest_nice = std::stoul(line.at(10));
+
+    return ret;
+}
+
 namespace ProcReader {
     bool isPID(const std::string &name) {
         for (auto &c : name) {
@@ -400,13 +459,102 @@ namespace ProcReader {
     }
 
     SystemStatus readSystem() {
-        auto proc = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
+        auto statContents = readText(ProcPath::getProcStatFile());
+        replace(statContents, "  ", " "); //Replace double whitespace
+
+        auto stat = readLines(statContents);
+        auto memInfo = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
 
         SystemStatus ret{};
 
-        ret.total = getBytesFromKilobyte(proc.at("MemTotal"));
-        ret.free = getBytesFromKilobyte(proc.at("MemFree"));
-        ret.available = getBytesFromKilobyte(proc.at("MemAvailable"));
+        for (auto &line : stat) {
+            auto lineSplit = splitString(line, " ");
+            if (lineSplit.at(0).rfind("cpu", 0) == 0) {
+                if (lineSplit.at(0) == "cpu") {
+                    ret.cpu = readCore(lineSplit);
+                } else {
+                    ret.cores.emplace_back(readCore(lineSplit));
+                }
+            } else if (lineSplit.at(0) == "page") {
+                ret.pageIn = std::stol(lineSplit.at(1));
+                ret.pageOut = std::stol(lineSplit.at(2));
+            } else if (lineSplit.at(0) == "swap") {
+                ret.swapIn = std::stol(lineSplit.at(1));
+                ret.swapOut = std::stol(lineSplit.at(2));
+            } else if (lineSplit.at(0) == "intr") {
+                ret.interrupts = std::stol(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "ctxt") {
+                ret.contextSwitches = std::stol(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "btime") {
+                ret.btime = std::stoul(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "processes") {
+                ret.processes = std::stol(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "procs_running") {
+                ret.processesRunning = std::stol(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "procs_blocked") {
+                ret.processesBlocked = std::stol(lineSplit.at(1));
+            } else if (lineSplit.at(0) == "softirq") {
+                ret.softIRQ = std::stol(lineSplit.at(1));
+            }
+            //Ignore unrecognized key for forward compatibility
+        }
+
+        ret.total = getBytesFromKilobyte(memInfo["MemTotal"]);
+        ret.free = getBytesFromKilobyte(memInfo["MemFree"]);
+        ret.available = getBytesFromKilobyte(memInfo["MemAvailable"]);
+        ret.buffers = getBytesFromKilobyte(memInfo["Buffers"]);
+        ret.cached = getBytesFromKilobyte(memInfo["Cached"]);
+        ret.active = getBytesFromKilobyte(memInfo["Active"]);
+        ret.inactive = getBytesFromKilobyte(memInfo["Inactive"]);
+        ret.anonActive = getBytesFromKilobyte(memInfo["Active(anon)"]);
+        ret.anonInactive = getBytesFromKilobyte(memInfo["Inactive(anon)"]);
+        ret.fileActive = getBytesFromKilobyte(memInfo["Active(file)"]);
+        ret.fileInactive = getBytesFromKilobyte(memInfo["Inactive(file)"]);
+        ret.unevictable = getBytesFromKilobyte(memInfo["Unevictable"]);
+        ret.locked = getBytesFromKilobyte(memInfo["Mlocked"]);
+        ret.highTotal = getBytesFromKilobyte(memInfo["HighTotal"]);
+        ret.highFree = getBytesFromKilobyte(memInfo["HighFree"]);
+        ret.lowTotal = getBytesFromKilobyte(memInfo["LowTotal"]);
+        ret.lowFree = getBytesFromKilobyte(memInfo["LowFree"]);
+        ret.mmapCopy = getBytesFromKilobyte(memInfo["MmapCopy"]);
+        ret.swapTotal = getBytesFromKilobyte(memInfo["SwapTotal"]);
+        ret.swapFree = getBytesFromKilobyte(memInfo["SwapFree"]);
+        ret.dirty = getBytesFromKilobyte(memInfo["Dirty"]);
+        ret.writeBack = getBytesFromKilobyte(memInfo["Writeback"]);
+        ret.anonPages = getBytesFromKilobyte(memInfo["AnonPages"]);
+        ret.mapped = getBytesFromKilobyte(memInfo["Mapped"]);
+        ret.shmem = getBytesFromKilobyte(memInfo["Shmem"]);
+        ret.kreclaimable = getBytesFromKilobyte(memInfo["KReclaimable"]);
+        ret.slab = getBytesFromKilobyte(memInfo["Slab"]);
+        ret.sreclaimable = getBytesFromKilobyte(memInfo["SReclaimable"]);
+        ret.sunreclaim = getBytesFromKilobyte(memInfo["SUnreclaim"]);
+        ret.kernelStack = getBytesFromKilobyte(memInfo["KernelStack"]);
+        ret.pageTables = getBytesFromKilobyte(memInfo["PageTables"]);
+        ret.quickLists = getBytesFromKilobyte(memInfo["Quicklists"]);
+        ret.nfsUnstable = getBytesFromKilobyte(memInfo["NFS_Unstable"]);
+        ret.bounce = getBytesFromKilobyte(memInfo["Bounce"]);
+        ret.writebackTmp = getBytesFromKilobyte(memInfo["WritebackTmp"]);
+        ret.commitLimit = getBytesFromKilobyte(memInfo["CommitLimit"]);
+        ret.commitedAs = getBytesFromKilobyte(memInfo["Committed_AS"]);
+        ret.vmAllocTotal = getBytesFromKilobyte(memInfo["VmallocTotal"]);
+        ret.vmAllocUsed = getBytesFromKilobyte(memInfo["VmallocUsed"]);
+        ret.vmAllocChunk = getBytesFromKilobyte(memInfo["VmallocChunk"]);
+        ret.hardwareCorrupted = getBytesFromKilobyte(memInfo["HardwareCorrupted"]);
+        ret.lazyFree = getBytesFromKilobyte(memInfo["LazyFree"]);
+        ret.anonHugePages = getBytesFromKilobyte(memInfo["AnonHugePages"]);
+        ret.shmemHugePages = getBytesFromKilobyte(memInfo["ShmemHugePages"]);
+        ret.shmemPmdMapped = getBytesFromKilobyte(memInfo["ShmemPmdMapped"]);
+        ret.cmaTotal = getBytesFromKilobyte(memInfo["CmaTotal"]);
+        ret.cmaFree = getBytesFromKilobyte(memInfo["CmaFree"]);
+        ret.hugePagesTotal = getBytesFromKilobyte(memInfo["HugePages_Total"]);
+        ret.hugePagesFree = getBytesFromKilobyte(memInfo["HugePages_Free"]);
+        ret.hugePagesRsvd = getBytesFromKilobyte(memInfo["HugePages_Rsvd"]);
+        ret.hugePagesSurp = getBytesFromKilobyte(memInfo["HugePages_Surp"]);
+        ret.hugePageSize = getBytesFromKilobyte(memInfo["Hugepagesize"]);
+        ret.directMap4K = getBytesFromKilobyte(memInfo["DirectMap4k"]);
+        ret.directMap4M = getBytesFromKilobyte(memInfo["DirectMap4M"]);
+        ret.directMap2M = getBytesFromKilobyte(memInfo["DirectMap2M"]);
+        ret.directMap1G = getBytesFromKilobyte(memInfo["DirectMap1G"]);
 
         return ret;
     }

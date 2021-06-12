@@ -20,14 +20,23 @@
 #include <os/types.hpp>
 
 Pid_t stringToPid(const std::string &str) {
-    return std::stol(str);
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
 }
 
 Uid_t stringToUid(const std::string &str) {
-    return std::stol(str);
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
 }
 
 Mem_t stringToMem(const std::string &str) {
-    return std::stol(str);
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
 }
 
