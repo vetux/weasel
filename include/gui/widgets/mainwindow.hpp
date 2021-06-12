@@ -41,6 +41,14 @@ private slots:
 
     void refreshPressed();
 
+    void processSignalRequested(const Process &proc, Signal signal);
+
+    void threadSignalRequested(const Thread &thread, Signal signal);
+
+    void processPriorityChangeRequested(const Process &proc, int priority);
+
+    void threadPriorityChangeRequested(const Thread &thread, int priority);
+
 private:
     void setupMenuBar();
 

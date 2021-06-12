@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
+
 #include <set>
 
 #include "os/users.hpp"
@@ -85,10 +86,15 @@ std::map<Pid_t, ProcessTreeItem *> getItemsRecursive(QStandardItem &item) {
 ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QVBoxLayout());
 
+    layout()->setMargin(0);
+
     treeView = new QTreeView();
 
     treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     treeView->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
+    treeView->setSelectionMode(QAbstractItemView::SingleSelection);
+    treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    treeView->setExpandsOnDoubleClick(false);
 
     model.setColumnCount(4);
     model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
@@ -183,17 +189,48 @@ void ProcessTreeWidget::clicked() {
 }
 
 void ProcessTreeWidget::doubleCLicked(const QModelIndex &index) {
-
+    auto row = model.index(index.row(), 0, index.parent());
+    if (treeView->isExpanded(row))
+        treeView->collapse(row);
+    else
+        treeView->expand(row);
 }
 
 void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
     QModelIndex index = treeView->indexAt(pos);
+
     if (index.isValid()) {
-        auto *contextMenu = new QMenu(treeView);
-        contextMenu->addAction("Test");
-        contextMenu->addAction("Test");
-        contextMenu->addMenu("TestMenu")->addAction("Test");
-        contextMenu->exec(treeView->viewport()->mapToGlobal(pos));
-        delete contextMenu;
+        auto *item = dynamic_cast<ProcessTreeItem *>(model.itemFromIndex(model.index(index.row(), 0, index.parent())));
+        if (item != nullptr) {
+            auto *contextMenu = new QMenu(treeView);
+
+            contextMenu->addAction("Terminate");
+
+            auto *menu = contextMenu->addMenu("Signal");
+            for (int i = SIGNAL_SIGHUP; i < SIGNAL_SIGTTOU; i++) {
+                menu->addAction(signalToString(static_cast<Signal>(i)).c_str());
+            }
+
+            contextMenu->addSeparator();
+            contextMenu->addAction("Properties");
+
+            // Seems to compile regardless of static type related compile error shown in IDE when using lambda as slot.
+            connect(contextMenu,
+                    &QMenu::triggered,
+                    [=](QAction *action) {
+                        if (action->text() == "Terminate") {
+                            emit processSignalRequested(item->getProcess(), SIGNAL_SIGTERM);
+                        } else if (action->text() == "Properties") {
+
+                        } else {
+                            emit processSignalRequested(item->getProcess(),
+                                                        stringToSignal(action->text().toStdString()));
+                        }
+                    });
+
+            contextMenu->exec(treeView->viewport()->mapToGlobal(pos));
+
+            delete contextMenu;
+        }
     }
 }

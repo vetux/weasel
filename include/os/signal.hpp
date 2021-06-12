@@ -20,6 +20,8 @@
 #ifndef WEASEL_SIGNAL_HPP
 #define WEASEL_SIGNAL_HPP
 
+#include <string>
+
 enum Signal {
     SIGNAL_SIGHUP,
     SIGNAL_SIGINT,
@@ -41,5 +43,9 @@ enum Signal {
     SIGNAL_SIGTTIN,
     SIGNAL_SIGTTOU
 };
+
+std::string signalToString(Signal sig);
+
+Signal stringToSignal(const std::string &str);
 
 #endif //WEASEL_SIGNAL_HPP

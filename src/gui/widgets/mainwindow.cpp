@@ -20,6 +20,7 @@
 #include "gui/widgets/mainwindow.hpp"
 
 #include <QMenuBar>
+#include <QMessageBox>
 
 MainWindow::MainWindow(int pollingInterval) {
     mainWidget = new QWidget();
@@ -42,10 +43,27 @@ MainWindow::MainWindow(int pollingInterval) {
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
     connect(toolbar, SIGNAL(refreshPressed()), this, SLOT(refreshPressed()));
 
+    connect(procTree,
+            SIGNAL(processSignalRequested(const Process &, Signal)),
+            this,
+            SLOT(processSignalRequested(const Process &, Signal)));
+    connect(procTree,
+            SIGNAL(threadSignalRequested(const Thread &, Signal)),
+            this,
+            SLOT(threadSignalRequested(const Thread &, Signal)));
+    connect(procTree,
+            SIGNAL(processPriorityChangeRequested(const Process &, int)),
+            this,
+            SLOT(processPriorityChangeRequested(const Process &, int)));
+    connect(procTree,
+            SIGNAL(threadPriorityChangeRequested(const Thread &, int)),
+            this,
+            SLOT(threadPriorityChangeRequested(const Thread &, int)));
+
     pollTimer.start(pollingInterval);
 }
 
-MainWindow::~MainWindow() {}
+MainWindow::~MainWindow() = default;
 
 void MainWindow::setupMenuBar() {
     menuBar()->addMenu("Weasel");
@@ -66,4 +84,72 @@ void MainWindow::refresh() {
     sched.refresh();
     procTree->setProcesses(sched.getProcesses());
     toolbar->setSystemStatus(sched.getSystemStatus());
+}
+
+void MainWindow::processSignalRequested(const Process &proc, Signal signal) {
+    if (QMessageBox::question(this,
+                              QString("Signal Process"),
+                              QString(("Do you want to send the signal "
+                                       + signalToString(signal)
+                                       + " to the process "
+                                       + std::to_string(proc.pid)).c_str()))
+        != QMessageBox::Yes) {
+        return;
+    }
+    try {
+        sched.signal(proc, signal);
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to signal process", e.what());
+    }
+}
+
+void MainWindow::threadSignalRequested(const Thread &thread, Signal signal) {
+    if (QMessageBox::question(this,
+                              QString("Signal Thread"),
+                              QString(("Do you want to send the signal "
+                                       + signalToString(signal)
+                                       + " to the thread "
+                                       + std::to_string(thread.tid)).c_str()))
+        != QMessageBox::Yes) {
+        return;
+    }
+    try {
+        sched.signal(thread, signal);
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to signal process", e.what());
+    }
+}
+
+void MainWindow::processPriorityChangeRequested(const Process &proc, int priority) {
+    if (QMessageBox::question(this,
+                              QString("Set Process Priority"),
+                              QString(("Do you want to set the priority of the process  "
+                                       + std::to_string(proc.pid)
+                                       + " to the value "
+                                       + std::to_string(priority)).c_str()))
+        != QMessageBox::Yes) {
+        return;
+    }
+    try {
+        sched.setPriority(proc, priority);
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to signal process", e.what());
+    }
+}
+
+void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priority) {
+    if (QMessageBox::question(this,
+                              QString("Set Thread Priority"),
+                              QString(("Do you want to set the priority of the thread  "
+                                       + std::to_string(thread.tid)
+                                       + " to the value "
+                                       + std::to_string(priority)).c_str()))
+        != QMessageBox::Yes) {
+        return;
+    }
+    try {
+        sched.setPriority(thread, priority);
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this, "Failed to signal process", e.what());
+    }
 }
