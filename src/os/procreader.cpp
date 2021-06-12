@@ -21,10 +21,12 @@
 
 #include <map>
 #include <fstream>
-#include <cstring>
-#include <cstdlib>
 #include <string>
 #include <sstream>
+#include <algorithm>
+
+#include <cstdlib>
+#include <cstring>
 
 #include <sys/stat.h>
 
@@ -123,20 +125,17 @@ std::vector<std::string> splitString(const std::string &str, const std::string &
     size_t pos = str.find(delimiter);
     while (pos != std::string::npos) {
         if (pos != 0) {
-            ret.emplace_back(str.substr(startPos, pos));
+            ret.emplace_back(str.substr(startPos, pos - startPos));
         }
 
         if (pos == str.size() - 1)
             break;
 
-        startPos = pos;
+        startPos = pos + 1;
         pos = str.find(delimiter, pos + 1);
-
-        if (pos == std::string::npos) {
-            ret.emplace_back(str.substr(startPos));
-            break;
-        }
     }
+
+    ret.emplace_back(str.substr(startPos, pos));
 
     return ret;
 }
@@ -446,7 +445,6 @@ namespace ProcReader {
         parseProcExe(p);
 
         std::string dir = ProcPath::getProcessTasksDirectory(pid);
-
         for (auto &d : std::filesystem::directory_iterator(dir)) {
             auto t = readThread(p, stringToPid(d.path().filename()));
             if (t.tid == p.pid)
