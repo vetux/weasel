@@ -22,6 +22,7 @@
 
 #include <filesystem>
 #include <stdexcept>
+#include <map>
 
 #include "os/thread.hpp"
 #include "os/process.hpp"
@@ -34,7 +35,9 @@ namespace ProcReader {
 
     Process readProcess(Pid_t pid);
 
-    SystemStatus readSystem();
+    SystemStatus readSystemStatus();
+
+    std::map<Pid_t, Process> readProcesses();
 }
 
 #endif //WEASEL_PROCREADER_HPP

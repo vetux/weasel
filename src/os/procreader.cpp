@@ -458,7 +458,7 @@ namespace ProcReader {
         return p;
     }
 
-    SystemStatus readSystem() {
+    SystemStatus readSystemStatus() {
         auto statContents = readText(ProcPath::getProcStatFile());
         replace(statContents, "  ", " "); //Replace double whitespace
 
@@ -556,6 +556,21 @@ namespace ProcReader {
         ret.directMap2M = getBytesFromKilobyte(memInfo["DirectMap2M"]);
         ret.directMap1G = getBytesFromKilobyte(memInfo["DirectMap1G"]);
 
+        return ret;
+    }
+
+    std::map<Pid_t, Process> readProcesses() {
+        std::map<Pid_t, Process> ret;
+        for (auto &fl : std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
+            try {
+                auto filename = fl.path().filename();
+                if (ProcReader::isPID(filename)) {
+                    auto pid = stringToPid(filename);
+                    ret[pid] = ProcReader::readProcess(pid);
+                }
+            }
+            catch (const std::exception &e) {} // Assume process does not exist anymore
+        }
         return ret;
     }
 }
