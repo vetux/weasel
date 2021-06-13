@@ -17,35 +17,27 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_TOOLBARWIDGET_HPP
-#define WEASEL_TOOLBARWIDGET_HPP
+#ifndef WEASEL_PROCESSTREEITEM_HPP
+#define WEASEL_PROCESSTREEITEM_HPP
 
-#include <QWidget>
-#include <QProgressBar>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
+#include <QStandardItem>
 
-#include "os/systemstatus.hpp"
+#include "core/process.hpp"
+#include "core/thread.hpp"
 
-#include "gui/widgets/memorybarwidget.hpp"
-
-class ToolbarWidget : public QWidget {
-Q_OBJECT
-signals:
-
-    void refreshPressed();
-
+class ProcessTreeItem : public QStandardItem {
 public:
-    explicit ToolbarWidget(QWidget *parent = nullptr);
+    explicit ProcessTreeItem(const Process &process);
 
-    ~ToolbarWidget() override;
+    ~ProcessTreeItem() override;
 
-    void setSystemStatus(const SystemStatus &system);
+    const Process &getProcess();
+
+    const QList<QStandardItem *> &getRow();
 
 private:
-    QPushButton *refreshButton;
-    MemoryBarWidget *memBar;
+    Process process;
+    QList<QStandardItem *> rowItems;
 };
 
-#endif //WEASEL_TOOLBARWIDGET_HPP
+#endif //WEASEL_PROCESSTREEITEM_HPP

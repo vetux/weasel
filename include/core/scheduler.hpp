@@ -22,31 +22,11 @@
 
 #include <map>
 
-#include "os/process.hpp"
-#include "os/signal.hpp"
-#include "os/systemstatus.hpp"
+#include "core/process.hpp"
+#include "core/signal.hpp"
+#include "core/systemstatus.hpp"
 
-class Scheduler {
-public:
-    /**
-     * This method updates the data.
-     */
-    void refresh();
-
-    /**
-     * The process and thread interfaces are plain data objects.
-     *
-     * To modify the process tree methods on the scheduler interface have to be used.
-     *
-     * @return The map of currently active processes with the pid as key.
-     */
-    const std::map<Pid_t, Process> &getProcesses();
-
-    /**
-     * @return The system information
-     */
-    const SystemStatus &getSystemStatus();
-
+namespace Scheduler {
     /**
      * Send the signal to the process.
      *
@@ -99,11 +79,7 @@ public:
     /**
      * @return The page size in bytes
      */
-    static int getPageSize();
-
-private:
-    std::map<Pid_t, Process> processes;
-    SystemStatus system;
-};
+    int getPageSize();
+}
 
 #endif //WEASEL_SCHEDULER_HPP

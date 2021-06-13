@@ -23,10 +23,10 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "os/scheduler.hpp"
+#include "core/source.hpp"
 
-#include "gui/widgets/processtreewidget.hpp"
-#include "gui/widgets/toolbarwidget.hpp"
+#include "processtreewidget.hpp"
+#include "toolbarwidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -56,7 +56,7 @@ private:
 
     QTimer pollTimer;
 
-    Scheduler sched;
+    Source source;
 
     QWidget *mainWidget;
 

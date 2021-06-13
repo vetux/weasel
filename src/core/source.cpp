@@ -17,26 +17,19 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <os/types.hpp>
+#include "core/source.hpp"
 
-Pid_t stringToPid(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
+#include "core/procreader.hpp"
+
+void Source::refresh() {
+    processes = ProcReader::readProcesses();
+    system = ProcReader::readSystemStatus();
 }
 
-Uid_t stringToUid(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
+const std::map<Pid_t, Process> &Source::getProcesses() {
+    return processes;
 }
 
-Mem_t stringToMem(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
+const SystemStatus &Source::getSystemStatus() {
+    return system;
 }
-

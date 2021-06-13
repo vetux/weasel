@@ -19,7 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "os/scheduler.hpp"
+#include "core/scheduler.hpp"
 
 #include <stdexcept>
 
@@ -32,9 +32,9 @@
 
 #include <sched.h>
 
-#include "os/procpath.hpp"
-#include "os/syscalls.hpp"
-#include "os/procreader.hpp"
+#include "core/procpath.hpp"
+#include "core/syscalls.hpp"
+#include "core/procreader.hpp"
 
 namespace fs = std::filesystem;
 
@@ -106,19 +106,6 @@ int convertPolicy(SchedulingPolicy policy) {
         default:
             throw std::runtime_error("Unrecognized policy value");
     }
-}
-
-void Scheduler::refresh() {
-    processes = ProcReader::readProcesses();
-    system = ProcReader::readSystemStatus();
-}
-
-const std::map<Pid_t, Process> &Scheduler::getProcesses() {
-    return processes;
-}
-
-const SystemStatus &Scheduler::getSystemStatus() {
-    return system;
 }
 
 void Scheduler::signal(const Process &process, Signal signal) {

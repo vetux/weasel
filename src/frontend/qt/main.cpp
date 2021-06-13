@@ -17,29 +17,20 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_USERS_HPP
-#define WEASEL_USERS_HPP
+#include <QApplication>
 
-#include <string>
+#include "frontend/qt/widgets/mainwindow.hpp"
 
-#include "os/types.hpp"
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
 
-namespace Users {
-    /**
-     * Find the username for a given pid.
-     *
-     * @param pid The uid of the user to find the name of
-     * @return The name of the user with the pid
-     */
-    std::string getUserName(Uid_t pid);
+    QApplication::setOrganizationName("Xenotux");
+    QApplication::setApplicationDisplayName("Weasel");
+    QApplication::setApplicationName("weasel");
+    QApplication::setApplicationVersion("v0.0.1");
 
-    /**
-     * Find the userid for a given name.
-     *
-     * @param userName The name of the user to find the pid of
-     * @return The pid of the user with the name
-     */
-    Uid_t getUserId(const std::string &userName);
+    MainWindow win;
+    win.show();
+
+    return QApplication::exec();
 }
-
-#endif //WEASEL_USERS_HPP

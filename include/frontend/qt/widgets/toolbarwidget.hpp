@@ -17,14 +17,35 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "os/users.hpp"
+#ifndef WEASEL_TOOLBARWIDGET_HPP
+#define WEASEL_TOOLBARWIDGET_HPP
 
-#include <pwd.h>
+#include <QWidget>
+#include <QProgressBar>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
-std::string Users::getUserName(Uid_t uid) {
-    return getpwuid(uid)->pw_name;
-}
+#include "core/systemstatus.hpp"
 
-Uid_t Users::getUserId(const std::string &userName) {
-    return getpwnam(userName.c_str())->pw_uid;
-}
+#include "memorybarwidget.hpp"
+
+class ToolbarWidget : public QWidget {
+Q_OBJECT
+signals:
+
+    void refreshPressed();
+
+public:
+    explicit ToolbarWidget(QWidget *parent = nullptr);
+
+    ~ToolbarWidget() override;
+
+    void setSystemStatus(const SystemStatus &system);
+
+private:
+    QPushButton *refreshButton;
+    MemoryBarWidget *memBar;
+};
+
+#endif //WEASEL_TOOLBARWIDGET_HPP

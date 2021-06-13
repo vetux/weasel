@@ -24,10 +24,10 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 
-#include "os/process.hpp"
-#include "os/signal.hpp"
+#include "core/process.hpp"
+#include "core/signal.hpp"
 
-#include "gui/processtreeitem.hpp"
+#include "frontend/qt/processtreeitem.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT

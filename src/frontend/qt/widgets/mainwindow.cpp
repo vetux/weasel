@@ -17,10 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "gui/widgets/mainwindow.hpp"
+#include "frontend/qt/widgets/mainwindow.hpp"
 
 #include <QMenuBar>
 #include <QMessageBox>
+
+#include "core/scheduler.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
     mainWidget = new QWidget();
@@ -81,9 +83,9 @@ void MainWindow::refreshPressed() {
 }
 
 void MainWindow::refresh() {
-    sched.refresh();
-    procTree->setProcesses(sched.getProcesses());
-    toolbar->setSystemStatus(sched.getSystemStatus());
+    source.refresh();
+    procTree->setProcesses(source.getProcesses());
+    toolbar->setSystemStatus(source.getSystemStatus());
 }
 
 void MainWindow::processSignalRequested(const Process &proc, Signal signal) {
@@ -97,7 +99,7 @@ void MainWindow::processSignalRequested(const Process &proc, Signal signal) {
         return;
     }
     try {
-        sched.signal(proc, signal);
+        Scheduler::signal(proc, signal);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -114,7 +116,7 @@ void MainWindow::threadSignalRequested(const Thread &thread, Signal signal) {
         return;
     }
     try {
-        sched.signal(thread, signal);
+        Scheduler::signal(thread, signal);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -131,7 +133,7 @@ void MainWindow::processPriorityChangeRequested(const Process &proc, int priorit
         return;
     }
     try {
-        sched.setPriority(proc, priority);
+        Scheduler::setPriority(proc, priority);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -148,7 +150,7 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
         return;
     }
     try {
-        sched.setPriority(thread, priority);
+        Scheduler::setPriority(thread, priority);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }

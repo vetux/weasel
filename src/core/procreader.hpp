@@ -17,27 +17,27 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCESSTREEITEM_HPP
-#define WEASEL_PROCESSTREEITEM_HPP
+#ifndef WEASEL_PROCREADER_HPP
+#define WEASEL_PROCREADER_HPP
 
-#include <QStandardItem>
+#include <filesystem>
+#include <stdexcept>
+#include <map>
 
-#include "os/process.hpp"
-#include "os/thread.hpp"
+#include "core/thread.hpp"
+#include "core/process.hpp"
+#include "core/systemstatus.hpp"
 
-class ProcessTreeItem : public QStandardItem {
-public:
-    explicit ProcessTreeItem(const Process &process);
+namespace ProcReader {
+    bool isPID(const std::string &name);
 
-    ~ProcessTreeItem() override;
+    Thread readThread(Process &process, Pid_t tid);
 
-    const Process &getProcess();
+    Process readProcess(Pid_t pid);
 
-    const QList<QStandardItem *> &getRow();
+    SystemStatus readSystemStatus();
 
-private:
-    Process process;
-    QList<QStandardItem *> rowItems;
-};
+    std::map<Pid_t, Process> readProcesses();
+}
 
-#endif //WEASEL_PROCESSTREEITEM_HPP
+#endif //WEASEL_PROCREADER_HPP

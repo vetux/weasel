@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "os/thread.hpp"
-#include "os/types.hpp"
+#include "core/thread.hpp"
+#include "core/types.hpp"
 
 struct Process {
     Pid_t pid{}; // The process id, equal to threads[0].tid

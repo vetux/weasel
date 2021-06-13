@@ -17,9 +17,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "gui/processtreeitem.hpp"
+#include "frontend/qt/processtreeitem.hpp"
 
-#include "os/users.hpp"
+#include "core/users.hpp"
 
 QList<QStandardItem *> createRow(const Process &proc) {
     QList<QStandardItem *> ret;

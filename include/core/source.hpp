@@ -17,27 +17,38 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_PROCREADER_HPP
-#define WEASEL_PROCREADER_HPP
+#ifndef WEASEL_SCANNER_HPP
+#define WEASEL_SCANNER_HPP
 
-#include <filesystem>
-#include <stdexcept>
 #include <map>
 
-#include "os/thread.hpp"
-#include "os/process.hpp"
-#include "os/systemstatus.hpp"
+#include "core/systemstatus.hpp"
+#include "core/process.hpp"
 
-namespace ProcReader {
-    bool isPID(const std::string &name);
+class Source {
+public:
+    /**
+    * This method updates the data.
+    */
+    void refresh();
 
-    Thread readThread(Process &process, Pid_t tid);
+    /**
+     * @return The system status data
+     */
+    const SystemStatus &getSystemStatus();
 
-    Process readProcess(Pid_t pid);
+    /**
+     * The process and thread interfaces are plain data objects.
+     *
+     * To modify the process tree methods on the scheduler interface have to be used.
+     *
+     * @return The map of currently active processes with the pid as key.
+     */
+    const std::map<Pid_t, Process> &getProcesses();
 
-    SystemStatus readSystemStatus();
+private:
+    SystemStatus system;
+    std::map<Pid_t, Process> processes;
+};
 
-    std::map<Pid_t, Process> readProcesses();
-}
-
-#endif //WEASEL_PROCREADER_HPP
+#endif //WEASEL_SCANNER_HPP

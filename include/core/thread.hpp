@@ -22,8 +22,8 @@
 
 #include <string>
 
-#include "os/schedulingpolicy.hpp"
-#include "os/types.hpp"
+#include "core/schedulingpolicy.hpp"
+#include "core/types.hpp"
 
 struct Thread {
     Pid_t pid{}; // The pid of the process which this thread belongs to, (main thread tid == pid)

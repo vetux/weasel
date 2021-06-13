@@ -17,10 +17,10 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include "frontend/qt/widgets/toolbarwidget.hpp"
+
 #include <sstream>
 #include <iomanip>
-
-#include "gui/widgets/toolbarwidget.hpp"
 
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QHBoxLayout());
