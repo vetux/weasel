@@ -154,8 +154,11 @@ void ProcessTreeWidget::setContents(const SystemStatus &status, const std::map<P
 
     std::map<Pid_t, Pid_t> newProcesses;
     for (auto &pair : processes) {
-        if (items.find(pair.first) == items.end()) {
+        auto it = items.find(pair.first);
+        if (it == items.end()) {
             newProcesses[pair.first] = pair.second.threads.at(0).ppid;
+        } else {
+            it->second->setProcess(status, pair.second);
         }
     }
 
