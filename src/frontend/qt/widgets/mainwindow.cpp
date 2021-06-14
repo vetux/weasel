@@ -84,7 +84,7 @@ void MainWindow::refreshPressed() {
 
 void MainWindow::refresh() {
     source.refresh();
-    procTree->setProcesses(source.getProcesses());
+    procTree->setContents(source.getSystemStatus(), source.getProcesses());
     toolbar->setSystemStatus(source.getSystemStatus());
 }
 

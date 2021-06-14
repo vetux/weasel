@@ -21,27 +21,50 @@
 
 #include "core/users.hpp"
 
-QList<QStandardItem *> createRow(const Process &proc) {
-    QList<QStandardItem *> ret;
-    ret.append(new QStandardItem(QString("%0").arg(proc.threads.at(0).pid)));
-    ret.append(new QStandardItem(QString("%0").arg(Users::getUserName(proc.threads.at(0).uid).c_str())));
-    ret.append(new QStandardItem(QString("%0").arg(proc.commandLine.c_str())));
-    return ret;
-}
+ProcessTreeItem::ProcessTreeItem() = default;
 
-ProcessTreeItem::ProcessTreeItem(const Process &process)
+ProcessTreeItem::ProcessTreeItem(const SystemStatus &status, const Process &process)
         : process(process),
-          rowItems(createRow(process)),
-          QStandardItem(QString("%0").arg(process.threads.at(0).comm.c_str())) {
-    rowItems.insert(0, this);
+          rowItems(),
+          QStandardItem() {
+    rowItems.append(this);
+
+    for (int i = 0; i < 4; i++)
+        rowItems.append(new QStandardItem());
+
+    setProcess(status, process);
 }
 
 ProcessTreeItem::~ProcessTreeItem() = default;
+
+void ProcessTreeItem::setProcess(const SystemStatus &s, const Process &p) {
+    process = p;
+    setName(QString("%0").arg(process.threads.at(0).comm.c_str()));
+    setPid(QString("%0").arg(process.threads.at(0).pid));
+    setUser(QString("%0").arg(Users::getUserName(process.threads.at(0).uid).c_str()));
+    setCommand(QString("%0").arg(process.commandLine.c_str()));
+}
 
 const Process &ProcessTreeItem::getProcess() {
     return process;
 }
 
-const QList<QStandardItem *> &ProcessTreeItem::getRow() {
+const QList<QStandardItem *> &ProcessTreeItem::getRowItems() {
     return rowItems;
+}
+
+void ProcessTreeItem::setName(const QString &name) {
+    rowItems.at(0)->setText(name);
+}
+
+void ProcessTreeItem::setPid(const QString &pid) {
+    rowItems.at(1)->setText(pid);
+}
+
+void ProcessTreeItem::setUser(const QString &user) {
+    rowItems.at(2)->setText(user);
+}
+
+void ProcessTreeItem::setCommand(const QString &command) {
+    rowItems.at(3)->setText(command);
 }

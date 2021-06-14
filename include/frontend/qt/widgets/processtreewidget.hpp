@@ -25,6 +25,7 @@
 #include <QStandardItemModel>
 
 #include "core/process.hpp"
+#include "core/systemstatus.hpp"
 #include "core/signal.hpp"
 
 #include "frontend/qt/processtreeitem.hpp"
@@ -46,7 +47,7 @@ public:
 
     ~ProcessTreeWidget() override;
 
-    void setProcesses(const std::map<Pid_t, Process> &processes);
+    void setContents(const SystemStatus &system, const std::map<Pid_t, Process> &processes);
 
 private slots:
 

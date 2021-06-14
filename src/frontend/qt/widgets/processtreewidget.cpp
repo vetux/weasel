@@ -118,13 +118,13 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
 
 ProcessTreeWidget::~ProcessTreeWidget() = default;
 
-void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
+void ProcessTreeWidget::setContents(const SystemStatus &status, const std::map<Pid_t, Process> &processes) {
     auto *tree = model.invisibleRootItem();
 
     std::map<Pid_t, ProcessTreeItem *> items = getItemsRecursive(*tree);
     std::set<Pid_t> deadProcesses;
 
-    for (auto &pair : p) {
+    for (auto &pair : processes) {
         auto it = items.find(pair.first);
         if (it != items.end()) {
             if (it->second->getProcess().threads.at(0).starttime != pair.second.threads.at(0).starttime) {
@@ -134,7 +134,7 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     }
 
     for (auto pair : items) {
-        if (p.find(pair.first) == p.end()) {
+        if (processes.find(pair.first) == processes.end()) {
             deadProcesses.insert(pair.first);
         }
     }
@@ -153,7 +153,7 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     }
 
     std::map<Pid_t, Pid_t> newProcesses;
-    for (auto &pair : p) {
+    for (auto &pair : processes) {
         if (items.find(pair.first) == items.end()) {
             newProcesses[pair.first] = pair.second.threads.at(0).ppid;
         }
@@ -163,14 +163,14 @@ void ProcessTreeWidget::setProcesses(const std::map<Pid_t, Process> &p) {
     while (!newProcesses.empty()) {
         for (auto pair : newProcesses) {
             if (pair.second == 0) {
-                auto *item = new ProcessTreeItem(p.at(pair.first));
-                tree->appendRow(item->getRow());
+                auto *item = new ProcessTreeItem(status, processes.at(pair.first));
+                tree->appendRow(item->getRowItems());
                 del.emplace_back(pair.first);
             } else {
                 ProcessTreeItem *parent;
                 if (findNodeRecursive(*tree, pair.second, parent)) {
-                    auto *item = new ProcessTreeItem(p.at(pair.first));
-                    parent->appendRow(item->getRow());
+                    auto *item = new ProcessTreeItem(status, processes.at(pair.first));
+                    parent->appendRow(item->getRowItems());
                     del.emplace_back(pair.first);
                 }
             }

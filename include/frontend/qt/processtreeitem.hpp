@@ -22,21 +22,34 @@
 
 #include <QStandardItem>
 
+#include "core/systemstatus.hpp"
 #include "core/process.hpp"
-#include "core/thread.hpp"
 
 class ProcessTreeItem : public QStandardItem {
 public:
-    explicit ProcessTreeItem(const Process &process);
+    ProcessTreeItem();
+
+    ProcessTreeItem(const SystemStatus &status, const Process &process);
 
     ~ProcessTreeItem() override;
 
+    void setProcess(const SystemStatus &status, const Process &process);
+
     const Process &getProcess();
 
-    const QList<QStandardItem *> &getRow();
+    const QList<QStandardItem *> &getRowItems();
+
+    void setName(const QString &name);
+
+    void setPid(const QString &pid);
+
+    void setUser(const QString &user);
+
+    void setCommand(const QString &command);
 
 private:
     Process process;
+
     QList<QStandardItem *> rowItems;
 };
 
