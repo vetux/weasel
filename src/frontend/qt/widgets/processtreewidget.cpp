@@ -96,6 +96,8 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
     treeView->setExpandsOnDoubleClick(false);
 
+    treeView->setStyleSheet("QTreeView::item { padding: 6px; }");
+
     model.setColumnCount(4);
     model.setHorizontalHeaderLabels({"Name", "PID", "User", "Command"});
 
