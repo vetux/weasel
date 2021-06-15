@@ -72,7 +72,7 @@ struct Thread {
     int exit_signal{};
     int processor{};
     unsigned int rt_priority{};
-    unsigned int policy{};
+    SchedulingPolicy policy{};
     unsigned long long delayacct_blkio_ticks{};
     unsigned long guest_time{};
     long cguest_time{};

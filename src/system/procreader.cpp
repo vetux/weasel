@@ -283,7 +283,7 @@ void parseThreadStat(Thread &thread) {
         if (split.size() < 39)
             return;
 
-        thread.policy = std::stoul(split.at(38));
+        thread.policy = convertPolicy(std::stoul(split.at(38)));
 
         if (split.size() < 40)
             return;
