@@ -409,53 +409,15 @@ SystemStatus::Core readCore(const std::vector<std::string> &line) {
     return ret;
 }
 
+bool isPID(const std::string &name) {
+    for (auto &c : name) {
+        if (!isAsciiNumber(c))
+            return false;
+    }
+    return true;
+}
+
 namespace ProcReader {
-    bool isPID(const std::string &name) {
-        for (auto &c : name) {
-            if (!isAsciiNumber(c))
-                return false;
-        }
-        return true;
-    }
-
-    Thread readThread(Process &p, Pid_t tid) {
-        Thread t;
-
-        t.pid = p.pid;
-        t.uid = p.uid;
-        t.tid = tid;
-
-        parseThreadStat(t);
-        parseThreadStatm(t);
-        parseThreadCwd(t);
-
-        return t;
-    }
-
-    Process readProcess(Pid_t pid) {
-        Process p;
-        p.pid = pid;
-        p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
-
-        parseProcCmdline(p);
-        parseProcEnviron(p);
-        parseProcIo(p);
-        parseProcRoot(p);
-        parseProcFd(p);
-        parseProcExe(p);
-
-        std::string dir = ProcPath::getProcessTasksDirectory(pid);
-        for (auto &d : std::filesystem::directory_iterator(dir)) {
-            auto t = readThread(p, stringToPid(d.path().filename()));
-            if (t.tid == p.pid)
-                p.threads.emplace(p.threads.begin(), t);
-            else
-                p.threads.emplace_back(t);
-        }
-
-        return p;
-    }
-
     SystemStatus readSystemStatus() {
         auto statContents = readText(ProcPath::getProcStatFile());
         replace(statContents, "  ", " "); //Replace double whitespace
@@ -562,7 +524,7 @@ namespace ProcReader {
         for (auto &fl : std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
             try {
                 auto filename = fl.path().filename();
-                if (ProcReader::isPID(filename)) {
+                if (isPID(filename)) {
                     auto pid = stringToPid(filename);
                     ret[pid] = ProcReader::readProcess(pid);
                 }
@@ -570,5 +532,42 @@ namespace ProcReader {
             catch (const std::exception &e) {} // Assume process does not exist anymore
         }
         return ret;
+    }
+
+    Process readProcess(Pid_t pid) {
+        Process p;
+        p.pid = pid;
+        p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
+
+        parseProcCmdline(p);
+        parseProcEnviron(p);
+        parseProcIo(p);
+        parseProcRoot(p);
+        parseProcFd(p);
+        parseProcExe(p);
+
+        std::string dir = ProcPath::getProcessTasksDirectory(pid);
+        for (auto &d : std::filesystem::directory_iterator(dir)) {
+            auto t = readThread(pid, stringToPid(d.path().filename()));
+            if (t.tid == p.pid)
+                p.threads.emplace(p.threads.begin(), t);
+            else
+                p.threads.emplace_back(t);
+        }
+
+        return p;
+    }
+
+    Thread readThread(Pid_t pid, Pid_t tid) {
+        Thread t;
+
+        t.pid = pid;
+        t.tid = tid;
+
+        parseThreadStat(t);
+        parseThreadStatm(t);
+        parseThreadCwd(t);
+
+        return t;
     }
 }

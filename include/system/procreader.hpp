@@ -50,7 +50,7 @@ namespace ProcReader {
      * @param tid The tid of the thread to read
      * @return The thread data for the thread tid in the process with pid
      */
-    Thread readThread(Pid_t &pid, Pid_t tid);
+    Thread readThread(Pid_t pid, Pid_t tid);
 }
 
 #endif //WEASEL_PROCREADER_HPP
