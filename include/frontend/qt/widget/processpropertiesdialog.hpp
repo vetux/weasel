@@ -26,6 +26,7 @@
 #include "system/process.hpp"
 
 class ProcessPropertiesDialog : public QDialog {
+Q_OBJECT
 public:
     ProcessPropertiesDialog(QWidget *parent, Process process);
 
