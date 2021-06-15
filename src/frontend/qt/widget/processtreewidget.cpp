@@ -25,7 +25,7 @@
 
 #include <set>
 
-#include "system/users.hpp"
+#include "system/user.hpp"
 
 #include "frontend/qt/widget/processpropertiesdialog.hpp"
 

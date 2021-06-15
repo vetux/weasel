@@ -17,14 +17,35 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "system/users.hpp"
+#include "system/user.hpp"
+
+#include <string>
+#include <stdexcept>
+
+#include <cstring>
 
 #include <pwd.h>
+#include <unistd.h>
 
-std::string Users::getUserName(Uid_t uid) {
+void User::setUser(Uid_t uid) {
+    if (setuid(uid) == -1) {
+        auto err = errno;
+        throw std::runtime_error("Failed to set user: " + std::string(strerror(err)));
+    }
+}
+
+Uid_t User::getUser() {
+    return getuid();
+}
+
+Uid_t User::getEffectiveUser() {
+    return geteuid();
+}
+
+std::string User::getUserName(Uid_t uid) {
     return getpwuid(uid)->pw_name;
 }
 
-Uid_t Users::getUserId(const std::string &userName) {
+Uid_t User::getUserId(const std::string &userName) {
     return getpwnam(userName.c_str())->pw_uid;
 }

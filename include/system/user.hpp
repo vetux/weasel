@@ -17,14 +17,35 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_USERS_HPP
-#define WEASEL_USERS_HPP
+#ifndef WEASEL_USER_HPP
+#define WEASEL_USER_HPP
 
 #include <string>
 
 #include "system/types.hpp"
 
-namespace Users {
+namespace User {
+    /**
+     * Set the effective uid of the calling process.
+     *
+     * @return
+     */
+    void setUser(Uid_t uid);
+
+    /**
+     * Returns the real uid of the current user.
+     *
+     * @return The uid of the user executing the calling process.
+     */
+    Uid_t getUser();
+
+    /**
+     * Returns the effective uid of the current user.
+     *
+     * @return The effective uid of the user executing the calling process.
+     */
+    Uid_t getEffectiveUser();
+
     /**
      * Find the username for a given pid.
      *
@@ -42,4 +63,4 @@ namespace Users {
     Uid_t getUserId(const std::string &userName);
 }
 
-#endif //WEASEL_USERS_HPP
+#endif //WEASEL_USER_HPP
