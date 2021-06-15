@@ -83,9 +83,10 @@ void MainWindow::refreshPressed() {
 }
 
 void MainWindow::refresh() {
-    source.refresh();
-    procTree->setContents(source.getSystemStatus(), source.getProcesses());
-    toolbar->setSystemStatus(source.getSystemStatus());
+    auto systemStatus = Scheduler::getSystemStatus();
+    auto processes = Scheduler::getProcesses();
+    procTree->setContents(systemStatus, processes);
+    toolbar->setSystemStatus(systemStatus);
 }
 
 void MainWindow::processSignalRequested(const Process &proc, Signal signal) {

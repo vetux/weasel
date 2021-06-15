@@ -108,6 +108,14 @@ int convertPolicy(SchedulingPolicy policy) {
     }
 }
 
+SystemStatus Scheduler::getSystemStatus() {
+    return ProcReader::readSystemStatus();
+}
+
+std::map<Pid_t, Process> Scheduler::getProcesses() {
+    return ProcReader::readProcesses();
+}
+
 void Scheduler::signal(const Process &process, Signal signal) {
     int r = kill(convertPID(process.pid), convertSignal(signal));
     if (r == -1) {

@@ -23,8 +23,6 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "system/source.hpp"
-
 #include "frontend/qt/widgets/processtreewidget.hpp"
 #include "frontend/qt/widgets/toolbarwidget.hpp"
 
@@ -55,8 +53,6 @@ private:
     void refresh();
 
     QTimer pollTimer;
-
-    Source source;
 
     QWidget *mainWidget;
 
