@@ -19,8 +19,21 @@
 
 #include "frontend/qt/widget/processpropertiesdialog.hpp"
 
+#include <QVBoxLayout>
+
 
 ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process process)
         : QDialog(parent), process(std::move(process)) {
     setWindowTitle(("Properties " + std::to_string(process.pid)).c_str());
+
+    tabWidget = new QTabWidget(this);
+    tabGeneral = new QWidget(tabWidget);
+    tabThreads = new QWidget(tabWidget);
+    tabWidget->addTab(tabGeneral, "General");
+    tabWidget->addTab(tabThreads, "Threads");
+
+    setLayout(new QVBoxLayout());
+    layout()->addWidget(tabWidget);
+
+    layout()->setMargin(6);
 }

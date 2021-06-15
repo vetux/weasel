@@ -21,6 +21,8 @@
 #define WEASEL_PROCESSPROPERTIESDIALOG_HPP
 
 #include <QDialog>
+#include <QTabWidget>
+
 #include <utility>
 
 #include "system/process.hpp"
@@ -32,6 +34,10 @@ public:
 
 private:
     Process process;
+
+    QTabWidget *tabWidget;
+    QWidget *tabGeneral;
+    QWidget *tabThreads;
 };
 
 #endif //WEASEL_PROCESSPROPERTIESDIALOG_HPP
