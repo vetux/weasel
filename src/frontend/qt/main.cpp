@@ -19,7 +19,7 @@
 
 #include <QApplication>
 
-#include "frontend/qt/widgets/mainwindow.hpp"
+#include "frontend/qt/widget/mainwindow.hpp"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);

@@ -28,7 +28,7 @@
 
 #include "system/systemstatus.hpp"
 
-#include "frontend/qt/widgets/memorybarwidget.hpp"
+#include "frontend/qt/widget/memorybarwidget.hpp"
 
 class ToolbarWidget : public QWidget {
 Q_OBJECT

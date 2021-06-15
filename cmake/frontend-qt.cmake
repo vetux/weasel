@@ -8,7 +8,7 @@ message("Python_Development_FOUND:${Python_Development_FOUND}")
 message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
-file(GLOB_RECURSE Frontend.Qt.GuiHeaders include/frontend/qt/widgets/*.hpp)
+file(GLOB_RECURSE Frontend.Qt.GuiHeaders include/frontend/qt/widget/*.hpp)
 
 file(GLOB_RECURSE Frontend.Qt.GuiSource src/frontend/qt/*.cpp)
 

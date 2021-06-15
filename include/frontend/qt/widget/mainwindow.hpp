@@ -23,8 +23,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "frontend/qt/widgets/processtreewidget.hpp"
-#include "frontend/qt/widgets/toolbarwidget.hpp"
+#include "frontend/qt/widget/processtreewidget.hpp"
+#include "frontend/qt/widget/toolbarwidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT

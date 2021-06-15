@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/widgets/processtreewidget.hpp"
+#include "frontend/qt/widget/processtreewidget.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
@@ -27,7 +27,7 @@
 
 #include "system/users.hpp"
 
-#include "frontend/qt/widgets/processpropertiesdialog.hpp"
+#include "frontend/qt/widget/processpropertiesdialog.hpp"
 
 std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
     std::vector<Pid_t> ret;
