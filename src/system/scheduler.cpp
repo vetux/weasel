@@ -34,7 +34,6 @@
 
 #include "system/procpath.hpp"
 #include "system/syscalls.hpp"
-#include "system/procreader.hpp"
 
 namespace fs = std::filesystem;
 
@@ -106,14 +105,6 @@ int convertPolicy(SchedulingPolicy policy) {
         default:
             throw std::runtime_error("Unrecognized policy value");
     }
-}
-
-SystemStatus Scheduler::getSystemStatus() {
-    return ProcReader::readSystemStatus();
-}
-
-std::map<Pid_t, Process> Scheduler::getProcesses() {
-    return ProcReader::readProcesses();
 }
 
 void Scheduler::signal(const Process &process, Signal signal) {

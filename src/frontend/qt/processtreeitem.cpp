@@ -21,6 +21,14 @@
 
 #include "system/user.hpp"
 
+static void replace(std::string &str, const std::string &v, const std::string &r) {
+    size_t pos = str.find(v);
+    while (pos != std::string::npos) {
+        str.replace(pos, v.size(), r);
+        pos = str.find(v);
+    }
+}
+
 ProcessTreeItem::ProcessTreeItem() = default;
 
 ProcessTreeItem::ProcessTreeItem(const SystemStatus &status, const Process &process)
@@ -41,8 +49,11 @@ void ProcessTreeItem::setProcess(const SystemStatus &s, const Process &p) {
     process = p;
     setName(QString("%0").arg(process.mainThread().comm.c_str()));
     setPid(QString("%0").arg(process.mainThread().pid));
-    setUser(QString("%0").arg(User::getUserName(process.mainThread().uid).c_str()));
-    setCommand(QString("%0").arg(process.commandLine.c_str()));
+    setUser(QString("%0").arg(User::getUserName(process.threads.at(0).uid).c_str()));
+
+    std::string c = p.commandLine;
+    replace(c, std::string("\0", 1), " ");
+    setCommand(QString("%0").arg(c.c_str()));
 }
 
 const Process &ProcessTreeItem::getProcess() {

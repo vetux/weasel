@@ -23,6 +23,7 @@
 #include <QMessageBox>
 
 #include "system/scheduler.hpp"
+#include "system/procreader.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
     mainWidget = new QWidget();
@@ -83,8 +84,8 @@ void MainWindow::refreshPressed() {
 }
 
 void MainWindow::refresh() {
-    auto systemStatus = Scheduler::getSystemStatus();
-    auto processes = Scheduler::getProcesses();
+    auto systemStatus = ProcReader::readSystemStatus();
+    auto processes = ProcReader::readProcesses();
     procTree->setContents(systemStatus, processes);
     toolbar->setSystemStatus(systemStatus);
 }

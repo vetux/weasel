@@ -28,20 +28,6 @@
 
 namespace Scheduler {
     /**
-     * @return The system status data
-     */
-    SystemStatus getSystemStatus();
-
-    /**
-     * The process and thread interfaces are plain data objects.
-     *
-     * To modify the process tree methods on the scheduler interface have to be used.
-     *
-     * @return The map of currently active processes with the pid as key.
-     */
-    std::map<Pid_t, Process> getProcesses();
-
-    /**
      * Send the signal to the process.
      *
      * @param process The process to send the signal to

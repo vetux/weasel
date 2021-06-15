@@ -29,15 +29,28 @@
 #include "system/systemstatus.hpp"
 
 namespace ProcReader {
-    bool isPID(const std::string &name);
-
-    Thread readThread(Process &process, Pid_t tid);
-
-    Process readProcess(Pid_t pid);
-
+    /**
+     * @return The system status read from /proc/stat
+     */
     SystemStatus readSystemStatus();
 
+    /**
+     * @return The currently active processes from /proc/PID
+     */
     std::map<Pid_t, Process> readProcesses();
+
+    /**
+     * @param pid The pid of the process to read.
+     * @return The data for the process with pid
+     */
+    Process readProcess(Pid_t pid);
+
+    /**
+     * @param pid The pid of the process to read the thread of
+     * @param tid The tid of the thread to read
+     * @return The thread data for the thread tid in the process with pid
+     */
+    Thread readThread(Pid_t &pid, Pid_t tid);
 }
 
 #endif //WEASEL_PROCREADER_HPP

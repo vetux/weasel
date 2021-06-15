@@ -107,7 +107,7 @@ void removeSurroundingWhiteSpace(std::string &str) {
     }
 }
 
-void replace(std::string &str, const std::string &v, const std::string &r) {
+static void replace(std::string &str, const std::string &v, const std::string &r) {
     size_t pos = str.find(v);
     while (pos != std::string::npos) {
         str.replace(pos, v.size(), r);
@@ -173,7 +173,6 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
 void parseProcCmdline(Process &proc) {
     try {
         proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid), " ");
-        replace(proc.commandLine, std::string("\0", 1), " ");
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
