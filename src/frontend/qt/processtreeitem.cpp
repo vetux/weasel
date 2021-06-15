@@ -29,7 +29,7 @@ ProcessTreeItem::ProcessTreeItem(const SystemStatus &status, const Process &proc
           QStandardItem() {
     rowItems.append(this);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 3; i++)
         rowItems.append(new QStandardItem());
 
     setProcess(status, process);

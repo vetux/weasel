@@ -61,7 +61,7 @@ SchedulingPolicy convertPolicy(uint32_t policy) {
     }
 }
 
-std::string readText(const std::string &filePath) {
+std::string readText(const std::string &filePath, const std::string &newLine = "\n") {
     std::string ret;
     std::ifstream stream;
 
@@ -73,7 +73,7 @@ std::string readText(const std::string &filePath) {
 
     std::string tmp;
     while (std::getline(stream, tmp)) {
-        ret += tmp + "\n";
+        ret += tmp + newLine;
     }
 
     return ret;
@@ -172,7 +172,8 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
 
 void parseProcCmdline(Process &proc) {
     try {
-        proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid));
+        proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid), " ");
+        replace(proc.commandLine, std::string("\0", 1), " ");
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
