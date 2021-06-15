@@ -49,7 +49,7 @@ void ProcessTreeItem::setProcess(const SystemStatus &s, const Process &p) {
     process = p;
     setName(QString("%0").arg(process.mainThread().comm.c_str()));
     setPid(QString("%0").arg(process.mainThread().pid));
-    setUser(QString("%0").arg(User::getUserName(process.threads.at(0).uid).c_str()));
+    setUser(QString("%0").arg(User::getUserName(process.uid).c_str()));
 
     std::string c = p.commandLine;
     replace(c, std::string("\0", 1), " ");

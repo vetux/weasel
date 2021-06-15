@@ -27,7 +27,6 @@
 
 struct Thread {
     Pid_t pid{}; // The pid of the process which this thread belongs to, (main thread tid == pid)
-    Uid_t uid{}; // User ID retrieved via stat()
     Pid_t tid{}; // The thread id
 
     //Reference: https://man7.org/linux/man-pages/man5/proc.5.html
