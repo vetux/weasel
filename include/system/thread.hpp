@@ -24,6 +24,7 @@
 
 #include "system/schedulingpolicy.hpp"
 #include "system/types.hpp"
+#include "system/signal.hpp"
 
 struct Thread {
     Pid_t pid{}; // The pid of the process which this thread belongs to, (main thread tid == pid)
@@ -95,6 +96,36 @@ struct Thread {
 
     // /proc/[pid]/task/[tid]/cwd
     std::string cwd{};
+
+    /**
+     * Send the signal to the thread.
+     *
+     * @param thread The thread to send the signal to
+     * @param signal The signal to send
+     */
+    void sendSignal(Signal signal) const;
+
+    /**
+     * Set the thread nice value.
+     *
+     * @param thread The thread to set the priority of
+     * @param priority The priority to set
+     */
+    void setPriority(int priority) const;
+
+    /**
+     * Set the scheduling policy of the thread.
+     *
+     * @param thread The thread to set the policy of.
+     * @param policy The policy to set.
+     * @param runtime If policy is DEADLINE the runtime value in nanoseconds.
+     * @param deadline If policy is DEADLINE the deadline value in nanoseconds.
+     * @param period If policy is DEADLINE the period value in nanoseconds.
+     */
+    void setPolicy(SchedulingPolicy policy,
+                   uint64_t runtime = 0,
+                   uint64_t deadline = 0,
+                   uint64_t period = 0) const;
 };
 
 #endif //WEASEL_THREAD_HPP

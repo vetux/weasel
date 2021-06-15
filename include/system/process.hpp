@@ -25,6 +25,7 @@
 
 #include "system/thread.hpp"
 #include "system/types.hpp"
+#include "system/signal.hpp"
 
 struct Process {
     Pid_t pid{}; // The process id, equal to threads[0].tid
@@ -56,9 +57,25 @@ struct Process {
 
     std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
 
-    const Thread &mainThread() const { return threads.at(0); }
+    const Thread &mainThread() const;
 
-    Thread &mainThread() { return threads.at(0); }
+    Thread &mainThread();
+
+    /**
+     * Send the signal to the process.
+     *
+     * @param signal The signal to send
+     */
+    void sendSignal(Signal signal) const;
+
+    /**
+     * Set the process nice value.
+     *
+     * The priority value is in the range -20 to 19, with -20 being the highest priority and 19 being the lowest priority.
+     *
+     * @param priority The priority to set.
+     */
+    void setPriority(int priority) const;
 };
 
 #endif //WEASEL_PROCESS_HPP

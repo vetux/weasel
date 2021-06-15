@@ -22,7 +22,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 
-#include "system/scheduler.hpp"
 #include "system/procreader.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
@@ -101,7 +100,7 @@ void MainWindow::processSignalRequested(const Process &proc, Signal signal) {
         return;
     }
     try {
-        Scheduler::signal(proc, signal);
+        proc.sendSignal(signal);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -118,7 +117,7 @@ void MainWindow::threadSignalRequested(const Thread &thread, Signal signal) {
         return;
     }
     try {
-        Scheduler::signal(thread, signal);
+        thread.sendSignal(signal);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -135,7 +134,7 @@ void MainWindow::processPriorityChangeRequested(const Process &proc, int priorit
         return;
     }
     try {
-        Scheduler::setPriority(proc, priority);
+        proc.setPriority(priority);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
@@ -152,7 +151,7 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
         return;
     }
     try {
-        Scheduler::setPriority(thread, priority);
+        thread.setPriority(priority);
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }

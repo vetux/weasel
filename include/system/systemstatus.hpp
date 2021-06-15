@@ -111,6 +111,11 @@ struct SystemStatus {
     Mem_t directMap4M;
     Mem_t directMap2M;
     Mem_t directMap1G;
+
+    /**
+     * @return The page size in bytes
+     */
+    static int getPageSize();
 };
 
 #endif //WEASEL_SYSTEMSTATUS_HPP

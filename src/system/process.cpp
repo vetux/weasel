@@ -1,5 +1,3 @@
-#include <vector>
-
 /**
  *  Weasel  -   Gui Process Explorer
  *  Copyright (C) 2021  Julian Zampiccoli
@@ -19,31 +17,23 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "system/scheduler.hpp"
+#include "system/process.hpp"
 
+#include <limits>
 #include <stdexcept>
 
-#include <filesystem>
 #include <csignal>
 #include <cstring>
-#include <algorithm>
 
 #include <sys/resource.h>
 
-#include <sched.h>
-
-#include "system/procpath.hpp"
-#include "system/syscalls.hpp"
-
-namespace fs = std::filesystem;
-
-pid_t convertPID(Pid_t pid) {
+static pid_t convertPID(Pid_t pid) {
     if (pid > std::numeric_limits<pid_t>::max() || pid < std::numeric_limits<pid_t>::min())
         throw std::runtime_error("Pid value is out of range");
     return static_cast<pid_t>(pid);
 }
 
-int convertSignal(Signal signal) {
+static int convertSignal(Signal signal) {
     switch (signal) {
         case SIGNAL_SIGHUP:
             return SIGHUP;
@@ -88,78 +78,26 @@ int convertSignal(Signal signal) {
     }
 }
 
-int convertPolicy(SchedulingPolicy policy) {
-    switch (policy) {
-        case OTHER:
-            return SCHED_OTHER;
-        case BATCH:
-            return SCHED_BATCH;
-        case IDLE:
-            return SCHED_IDLE;
-        case FIFO:
-            return SCHED_FIFO;
-        case RR:
-            return SCHED_RR;
-        case DEADLINE:
-            return SCHED_DEADLINE;
-        default:
-            throw std::runtime_error("Unrecognized policy value");
-    }
+const Thread &Process::mainThread() const {
+    return threads.at(0);
 }
 
-void Scheduler::signal(const Process &process, Signal signal) {
-    int r = kill(convertPID(process.pid), convertSignal(signal));
+Thread &Process::mainThread() {
+    return threads.at(0);
+}
+
+void Process::sendSignal(Signal signal) const {
+    int r = kill(convertPID(pid), convertSignal(signal));
     if (r == -1) {
         auto err = errno;
         throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
     }
 }
 
-void Scheduler::signal(const Thread &thread, Signal signal) {
-    auto r = tkill(convertPID(thread.tid), convertSignal(signal));
-    if (r == -1) {
-        auto err = errno;
-        throw std::runtime_error("Failed to send signal: " + std::string(strerror(err)));
-    }
-}
-
-void Scheduler::setPriority(const Process &process, int priority) {
-    int r = setpriority(PRIO_PROCESS, convertPID(process.pid), priority);
+void Process::setPriority(int priority) const {
+    int r = setpriority(PRIO_PROCESS, convertPID(pid), priority);
     if (r == -1) {
         auto err = errno;
         throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
     }
-}
-
-void Scheduler::setPriority(const Thread &thread, int priority) {
-    int r = setpriority(PRIO_PROCESS, convertPID(thread.tid), priority);
-    if (r == -1) {
-        auto err = errno;
-        throw std::runtime_error("Failed to set priority: " + std::string(strerror(err)));
-    }
-}
-
-void Scheduler::setPolicy(const Thread &thread,
-                          SchedulingPolicy policy,
-                          uint64_t runtime,
-                          uint64_t deadline,
-                          uint64_t period) {
-    sched_attr attr{};
-    attr.size = sizeof(struct sched_attr);
-    attr.sched_policy = convertPolicy(policy);
-    attr.sched_flags = 0;
-    attr.sched_nice = thread.priority;
-    attr.sched_priority = convertPolicy(policy);
-    attr.sched_runtime = runtime;
-    attr.sched_deadline = deadline;
-    attr.sched_period = period;
-    int r = sched_setattr(thread.tid, &attr, 0);
-    if (r == -1) {
-        auto err = errno;
-        throw std::runtime_error("Failed to set policy: " + std::string(strerror(err)));
-    }
-}
-
-int Scheduler::getPageSize() {
-    return getpagesize();
 }
