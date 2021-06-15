@@ -19,7 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "core/scheduler.hpp"
+#include "system/scheduler.hpp"
 
 #include <stdexcept>
 
@@ -32,9 +32,9 @@
 
 #include <sched.h>
 
-#include "core/procpath.hpp"
-#include "core/syscalls.hpp"
-#include "core/procreader.hpp"
+#include "system/procpath.hpp"
+#include "system/syscalls.hpp"
+#include "system/procreader.hpp"
 
 namespace fs = std::filesystem;
 

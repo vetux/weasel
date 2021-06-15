@@ -17,26 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <core/types.hpp>
+#include "system/users.hpp"
 
-Pid_t stringToPid(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
+#include <pwd.h>
+
+std::string Users::getUserName(Uid_t uid) {
+    return getpwuid(uid)->pw_name;
 }
 
-Uid_t stringToUid(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
+Uid_t Users::getUserId(const std::string &userName) {
+    return getpwnam(userName.c_str())->pw_uid;
 }
-
-Mem_t stringToMem(const std::string &str) {
-    if (str.empty())
-        return 0;
-    else
-        return std::stol(str);
-}
-

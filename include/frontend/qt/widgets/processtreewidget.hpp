@@ -24,9 +24,9 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 
-#include "core/process.hpp"
-#include "core/systemstatus.hpp"
-#include "core/signal.hpp"
+#include "system/process.hpp"
+#include "system/systemstatus.hpp"
+#include "system/signal.hpp"
 
 #include "frontend/qt/processtreeitem.hpp"
 

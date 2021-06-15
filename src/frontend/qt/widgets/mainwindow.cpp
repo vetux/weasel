@@ -22,7 +22,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 
-#include "core/scheduler.hpp"
+#include "system/scheduler.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
     mainWidget = new QWidget();

@@ -17,9 +17,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "core/source.hpp"
+#include "system/source.hpp"
 
-#include "core/procreader.hpp"
+#include "system/procreader.hpp"
 
 void Source::refresh() {
     processes = ProcReader::readProcesses();

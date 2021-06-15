@@ -22,7 +22,7 @@
 
 #include <string>
 
-#include "core/types.hpp"
+#include "system/types.hpp"
 
 #define PATH_PROC std::string("/proc")
 #define PATH_TASK std::string("/task")

@@ -17,29 +17,26 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_USERS_HPP
-#define WEASEL_USERS_HPP
+#include <system/types.hpp>
 
-#include <string>
-
-#include "core/types.hpp"
-
-namespace Users {
-    /**
-     * Find the username for a given pid.
-     *
-     * @param pid The uid of the user to find the name of
-     * @return The name of the user with the pid
-     */
-    std::string getUserName(Uid_t pid);
-
-    /**
-     * Find the userid for a given name.
-     *
-     * @param userName The name of the user to find the pid of
-     * @return The pid of the user with the name
-     */
-    Uid_t getUserId(const std::string &userName);
+Pid_t stringToPid(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
 }
 
-#endif //WEASEL_USERS_HPP
+Uid_t stringToUid(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
+}
+
+Mem_t stringToMem(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
+}
+

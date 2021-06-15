@@ -22,9 +22,9 @@
 
 #include <map>
 
-#include "core/process.hpp"
-#include "core/signal.hpp"
-#include "core/systemstatus.hpp"
+#include "system/process.hpp"
+#include "system/signal.hpp"
+#include "system/systemstatus.hpp"
 
 namespace Scheduler {
     /**

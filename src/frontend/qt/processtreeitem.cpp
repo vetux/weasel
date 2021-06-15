@@ -19,7 +19,7 @@
 
 #include "frontend/qt/processtreeitem.hpp"
 
-#include "core/users.hpp"
+#include "system/users.hpp"
 
 ProcessTreeItem::ProcessTreeItem() = default;
 

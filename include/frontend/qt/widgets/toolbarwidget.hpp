@@ -26,9 +26,9 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "core/systemstatus.hpp"
+#include "system/systemstatus.hpp"
 
-#include "memorybarwidget.hpp"
+#include "frontend/qt/widgets/memorybarwidget.hpp"
 
 class ToolbarWidget : public QWidget {
 Q_OBJECT

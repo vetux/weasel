@@ -22,8 +22,8 @@
 
 #include <QStandardItem>
 
-#include "core/systemstatus.hpp"
-#include "core/process.hpp"
+#include "system/systemstatus.hpp"
+#include "system/process.hpp"
 
 class ProcessTreeItem : public QStandardItem {
 public:

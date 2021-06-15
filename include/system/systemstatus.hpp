@@ -22,7 +22,7 @@
 
 #include <vector>
 
-#include "core/types.hpp"
+#include "system/types.hpp"
 
 struct SystemStatus {
     struct Core {

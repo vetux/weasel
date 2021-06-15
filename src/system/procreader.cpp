@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "core/procreader.hpp"
+#include "system/procreader.hpp"
 
 #include <map>
 #include <fstream>
@@ -30,8 +30,8 @@
 
 #include <sys/stat.h>
 
-#include "core/procpath.hpp"
-#include "core/syscalls.hpp"
+#include "system/procpath.hpp"
+#include "system/syscalls.hpp"
 
 inline bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';

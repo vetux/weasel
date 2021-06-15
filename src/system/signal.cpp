@@ -19,7 +19,7 @@
 
 #include <stdexcept>
 
-#include "core/signal.hpp"
+#include "system/signal.hpp"
 
 std::string signalToString(Signal sig) {
     switch (sig) {

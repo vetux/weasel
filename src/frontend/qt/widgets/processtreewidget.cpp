@@ -25,7 +25,7 @@
 
 #include <set>
 
-#include "core/users.hpp"
+#include "system/users.hpp"
 
 std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
     std::vector<Pid_t> ret;
