@@ -27,6 +27,8 @@
 
 #include "system/users.hpp"
 
+#include "frontend/qt/widgets/processpropertiesdialog.hpp"
+
 std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
     std::vector<Pid_t> ret;
 
@@ -226,7 +228,9 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
                         if (action->text() == "Terminate") {
                             emit processSignalRequested(item->getProcess(), SIGNAL_SIGTERM);
                         } else if (action->text() == "Properties") {
-
+                            ProcessPropertiesDialog dialog(this, item->getProcess());
+                            dialog.show();
+                            dialog.exec();
                         } else {
                             emit processSignalRequested(item->getProcess(),
                                                         stringToSignal(action->text().toStdString()));
