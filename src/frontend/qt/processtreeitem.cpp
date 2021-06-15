@@ -39,9 +39,9 @@ ProcessTreeItem::~ProcessTreeItem() = default;
 
 void ProcessTreeItem::setProcess(const SystemStatus &s, const Process &p) {
     process = p;
-    setName(QString("%0").arg(process.threads.at(0).comm.c_str()));
-    setPid(QString("%0").arg(process.threads.at(0).pid));
-    setUser(QString("%0").arg(User::getUserName(process.threads.at(0).uid).c_str()));
+    setName(QString("%0").arg(process.mainThread().comm.c_str()));
+    setPid(QString("%0").arg(process.mainThread().pid));
+    setUser(QString("%0").arg(User::getUserName(process.mainThread().uid).c_str()));
     setCommand(QString("%0").arg(process.commandLine.c_str()));
 }
 

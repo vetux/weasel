@@ -55,6 +55,10 @@ struct Process {
     std::string executablePath{};
 
     std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
+
+    const Thread &mainThread() const { return threads.at(0); }
+
+    Thread &mainThread() { return threads.at(0); }
 };
 
 #endif //WEASEL_PROCESS_HPP

@@ -131,7 +131,7 @@ void ProcessTreeWidget::setContents(const SystemStatus &status, const std::map<P
     for (auto &pair : processes) {
         auto it = items.find(pair.first);
         if (it != items.end()) {
-            if (it->second->getProcess().threads.at(0).starttime != pair.second.threads.at(0).starttime) {
+            if (it->second->getProcess().mainThread().starttime != pair.second.mainThread().starttime) {
                 deadProcesses.insert(pair.first);
             }
         }
@@ -160,7 +160,7 @@ void ProcessTreeWidget::setContents(const SystemStatus &status, const std::map<P
     for (auto &pair : processes) {
         auto it = items.find(pair.first);
         if (it == items.end()) {
-            newProcesses[pair.first] = pair.second.threads.at(0).ppid;
+            newProcesses[pair.first] = pair.second.mainThread().ppid;
         } else {
             it->second->setProcess(status, pair.second);
         }
