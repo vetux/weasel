@@ -29,11 +29,13 @@ class ProcessTreeItem : public QStandardItem {
 public:
     ProcessTreeItem();
 
-    ProcessTreeItem(const SystemStatus &status, const Process &process);
+    ProcessTreeItem(const SystemStatus &status, const SystemStatus &prevStatus, const Process &process,
+                    const Process &prevProc);
 
     ~ProcessTreeItem() override;
 
-    void setProcess(const SystemStatus &status, const Process &process);
+    void setProcess(const SystemStatus &s, const SystemStatus &prevStatus, const Process &p,
+                    const Process &prevProc);
 
     const Process &getProcess();
 
@@ -44,6 +46,8 @@ public:
     void setPid(const QString &pid);
 
     void setUser(const QString &user);
+
+    void setCpu(const QString &cpu);
 
     void setCommand(const QString &command);
 

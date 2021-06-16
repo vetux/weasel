@@ -85,8 +85,12 @@ void MainWindow::refreshPressed() {
 void MainWindow::refresh() {
     auto systemStatus = ProcReader::readSystemStatus();
     auto processes = ProcReader::readProcesses();
-    procTree->setContents(systemStatus, processes);
-    toolbar->setSystemStatus(systemStatus);
+    if (!prevProc.empty()) {
+        procTree->setContents(systemStatus, prevStatus, processes, prevProc);
+        toolbar->setSystemStatus(systemStatus, prevStatus);
+    }
+    prevStatus = systemStatus;
+    prevProc = processes;
 }
 
 void MainWindow::processSignalRequested(const Process &proc, Signal signal) {

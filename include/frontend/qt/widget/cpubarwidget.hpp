@@ -17,37 +17,29 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_TOOLBARWIDGET_HPP
-#define WEASEL_TOOLBARWIDGET_HPP
+#ifndef WEASEL_CPUBARWIDGET_HPP
+#define WEASEL_CPUBARWIDGET_HPP
 
-#include <QWidget>
 #include <QProgressBar>
-#include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 
 #include "system/systemstatus.hpp"
 
-#include "frontend/qt/widget/memorybarwidget.hpp"
-#include "frontend/qt/widget/cpubarwidget.hpp"
-
-class ToolbarWidget : public QWidget {
-Q_OBJECT
-signals:
-
-    void refreshPressed();
-
+class CpuBarWidget : public QWidget {
 public:
-    explicit ToolbarWidget(QWidget *parent = nullptr);
+    explicit CpuBarWidget(QWidget *parent = nullptr);
 
-    ~ToolbarWidget() override;
+    void setTotalCpu(const SystemStatus::Core &core, const SystemStatus::Core &prev);
 
-    void setSystemStatus(const SystemStatus &system, const SystemStatus &prevSystem);
+    void setCpus(const std::vector<SystemStatus::Core> &cores, const std::vector<SystemStatus::Core> &prevCores);
 
 private:
-    QPushButton *refreshButton;
-    MemoryBarWidget *memBar;
-    CpuBarWidget *cpuBar;
+    QProgressBar *totalCpuBar;
+    QLabel *totalCpuLabel;
+
+    std::vector<QProgressBar *> cpuBars;
+    std::vector<QLabel *> cpuLabels;
+
 };
 
-#endif //WEASEL_TOOLBARWIDGET_HPP
+#endif //WEASEL_CPUBARWIDGET_HPP

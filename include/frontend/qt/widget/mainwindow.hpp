@@ -58,6 +58,9 @@ private:
 
     ToolbarWidget *toolbar;
     ProcessTreeWidget *procTree;
+
+    SystemStatus prevStatus;
+    std::map<Pid_t, Process> prevProc;
 };
 
 #endif //WEASEL_MAINWINDOW_HPP

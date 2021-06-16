@@ -21,6 +21,22 @@
 
 #include "system/user.hpp"
 
+static float getCpuPercentage(const SystemStatus &system,
+                              const SystemStatus &prevSystem,
+                              const Thread &thread,
+                              const Thread &prev) {
+    //https://github.com/scaidermern/top-processes/blob/2a2b1a84282b0418f51fd145133175dbff6e155a/top_proc.c#L158
+    auto total_cpu = system.cpu.user + system.cpu.nice + system.cpu.system + system.cpu.idle
+                     + system.cpu.iowait + system.cpu.irq + system.cpu.softirq + system.cpu.steal;
+    auto prev_total_cpu = prevSystem.cpu.user + prevSystem.cpu.nice + prevSystem.cpu.system + prevSystem.cpu.idle
+                          + prevSystem.cpu.iowait + prevSystem.cpu.irq + prevSystem.cpu.softirq + prevSystem.cpu.steal;
+    auto total = thread.utime + thread.stime;
+    auto prevTotal = prev.utime + prev.stime;
+    auto cpuTime = total - prevTotal;
+    auto percentage = (cpuTime / (float) (total_cpu - prev_total_cpu) * 100.0 * system.cores.size());
+    return percentage;
+}
+
 static void replace(std::string &str, const std::string &v, const std::string &r) {
     size_t pos = str.find(v);
     while (pos != std::string::npos) {
@@ -31,25 +47,32 @@ static void replace(std::string &str, const std::string &v, const std::string &r
 
 ProcessTreeItem::ProcessTreeItem() = default;
 
-ProcessTreeItem::ProcessTreeItem(const SystemStatus &status, const Process &process)
+ProcessTreeItem::ProcessTreeItem(const SystemStatus &status,
+                                 const SystemStatus &prevStatus,
+                                 const Process &process,
+                                 const Process &prevProc)
         : process(process),
           rowItems(),
           QStandardItem() {
     rowItems.append(this);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
         rowItems.append(new QStandardItem());
 
-    setProcess(status, process);
+    setProcess(status, prevStatus, process, prevProc);
 }
 
 ProcessTreeItem::~ProcessTreeItem() = default;
 
-void ProcessTreeItem::setProcess(const SystemStatus &s, const Process &p) {
+void ProcessTreeItem::setProcess(const SystemStatus &s,
+                                 const SystemStatus &prevStatus,
+                                 const Process &p,
+                                 const Process &prevProc) {
     process = p;
     setName(QString("%0").arg(process.mainThread().comm.c_str()));
     setPid(QString("%0").arg(process.mainThread().pid));
     setUser(QString("%0").arg(User::getUserName(process.uid).c_str()));
+    setCpu(QString("%0").arg(getCpuPercentage(s, prevStatus, p.mainThread(), prevProc.mainThread()), 0, 'f', 2));
 
     std::string c = p.commandLine;
     replace(c, std::string("\0", 1), " ");
@@ -76,6 +99,10 @@ void ProcessTreeItem::setUser(const QString &user) {
     rowItems.at(2)->setText(user);
 }
 
+void ProcessTreeItem::setCpu(const QString &cpu) {
+    rowItems.at(3)->setText(cpu);
+}
+
 void ProcessTreeItem::setCommand(const QString &command) {
-    rowItems.at(3)->setText(command);
+    rowItems.at(4)->setText(command);
 }

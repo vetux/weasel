@@ -27,10 +27,12 @@ ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
 
     refreshButton = new QPushButton();
     memBar = new MemoryBarWidget();
+    cpuBar = new CpuBarWidget();
 
     refreshButton->setText("Refresh");
 
     layout()->addWidget(refreshButton);
+    layout()->addWidget(cpuBar);
     layout()->addWidget(memBar);
     layout()->setMargin(0);
 
@@ -41,7 +43,7 @@ ToolbarWidget::~ToolbarWidget() {
 
 }
 
-void ToolbarWidget::setSystemStatus(const SystemStatus &system) {
+void ToolbarWidget::setSystemStatus(const SystemStatus &system, const SystemStatus &prevSystem) {
     float available = static_cast<float>(system.available) / system.total;
     float free = static_cast<float>(system.free) / system.total;
 
@@ -59,4 +61,7 @@ void ToolbarWidget::setSystemStatus(const SystemStatus &system) {
     text += stream.str() + "G";
 
     memBar->setText(text.c_str());
+
+    cpuBar->setTotalCpu(system.cpu, prevSystem.cpu);
+    cpuBar->setCpus(system.cores, prevSystem.cores);
 }
