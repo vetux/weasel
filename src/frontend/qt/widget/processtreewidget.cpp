@@ -100,8 +100,8 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
 
     treeView->setStyleSheet("QTreeView::item { padding: 6px; }");
 
-    model.setColumnCount(5);
-    model.setHorizontalHeaderLabels({"Name", "PID", "User", "Cpu", "Command"});
+    model.setColumnCount(8);
+    model.setHorizontalHeaderLabels({"Name", "PID", "User", "Cpu", "Virtual", "Resident", "Shared", "Command"});
 
     treeView->setModel(&model);
 

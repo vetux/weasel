@@ -21,6 +21,10 @@
 
 #include "system/user.hpp"
 
+#define BYTES_MEGABYTE 1000000
+
+#define BYTES_GIGABYTE 1000000000
+
 static float getCpuPercentage(const SystemStatus &system,
                               const SystemStatus &prevSystem,
                               const Thread &thread,
@@ -35,6 +39,16 @@ static float getCpuPercentage(const SystemStatus &system,
     auto cpuTime = total - prevTotal;
     auto percentage = (cpuTime / (float) (total_cpu - prev_total_cpu) * 100.0 * system.cores.size());
     return percentage;
+}
+
+static std::string getMemoryString(unsigned long bytes) {
+    if (bytes >= BYTES_GIGABYTE) {
+        return std::to_string(bytes / BYTES_GIGABYTE) + "G";
+    } else if (bytes >= BYTES_MEGABYTE) {
+        return std::to_string(bytes / BYTES_MEGABYTE) + "M";
+    } else {
+        return std::to_string(bytes);
+    }
 }
 
 static void replace(std::string &str, const std::string &v, const std::string &r) {
@@ -56,7 +70,7 @@ ProcessTreeItem::ProcessTreeItem(const SystemStatus &status,
           QStandardItem() {
     rowItems.append(this);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 7; i++)
         rowItems.append(new QStandardItem());
 
     setProcess(status, prevStatus, process, prevProc);
@@ -73,6 +87,9 @@ void ProcessTreeItem::setProcess(const SystemStatus &s,
     setPid(QString("%0").arg(process.mainThread().pid));
     setUser(QString("%0").arg(User::getUserName(process.uid).c_str()));
     setCpu(QString("%0").arg(getCpuPercentage(s, prevStatus, p.mainThread(), prevProc.mainThread()), 0, 'f', 2));
+    setVirtual(QString("%0").arg(getMemoryString(p.mainThread().vsize).c_str()));
+    setResident(QString("%0").arg(getMemoryString(p.mainThread().resident * SystemStatus::getPageSize()).c_str()));
+    setShared(QString("%0").arg(getMemoryString(p.mainThread().shared * SystemStatus::getPageSize()).c_str()));
 
     std::string c = p.commandLine;
     replace(c, std::string("\0", 1), " ");
@@ -103,6 +120,18 @@ void ProcessTreeItem::setCpu(const QString &cpu) {
     rowItems.at(3)->setText(cpu);
 }
 
+void ProcessTreeItem::setVirtual(const QString &mem) {
+    rowItems.at(4)->setText(mem);
+}
+
+void ProcessTreeItem::setResident(const QString &mem) {
+    rowItems.at(5)->setText(mem);
+}
+
+void ProcessTreeItem::setShared(const QString &mem) {
+    rowItems.at(6)->setText(mem);
+}
+
 void ProcessTreeItem::setCommand(const QString &command) {
-    rowItems.at(4)->setText(command);
+    rowItems.at(7)->setText(command);
 }

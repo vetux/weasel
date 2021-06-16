@@ -49,6 +49,12 @@ public:
 
     void setCpu(const QString &cpu);
 
+    void setVirtual(const QString &mem);
+
+    void setResident(const QString &mem);
+
+    void setShared(const QString &mem);
+
     void setCommand(const QString &command);
 
 private:
