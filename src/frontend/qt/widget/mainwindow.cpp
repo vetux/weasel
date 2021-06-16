@@ -43,7 +43,6 @@ MainWindow::MainWindow(int pollingInterval) {
     refresh();
 
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
-    connect(toolbar, SIGNAL(refreshPressed()), this, SLOT(refreshPressed()));
 
     connect(procTree,
             SIGNAL(processSignalRequested(const Process &, Signal)),
@@ -75,10 +74,6 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::onPollTimeOut() {
-    refresh();
-}
-
-void MainWindow::refreshPressed() {
     refresh();
 }
 

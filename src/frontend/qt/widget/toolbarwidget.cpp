@@ -25,18 +25,12 @@
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
     setLayout(new QHBoxLayout());
 
-    refreshButton = new QPushButton();
     memBar = new MemoryBarWidget();
     cpuBar = new CpuBarWidget();
 
-    refreshButton->setText("Refresh");
-
-    layout()->addWidget(refreshButton);
     layout()->addWidget(cpuBar);
     layout()->addWidget(memBar);
     layout()->setMargin(0);
-
-    connect(refreshButton, SIGNAL(pressed()), this, SIGNAL(refreshPressed()));
 }
 
 ToolbarWidget::~ToolbarWidget() {

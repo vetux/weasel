@@ -37,8 +37,6 @@ private slots:
 
     void onPollTimeOut();
 
-    void refreshPressed();
-
     void processSignalRequested(const Process &proc, Signal signal);
 
     void threadSignalRequested(const Thread &thread, Signal signal);

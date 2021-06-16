@@ -34,9 +34,6 @@
 class ToolbarWidget : public QWidget {
 Q_OBJECT
 signals:
-
-    void refreshPressed();
-
 public:
     explicit ToolbarWidget(QWidget *parent = nullptr);
 
@@ -45,7 +42,6 @@ public:
     void setSystemStatus(const SystemStatus &system, const SystemStatus &prevSystem);
 
 private:
-    QPushButton *refreshButton;
     MemoryBarWidget *memBar;
     CpuBarWidget *cpuBar;
 };
