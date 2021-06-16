@@ -27,38 +27,25 @@
 #define STYLE(color) "QProgressBar {background:transparent; color:transparent;} QProgressBar::chunk { background-color: "#color"; width: 2px; margin-left: 1px; margin-right: 1px;}"
 
 MemoryBarWidget::MemoryBarWidget() {
-    memoryFreeBar = new QProgressBar();
     memoryAvailableBar = new QProgressBar();
     memoryText = new QLabel();
 
     memoryText->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
-    memoryFreeBar->setStyleSheet(STYLE("orange"));
-    memoryAvailableBar->setStyleSheet(STYLE("green"));
-
     memoryAvailableBar->setRange(0, 100);
-    memoryFreeBar->setRange(0, 100);
 
     memoryAvailableBar->setLayout(new QHBoxLayout());
     memoryAvailableBar->layout()->setMargin(0);
     memoryAvailableBar->layout()->setContentsMargins(0, 0, 5, 0);
     memoryAvailableBar->layout()->addWidget(memoryText);
 
-    memoryFreeBar->setLayout(new QHBoxLayout());
-    memoryFreeBar->layout()->setMargin(0);
-    memoryFreeBar->layout()->addWidget(memoryAvailableBar);
-
     setLayout(new QHBoxLayout());
     layout()->setMargin(0);
-    layout()->addWidget(memoryFreeBar);
+    layout()->addWidget(memoryAvailableBar);
 }
 
 void MemoryBarWidget::setAvailable(float availableMemory) {
     memoryAvailableBar->setValue(static_cast<int>(100 * (1.0f - availableMemory)));
-}
-
-void MemoryBarWidget::setFree(float freeMemory) {
-    memoryFreeBar->setValue(static_cast<int>(100 * (1.0f - freeMemory)));
 }
 
 void MemoryBarWidget::setText(const QString &text) {

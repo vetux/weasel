@@ -29,14 +29,11 @@ Q_OBJECT
 public:
     MemoryBarWidget();
 
-    void setFree(float freeMemory);
-
     void setAvailable(float availableMemory);
 
     void setText(const QString &text);
 
 private:
-    QProgressBar *memoryFreeBar;
     QProgressBar *memoryAvailableBar;
     QLabel *memoryText;
 };

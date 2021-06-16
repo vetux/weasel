@@ -45,10 +45,8 @@ ToolbarWidget::~ToolbarWidget() {
 
 void ToolbarWidget::setSystemStatus(const SystemStatus &system, const SystemStatus &prevSystem) {
     float available = static_cast<float>(system.available) / system.total;
-    float free = static_cast<float>(system.free) / system.total;
 
     memBar->setAvailable(available);
-    memBar->setFree(free);
 
     std::string text;
 
