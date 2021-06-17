@@ -53,7 +53,8 @@ public:
 
     ~ProcessTreeWidget() override;
 
-    void setContents(const SystemStatus &status, const SystemStatus &prevStatus,
+    void setContents(const SystemStatus &status,
+                     const SystemStatus &prevStatus,
                      const std::map<Pid_t, Process> &processes,
                      const std::map<Pid_t, Process> &prevProc);
 
