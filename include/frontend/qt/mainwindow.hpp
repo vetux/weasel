@@ -23,9 +23,10 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "frontend/qt/tree/processtreewidget.hpp"
 #include "frontend/qt/prop/processpropertiesdialog.hpp"
+#include "frontend/qt/settings/settingsdialog.hpp"
 #include "frontend/qt/toolbar/toolbarwidget.hpp"
+#include "frontend/qt/tree/processtreewidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -48,9 +49,9 @@ private slots:
 
     void processPropertiesRequested(const Process &proc);
 
-private:
-    void setupMenuBar();
+    void onActionTriggered(QAction *action);
 
+private:
     void refresh();
 
     QTimer pollTimer;

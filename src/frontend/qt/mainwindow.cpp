@@ -38,7 +38,14 @@ MainWindow::MainWindow(int pollingInterval) {
 
     setCentralWidget(mainWidget);
 
-    setupMenuBar();
+    auto *menu = menuBar()->addMenu("Weasel");
+    menu->addAction("Preferences");
+
+    menu = menuBar()->addMenu("View");
+    menu = menuBar()->addMenu("Tools");
+    menu = menuBar()->addMenu("Help");
+
+    connect(menuBar(), SIGNAL(triggered(QAction * )), this, SLOT(onActionTriggered(QAction * )));
 
     prevStatus = ProcReader::readSystemStatus();
     prevProc = ProcReader::readProcesses();
@@ -71,13 +78,6 @@ MainWindow::MainWindow(int pollingInterval) {
 }
 
 MainWindow::~MainWindow() = default;
-
-void MainWindow::setupMenuBar() {
-    menuBar()->addMenu("Weasel");
-    menuBar()->addMenu("View");
-    menuBar()->addMenu("Tools");
-    menuBar()->addMenu("Help");
-}
 
 void MainWindow::onPollTimeOut() {
     refresh();
@@ -176,4 +176,11 @@ void MainWindow::processPropertiesRequested(const Process &proc) {
             });
     dialogs.insert(dialog);
     dialog->show();
+}
+
+void MainWindow::onActionTriggered(QAction *action) {
+    if (action->text() == "Preferences") {
+        SettingsDialog dialog;
+        dialog.exec();
+    }
 }

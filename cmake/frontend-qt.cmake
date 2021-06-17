@@ -15,6 +15,7 @@ set(Frontend.Qt.GuiHeaders
         include/frontend/qt/prop/tab/generaltab.hpp
         include/frontend/qt/prop/tab/networktab.hpp
         include/frontend/qt/prop/tab/threadstab.hpp
+        include/frontend/qt/settings/settingsdialog.hpp
         include/frontend/qt/toolbar/cpubarwidget.hpp
         include/frontend/qt/toolbar/memorybarwidget.hpp
         include/frontend/qt/toolbar/toolbarwidget.hpp
