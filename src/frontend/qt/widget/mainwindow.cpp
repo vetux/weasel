@@ -40,6 +40,8 @@ MainWindow::MainWindow(int pollingInterval) {
 
     setupMenuBar();
 
+    prevStatus = ProcReader::readSystemStatus();
+    prevProc = ProcReader::readProcesses();
     refresh();
 
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
@@ -80,10 +82,8 @@ void MainWindow::onPollTimeOut() {
 void MainWindow::refresh() {
     auto systemStatus = ProcReader::readSystemStatus();
     auto processes = ProcReader::readProcesses();
-    if (!prevProc.empty()) {
-        procTree->setContents(systemStatus, prevStatus, processes, prevProc);
-        toolbar->setSystemStatus(systemStatus, prevStatus);
-    }
+    procTree->setContents(systemStatus, prevStatus, processes, prevProc);
+    toolbar->setSystemStatus(systemStatus, prevStatus);
     prevStatus = systemStatus;
     prevProc = processes;
 }
