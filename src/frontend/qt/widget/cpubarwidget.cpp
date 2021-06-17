@@ -42,25 +42,8 @@ static int getCpuPercentage(const SystemStatus::Core &core, const SystemStatus::
 }
 
 CpuBarWidget::CpuBarWidget(QWidget *parent) : QWidget(parent) {
-    totalCpuBar = new QProgressBar();
-    totalCpuLabel = new QLabel();
-
-    totalCpuBar->setRange(0, 100);
-
-    totalCpuLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-    totalCpuLabel->setText("Total");
-    totalCpuLabel->setContentsMargins(0, 0, 6, 0);
-
-    totalCpuBar->setLayout(new QHBoxLayout());
-    totalCpuBar->layout()->addWidget(totalCpuLabel);
-    totalCpuBar->layout()->setMargin(0);
-
     setLayout(new QHBoxLayout());
-    layout()->addWidget(totalCpuBar);
-}
-
-void CpuBarWidget::setTotalCpu(const SystemStatus::Core &core, const SystemStatus::Core &prev) {
-    totalCpuBar->setValue((int) getCpuPercentage(core, prev));
+    layout()->setMargin(0);
 }
 
 void CpuBarWidget::setCpus(const std::vector<SystemStatus::Core> &cores,
@@ -74,20 +57,27 @@ void CpuBarWidget::setCpus(const std::vector<SystemStatus::Core> &cores,
     while (cpuBars.size() < cores.size()) {
         auto *progressBar = new QProgressBar();
         auto *label = new QLabel;
+        auto *plabel = new QLabel;
 
         progressBar->setRange(0, 100);
 
         label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
         label->setContentsMargins(0, 0, 6, 0);
 
+        plabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+        plabel->setContentsMargins(6, 0, 0, 0);
+
         progressBar->setLayout(new QHBoxLayout());
+        progressBar->layout()->addWidget(plabel);
         progressBar->layout()->addWidget(label);
         progressBar->layout()->setMargin(0);
+        progressBar->setTextVisible(false);
 
         layout()->addWidget(progressBar);
 
         cpuBars.emplace_back(progressBar);
         cpuLabels.emplace_back(label);
+        percentageLabels.emplace_back(plabel);
     }
 
     if (!prevCores.empty()) {
@@ -96,8 +86,11 @@ void CpuBarWidget::setCpus(const std::vector<SystemStatus::Core> &cores,
             auto &prev = prevCores.at(i);
             auto *bar = cpuBars.at(i);
             auto *label = cpuLabels.at(i);
-            bar->setValue(getCpuPercentage(core, prev));
+            auto *plabel = percentageLabels.at(i);
+            auto usage = getCpuPercentage(core, prev);
+            bar->setValue(usage);
             label->setText(("Cpu " + std::to_string(i)).c_str());
+            plabel->setText((std::to_string(usage) + "%").c_str());
         }
     }
 }

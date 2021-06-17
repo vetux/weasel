@@ -21,9 +21,10 @@
 
 #include <sstream>
 #include <iomanip>
+#include <QVBoxLayout>
 
 ToolbarWidget::ToolbarWidget(QWidget *parent) : QWidget(parent) {
-    setLayout(new QHBoxLayout());
+    setLayout(new QVBoxLayout());
 
     memBar = new MemoryBarWidget();
     cpuBar = new CpuBarWidget();
@@ -54,6 +55,5 @@ void ToolbarWidget::setSystemStatus(const SystemStatus &system, const SystemStat
 
     memBar->setText(text.c_str());
 
-    cpuBar->setTotalCpu(system.cpu, prevSystem.cpu);
     cpuBar->setCpus(system.cores, prevSystem.cores);
 }

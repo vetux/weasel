@@ -26,20 +26,16 @@
 #include "system/systemstatus.hpp"
 
 class CpuBarWidget : public QWidget {
+Q_OBJECT
 public:
     explicit CpuBarWidget(QWidget *parent = nullptr);
-
-    void setTotalCpu(const SystemStatus::Core &core, const SystemStatus::Core &prev);
 
     void setCpus(const std::vector<SystemStatus::Core> &cores, const std::vector<SystemStatus::Core> &prevCores);
 
 private:
-    QProgressBar *totalCpuBar;
-    QLabel *totalCpuLabel;
-
     std::vector<QProgressBar *> cpuBars;
     std::vector<QLabel *> cpuLabels;
-
+    std::vector<QLabel *> percentageLabels;
 };
 
 #endif //WEASEL_CPUBARWIDGET_HPP
