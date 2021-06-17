@@ -30,9 +30,7 @@
 #include "system/systemstatus.hpp"
 #include "system/signal.hpp"
 
-#include "frontend/qt/processtreeitem.hpp"
-
-#include "frontend/qt/widget/processpropertiesdialog.hpp"
+#include "frontend/qt/tree/processtreeitem.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT

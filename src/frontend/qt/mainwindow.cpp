@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/widget/mainwindow.hpp"
+#include "frontend/qt/mainwindow.hpp"
 
 #include <QMenuBar>
 #include <QMessageBox>

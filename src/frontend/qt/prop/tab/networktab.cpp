@@ -17,6 +17,6 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/widget/tab/networktab.hpp"
+#include "frontend/qt/prop/tab/networktab.hpp"
 
 NetworkTab::NetworkTab(QWidget *parent) {}

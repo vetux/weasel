@@ -28,8 +28,8 @@
 
 #include "system/systemstatus.hpp"
 
-#include "frontend/qt/widget/memorybarwidget.hpp"
-#include "frontend/qt/widget/cpubarwidget.hpp"
+#include "frontend/qt/toolbar/memorybarwidget.hpp"
+#include "frontend/qt/toolbar/cpubarwidget.hpp"
 
 class ToolbarWidget : public QWidget {
 Q_OBJECT
