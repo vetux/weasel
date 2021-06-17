@@ -20,6 +20,8 @@
 #ifndef WEASEL_PROCESSTREEWIDGET_HPP
 #define WEASEL_PROCESSTREEWIDGET_HPP
 
+#include <set>
+
 #include <QWidget>
 #include <QTreeView>
 #include <QStandardItemModel>
@@ -29,6 +31,8 @@
 #include "system/signal.hpp"
 
 #include "frontend/qt/processtreeitem.hpp"
+
+#include "frontend/qt/widget/processpropertiesdialog.hpp"
 
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
@@ -63,6 +67,8 @@ private:
     QStandardItemModel model;
 
     QTreeView *treeView;
+
+    std::set<ProcessPropertiesDialog *> dialogs;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

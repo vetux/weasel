@@ -26,6 +26,7 @@
 #include <utility>
 
 #include "system/process.hpp"
+#include "system/systemstatus.hpp"
 
 #include "frontend/qt/widget/tab/generaltab.hpp"
 #include "frontend/qt/widget/tab/threadstab.hpp"
@@ -36,6 +37,12 @@ class ProcessPropertiesDialog : public QDialog {
 Q_OBJECT
 public:
     ProcessPropertiesDialog(QWidget *parent, Process process);
+
+public slots:
+    void onRefresh(const SystemStatus &status,
+                   const SystemStatus &prevStatus,
+                   const std::map<Pid_t, Process> &processes,
+                   const std::map<Pid_t, Process> &prevProc);
 
 private:
     Process process;

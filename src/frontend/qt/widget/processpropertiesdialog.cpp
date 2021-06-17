@@ -41,3 +41,10 @@ ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process proces
 
     layout()->setMargin(6);
 }
+
+void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,
+                                        const SystemStatus &prevStatus,
+                                        const std::map<Pid_t, Process> &processes,
+                                        const std::map<Pid_t, Process> &prevProc) {
+
+}

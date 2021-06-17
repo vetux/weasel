@@ -202,6 +202,10 @@ void ProcessTreeWidget::setContents(const SystemStatus &status,
 
         del.clear();
     }
+
+    for (auto *dialog : dialogs) {
+        dialog->onRefresh(status, prevStatus, processes, prevProc);
+    }
 }
 
 void ProcessTreeWidget::clicked() {
@@ -241,9 +245,14 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
                         if (action->text() == "Terminate") {
                             emit processSignalRequested(item->getProcess(), SIGNAL_SIGTERM);
                         } else if (action->text() == "Properties") {
-                            ProcessPropertiesDialog dialog(this, item->getProcess());
-                            dialog.show();
-                            dialog.exec();
+                            auto *dialog = new ProcessPropertiesDialog(this, item->getProcess());
+                            connect(dialog,
+                                    &QDialog::finished,
+                                    [this, dialog](int) {
+                                        dialogs.erase(dialog);
+                                    });
+                            dialogs.insert(dialog);
+                            dialog->show();
                         } else {
                             emit processSignalRequested(item->getProcess(),
                                                         stringToSignal(action->text().toStdString()));
