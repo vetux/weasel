@@ -45,6 +45,8 @@ private slots:
 
     void threadPriorityChangeRequested(const Thread &thread, int priority);
 
+    void processPropertiesRequested(const Process &proc);
+
 private:
     void setupMenuBar();
 
@@ -59,6 +61,8 @@ private:
 
     SystemStatus prevStatus;
     std::map<Pid_t, Process> prevProc;
+
+    std::set<ProcessPropertiesDialog *> dialogs;
 };
 
 #endif //WEASEL_MAINWINDOW_HPP

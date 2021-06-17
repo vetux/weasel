@@ -46,6 +46,8 @@ signals:
 
     void threadPriorityChangeRequested(const Thread &thread, int priority);
 
+    void processPropertiesRequested(const Process &proc);
+
 public:
     explicit ProcessTreeWidget(QWidget *parent = nullptr);
 
@@ -67,8 +69,6 @@ private:
     QStandardItemModel model;
 
     QTreeView *treeView;
-
-    std::set<ProcessPropertiesDialog *> dialogs;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

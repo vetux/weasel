@@ -62,6 +62,10 @@ MainWindow::MainWindow(int pollingInterval) {
             SIGNAL(threadPriorityChangeRequested(const Thread &, int)),
             this,
             SLOT(threadPriorityChangeRequested(const Thread &, int)));
+    connect(procTree,
+            SIGNAL(processPropertiesRequested(const Process &)),
+            this,
+            SLOT(processPropertiesRequested(const Process &)));
 
     pollTimer.start(pollingInterval);
 }
@@ -82,8 +86,14 @@ void MainWindow::onPollTimeOut() {
 void MainWindow::refresh() {
     auto systemStatus = ProcReader::readSystemStatus();
     auto processes = ProcReader::readProcesses();
+
     procTree->setContents(systemStatus, prevStatus, processes, prevProc);
     toolbar->setSystemStatus(systemStatus, prevStatus);
+
+    for (auto *dialog : dialogs) {
+        dialog->onRefresh(systemStatus, prevStatus, processes, prevProc);
+    }
+
     prevStatus = systemStatus;
     prevProc = processes;
 }
@@ -154,4 +164,16 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
     } catch (const std::exception &e) {
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
+}
+
+
+void MainWindow::processPropertiesRequested(const Process &proc) {
+    auto *dialog = new ProcessPropertiesDialog(this, proc);
+    connect(dialog,
+            &QDialog::finished,
+            [this, dialog](int) {
+                dialogs.erase(dialog);
+            });
+    dialogs.insert(dialog);
+    dialog->show();
 }
