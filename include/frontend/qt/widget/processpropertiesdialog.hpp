@@ -27,6 +27,11 @@
 
 #include "system/process.hpp"
 
+#include "frontend/qt/widget/tab/generaltab.hpp"
+#include "frontend/qt/widget/tab/threadstab.hpp"
+#include "frontend/qt/widget/tab/disktab.hpp"
+#include "frontend/qt/widget/tab/networktab.hpp"
+
 class ProcessPropertiesDialog : public QDialog {
 Q_OBJECT
 public:
@@ -36,8 +41,11 @@ private:
     Process process;
 
     QTabWidget *tabWidget;
-    QWidget *tabGeneral;
-    QWidget *tabThreads;
+
+    GeneralTab *tabGeneral;
+    ThreadsTab *tabThreads;
+    DiskTab *tabDisk;
+    NetworkTab *tabNetwork;
 };
 
 #endif //WEASEL_PROCESSPROPERTIESDIALOG_HPP

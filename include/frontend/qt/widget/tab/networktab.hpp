@@ -17,27 +17,15 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/widget/processpropertiesdialog.hpp"
+#ifndef WEASEL_NETWORKTAB_HPP
+#define WEASEL_NETWORKTAB_HPP
 
-#include <QVBoxLayout>
+#include <QWidget>
 
-ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process process)
-        : QDialog(parent), process(std::move(process)) {
-    setWindowTitle(("Properties " + std::to_string(process.pid)).c_str());
+class NetworkTab : public QWidget {
+Q_OBJECT
+public:
+    explicit NetworkTab(QWidget *parent = nullptr);
+};
 
-    tabWidget = new QTabWidget(this);
-    tabGeneral = new GeneralTab(tabWidget);
-    tabThreads = new ThreadsTab(tabWidget);
-    tabDisk = new DiskTab(tabWidget);
-    tabNetwork = new NetworkTab(tabWidget);
-
-    tabWidget->addTab(tabGeneral, "General");
-    tabWidget->addTab(tabThreads, "Threads");
-    tabWidget->addTab(tabDisk, "Disk");
-    tabWidget->addTab(tabNetwork, "Network");
-
-    setLayout(new QVBoxLayout());
-    layout()->addWidget(tabWidget);
-
-    layout()->setMargin(6);
-}
+#endif //WEASEL_NETWORKTAB_HPP
