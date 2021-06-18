@@ -31,10 +31,13 @@ public:
     explicit NetworkTab(QWidget *parent = nullptr);
 
 public slots:
+
     void setData(const SystemStatus &status,
                  const SystemStatus &prevStatus,
                  const Process &proc,
                  const Process &prevProc);
+
+    void clearData();
 };
 
 #endif //WEASEL_NETWORKTAB_HPP

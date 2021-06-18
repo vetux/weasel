@@ -41,15 +41,28 @@ ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process proces
 
     layout()->setMargin(6);
 
-    resize(640,320);
+    resize(640, 320);
 }
 
 void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,
                                         const SystemStatus &prevStatus,
                                         const std::map<Pid_t, Process> &processes,
                                         const std::map<Pid_t, Process> &prevProc) {
-    tabGeneral->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
-    tabThreads->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
-    tabDisk->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
-    tabNetwork->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
+    if (processDead || processes.find(process.pid) == processes.end()) {
+        if (!processDead) {
+            processDead = true;
+            setWindowTitle(windowTitle() + " (Dead)");
+            tabGeneral->clearData();
+            tabThreads->clearData();
+            tabDisk->clearData();
+            tabNetwork->clearData();
+        }
+    } else {
+        auto &p = processes.at(process.pid);
+        auto &pv = prevProc.at(process.pid);
+        tabGeneral->setData(status, prevStatus, p, pv);
+        tabThreads->setData(status, prevStatus, p, pv);
+        tabDisk->setData(status, prevStatus, p, pv);
+        tabNetwork->setData(status, prevStatus, p, pv);
+    }
 }

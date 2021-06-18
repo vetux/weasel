@@ -35,6 +35,8 @@ public slots:
                  const SystemStatus &prevStatus,
                  const Process &proc,
                  const Process &prevProc);
+
+    void clearData();
 };
 
 #endif //WEASEL_DISKTAB_HPP

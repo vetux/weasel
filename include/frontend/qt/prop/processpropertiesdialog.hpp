@@ -53,6 +53,8 @@ private:
     ThreadsTab *tabThreads;
     DiskTab *tabDisk;
     NetworkTab *tabNetwork;
+
+    bool processDead = false;
 };
 
 #endif //WEASEL_PROCESSPROPERTIESDIALOG_HPP

@@ -151,7 +151,7 @@ void GeneralTab::setData(const SystemStatus &status,
                          const Process &prevProc) {
     processPidLabel->setText(std::to_string(proc.pid).c_str());
     processNameLabel->setText(proc.mainThread().comm.c_str());
-    
+
     userIdLabel->setText(std::to_string(proc.uid).c_str());
     userNameLabel->setText(User::getUserName(proc.uid).c_str());
 
@@ -165,4 +165,20 @@ void GeneralTab::setData(const SystemStatus &status,
     for (auto &e : proc.environ) {
         environListWidget->addItem(e.c_str());
     }
+}
+
+void GeneralTab::clearData() {
+    processPidLabel->setText("");
+    processNameLabel->setText("");
+
+    userIdLabel->setText("");
+    userNameLabel->setText("");
+
+    commandLineLabel->setText("");
+
+    executablePathLabel->setText("");
+
+    rootDirLabel->setText("");
+
+    environListWidget->clear();
 }

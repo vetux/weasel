@@ -21,7 +21,13 @@
 
 DiskTab::DiskTab(QWidget *parent) {}
 
-void DiskTab::setData(const SystemStatus &status, const SystemStatus &prevStatus, const Process &proc,
+void DiskTab::setData(const SystemStatus &status,
+                      const SystemStatus &prevStatus,
+                      const Process &proc,
                       const Process &prevProc) {
+
+}
+
+void DiskTab::clearData() {
 
 }

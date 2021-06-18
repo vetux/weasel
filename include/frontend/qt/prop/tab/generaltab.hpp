@@ -42,6 +42,8 @@ public slots:
                  const Process &proc,
                  const Process &prevProc);
 
+    void clearData();
+
 private:
     QLabel *processTitleLabel;
     QLineEdit *processPidLabel;

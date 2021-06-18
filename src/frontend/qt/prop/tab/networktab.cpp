@@ -21,7 +21,13 @@
 
 NetworkTab::NetworkTab(QWidget *parent) {}
 
-void NetworkTab::setData(const SystemStatus &status, const SystemStatus &prevStatus, const Process &proc,
+void NetworkTab::setData(const SystemStatus &status,
+                         const SystemStatus &prevStatus,
+                         const Process &proc,
                          const Process &prevProc) {
+
+}
+
+void NetworkTab::clearData() {
 
 }
