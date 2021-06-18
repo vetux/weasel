@@ -28,6 +28,10 @@ GeneralTab::GeneralTab(QWidget *parent)
         : QWidget(parent) {
     setLayout(new QVBoxLayout());
 
+    processTitleLabel = new QLabel(this);
+    processPidLabel = new QLineEdit(this);
+    processNameLabel = new QLineEdit(this);
+
     userTitleLabel = new QLabel(this);
     userIdLabel = new QLineEdit(this);
     userNameLabel = new QLineEdit(this);
@@ -46,13 +50,16 @@ GeneralTab::GeneralTab(QWidget *parent)
     environTitleLabel = new QLabel(this);
     environListWidget = new QListWidget(this);
 
+    processPidLabel->setReadOnly(true);
+    processNameLabel->setReadOnly(true);
     userIdLabel->setReadOnly(true);
     userNameLabel->setReadOnly(true);
     commandLineLabel->setReadOnly(true);
     executablePathLabel->setReadOnly(true);
     rootDirLabel->setReadOnly(true);
 
-    userTitleLabel->setText("User");
+    processTitleLabel->setText("Process ID / Name");
+    userTitleLabel->setText("User ID / Name");
     commandLineTitleLabel->setText("Commandline");
     executablePathTitleLabel->setText("Executable");
     rootDirTitleLabel->setText("Root Directory");
@@ -65,6 +72,21 @@ GeneralTab::GeneralTab(QWidget *parent)
     layoutWidget->setLayout(new QVBoxLayout());
 
     auto *subLayoutWidget = new QWidget(this);
+    subLayoutWidget->setLayout(new QHBoxLayout());
+    subLayoutWidget->layout()->setMargin(0);
+
+    subLayoutWidget->layout()->addWidget(processPidLabel);
+    subLayoutWidget->layout()->addWidget(processNameLabel);
+
+    layoutWidget->layout()->addWidget(processTitleLabel);
+    layoutWidget->layout()->addWidget(subLayoutWidget);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    subLayoutWidget = new QWidget(this);
     subLayoutWidget->setLayout(new QHBoxLayout());
     subLayoutWidget->layout()->setMargin(0);
 
@@ -127,6 +149,9 @@ void GeneralTab::setData(const SystemStatus &status,
                          const SystemStatus &prevStatus,
                          const Process &proc,
                          const Process &prevProc) {
+    processPidLabel->setText(std::to_string(proc.pid).c_str());
+    processNameLabel->setText(proc.mainThread().comm.c_str());
+    
     userIdLabel->setText(std::to_string(proc.uid).c_str());
     userNameLabel->setText(User::getUserName(proc.uid).c_str());
 

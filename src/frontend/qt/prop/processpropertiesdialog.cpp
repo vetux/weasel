@@ -40,6 +40,8 @@ ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process proces
     layout()->addWidget(tabWidget);
 
     layout()->setMargin(6);
+
+    resize(640,320);
 }
 
 void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,

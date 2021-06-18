@@ -38,11 +38,15 @@ public:
 public slots:
 
     void setData(const SystemStatus &status,
-                    const SystemStatus &prevStatus,
-                    const Process &proc,
-                    const Process &prevProc);
+                 const SystemStatus &prevStatus,
+                 const Process &proc,
+                 const Process &prevProc);
 
 private:
+    QLabel *processTitleLabel;
+    QLineEdit *processPidLabel;
+    QLineEdit *processNameLabel;
+
     QLabel *userTitleLabel;
     QLineEdit *userIdLabel;
     QLineEdit *userNameLabel;
