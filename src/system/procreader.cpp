@@ -207,7 +207,14 @@ void parseProcFd(Process &proc) {
     try {
         const auto p = ProcPath::getProcessFdDirectory(proc.pid);
         for (auto &f : std::filesystem::directory_iterator(p)) {
-            proc.openFiles.emplace_back(getRealPath(f.path()));
+            if (f.path().filename() == "0")
+                proc.openFiles.emplace_back("stdin");
+            else if (f.path().filename() == "1")
+                proc.openFiles.emplace_back("stdout");
+            else if (f.path().filename() == "2")
+                proc.openFiles.emplace_back("stderr");
+            else
+                proc.openFiles.emplace_back(getRealPath(f.path()));
         }
     } catch (const std::exception &e) {} //Assume permissions error
 }
