@@ -19,22 +19,54 @@
 
 #include "frontend/qt/prop/tab/disktab.hpp"
 
-DiskTab::DiskTab(QWidget *parent) {}
+#include <QVBoxLayout>
+
+DiskTab::DiskTab(QWidget *parent)
+        : QWidget(parent) {
+    openFilesTitleLabel = new QLabel(this);
+    openFilesListWidget = new QListWidget(this);
+    openFilesPushButton = new QPushButton(this);
+
+    openFilesTitleLabel->setText("Open Files");
+    openFilesPushButton->setText("Open");
+
+    setLayout(new QVBoxLayout());
+    layout()->addWidget(openFilesTitleLabel);
+    layout()->addWidget(openFilesListWidget);
+    layout()->addWidget(openFilesPushButton);
+
+    connect(openFilesPushButton, SIGNAL(pressed()), this, SLOT(onOpenFilePressed()));
+}
 
 void DiskTab::setData(const SystemStatus &status,
                       const SystemStatus &prevStatus,
                       const Process &proc,
                       const Process &prevProc) {
-
+    openFilesListWidget->clear();
+    for (auto &f : proc.openFiles) {
+        openFilesListWidget->addItem(f.c_str());
+    }
 }
 
 void DiskTab::updateData(const SystemStatus &status,
                          const SystemStatus &prevStatus,
                          const Process &proc,
                          const Process &prevProc) {
-
+    auto index = openFilesListWidget->currentIndex();
+    openFilesListWidget->clear();
+    for (auto &f : proc.openFiles) {
+        openFilesListWidget->addItem(f.c_str());
+    }
+    openFilesListWidget->setCurrentIndex(index);
 }
 
 void DiskTab::clearData() {
+    openFilesListWidget->clear();
+}
 
+void DiskTab::onOpenFilePressed() {
+    auto item = openFilesListWidget->currentItem();
+    if (item != nullptr) {
+        auto f = item->text().toStdString();
+    }
 }

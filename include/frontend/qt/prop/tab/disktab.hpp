@@ -21,6 +21,9 @@
 #define WEASEL_DISKTAB_HPP
 
 #include <QWidget>
+#include <QLabel>
+#include <QListWidget>
+#include <QPushButton>
 
 #include "system/process.hpp"
 #include "system/systemstatus.hpp"
@@ -31,6 +34,7 @@ public:
     explicit DiskTab(QWidget *parent = nullptr);
 
 public slots:
+
     void setData(const SystemStatus &status,
                  const SystemStatus &prevStatus,
                  const Process &proc,
@@ -42,6 +46,15 @@ public slots:
                     const Process &prevProc);
 
     void clearData();
+
+private slots:
+
+    void onOpenFilePressed();
+
+private:
+    QLabel *openFilesTitleLabel;
+    QListWidget *openFilesListWidget;
+    QPushButton *openFilesPushButton;
 };
 
 #endif //WEASEL_DISKTAB_HPP
