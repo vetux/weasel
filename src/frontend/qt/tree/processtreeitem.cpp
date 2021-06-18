@@ -21,6 +21,8 @@
 
 #include "system/user.hpp"
 
+#include "frontend/qt/strutil.hpp"
+
 #define BYTES_MEGABYTE 1000000
 
 #define BYTES_GIGABYTE 1000000000
@@ -48,14 +50,6 @@ static std::string getMemoryString(unsigned long bytes) {
         return std::to_string(bytes / BYTES_MEGABYTE) + "M";
     } else {
         return std::to_string(bytes);
-    }
-}
-
-static void replace(std::string &str, const std::string &v, const std::string &r) {
-    size_t pos = str.find(v);
-    while (pos != std::string::npos) {
-        str.replace(pos, v.size(), r);
-        pos = str.find(v);
     }
 }
 

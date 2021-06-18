@@ -17,24 +17,11 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/prop/tab/networktab.hpp"
+#ifndef WEASEL_STRUTIL_HPP
+#define WEASEL_STRUTIL_HPP
 
-NetworkTab::NetworkTab(QWidget *parent) {}
+#include <string>
 
-void NetworkTab::setData(const SystemStatus &status,
-                         const SystemStatus &prevStatus,
-                         const Process &proc,
-                         const Process &prevProc) {
+void replace(std::string &str, const std::string &v, const std::string &r);
 
-}
-
-void NetworkTab::updateData(const SystemStatus &status,
-                            const SystemStatus &prevStatus,
-                            const Process &proc,
-                            const Process &prevProc) {
-
-}
-
-void NetworkTab::clearData() {
-
-}
+#endif //WEASEL_STRUTIL_HPP

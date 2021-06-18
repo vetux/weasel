@@ -36,13 +36,19 @@
 class ProcessPropertiesDialog : public QDialog {
 Q_OBJECT
 public:
-    ProcessPropertiesDialog(QWidget *parent, Process process);
+    ProcessPropertiesDialog(QWidget *parent);
 
 public slots:
-    void onRefresh(const SystemStatus &status,
-                   const SystemStatus &prevStatus,
-                   const std::map<Pid_t, Process> &processes,
-                   const std::map<Pid_t, Process> &prevProc);
+
+    void setData(const SystemStatus &status,
+                 const SystemStatus &prevStatus,
+                 const Process &proc,
+                 const Process &prevProc);
+
+    void updateData(const SystemStatus &status,
+                    const SystemStatus &prevStatus,
+                    const std::map<Pid_t, Process> &proc,
+                    const std::map<Pid_t, Process> &prevProc);
 
 private:
     Process process;

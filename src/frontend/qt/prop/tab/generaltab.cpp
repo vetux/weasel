@@ -24,6 +24,8 @@
 
 #include "system/user.hpp"
 
+#include "frontend/qt/strutil.hpp"
+
 GeneralTab::GeneralTab(QWidget *parent)
         : QWidget(parent) {
     setLayout(new QVBoxLayout());
@@ -155,7 +157,9 @@ void GeneralTab::setData(const SystemStatus &status,
     userIdLabel->setText(std::to_string(proc.uid).c_str());
     userNameLabel->setText(User::getUserName(proc.uid).c_str());
 
-    commandLineLabel->setText(proc.commandLine.c_str());
+    auto c = proc.commandLine;
+    replace(c, std::string("\0", 1), " ");
+    commandLineLabel->setText(c.c_str());
 
     executablePathLabel->setText(proc.executablePath.c_str());
 
@@ -165,6 +169,13 @@ void GeneralTab::setData(const SystemStatus &status,
     for (auto &e : proc.environ) {
         environListWidget->addItem(e.c_str());
     }
+}
+
+void GeneralTab::updateData(const SystemStatus &status,
+                            const SystemStatus &prevStatus,
+                            const Process &proc,
+                            const Process &prevProc) {
+
 }
 
 void GeneralTab::clearData() {

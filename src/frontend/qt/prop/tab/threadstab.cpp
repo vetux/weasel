@@ -28,6 +28,13 @@ void ThreadsTab::setData(const SystemStatus &status,
 
 }
 
+void ThreadsTab::updateData(const SystemStatus &status,
+                            const SystemStatus &prevStatus,
+                            const Process &proc,
+                            const Process &prevProc) {
+
+}
+
 void ThreadsTab::clearData() {
 
 }

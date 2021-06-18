@@ -17,24 +17,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/prop/tab/networktab.hpp"
+#include "frontend/qt/strutil.hpp"
 
-NetworkTab::NetworkTab(QWidget *parent) {}
-
-void NetworkTab::setData(const SystemStatus &status,
-                         const SystemStatus &prevStatus,
-                         const Process &proc,
-                         const Process &prevProc) {
-
-}
-
-void NetworkTab::updateData(const SystemStatus &status,
-                            const SystemStatus &prevStatus,
-                            const Process &proc,
-                            const Process &prevProc) {
-
-}
-
-void NetworkTab::clearData() {
-
+void replace(std::string &str, const std::string &v, const std::string &r) {
+    size_t pos = str.find(v);
+    while (pos != std::string::npos) {
+        str.replace(pos, v.size(), r);
+        pos = str.find(v);
+    }
 }

@@ -37,6 +37,11 @@ public slots:
                  const Process &proc,
                  const Process &prevProc);
 
+    void updateData(const SystemStatus &status,
+                    const SystemStatus &prevStatus,
+                    const Process &proc,
+                    const Process &prevProc);
+
     void clearData();
 };
 

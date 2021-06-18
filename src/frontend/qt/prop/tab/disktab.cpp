@@ -28,6 +28,13 @@ void DiskTab::setData(const SystemStatus &status,
 
 }
 
+void DiskTab::updateData(const SystemStatus &status,
+                         const SystemStatus &prevStatus,
+                         const Process &proc,
+                         const Process &prevProc) {
+
+}
+
 void DiskTab::clearData() {
 
 }

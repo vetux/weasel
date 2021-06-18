@@ -91,7 +91,7 @@ void MainWindow::refresh() {
     toolbar->setSystemStatus(systemStatus, prevStatus);
 
     for (auto *dialog : dialogs) {
-        dialog->onRefresh(systemStatus, prevStatus, processes, prevProc);
+        dialog->updateData(systemStatus, prevStatus, processes, prevProc);
     }
 
     prevStatus = systemStatus;
@@ -168,15 +168,15 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
 
 
 void MainWindow::processPropertiesRequested(const Process &proc) {
-    auto *dialog = new ProcessPropertiesDialog(this, proc);
+    auto *dialog = new ProcessPropertiesDialog(this);
     connect(dialog,
             &QDialog::finished,
             [this, dialog](int) {
                 dialogs.erase(dialog);
             });
     dialogs.insert(dialog);
+    dialog->setData(prevStatus, prevStatus, proc, proc);
     dialog->show();
-    dialog->onRefresh(prevStatus, prevStatus, prevProc, prevProc);
 }
 
 void MainWindow::onActionTriggered(QAction *action) {

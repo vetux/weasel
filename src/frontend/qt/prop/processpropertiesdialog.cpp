@@ -21,10 +21,8 @@
 
 #include <QVBoxLayout>
 
-ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process process)
-        : QDialog(parent), process(std::move(process)) {
-    setWindowTitle(("Properties " + std::to_string(process.pid)).c_str());
-
+ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent)
+        : QDialog(parent) {
     tabWidget = new QTabWidget(this);
     tabGeneral = new GeneralTab(tabWidget);
     tabThreads = new ThreadsTab(tabWidget);
@@ -44,10 +42,27 @@ ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Process proces
     resize(640, 320);
 }
 
-void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,
-                                        const SystemStatus &prevStatus,
-                                        const std::map<Pid_t, Process> &processes,
-                                        const std::map<Pid_t, Process> &prevProc) {
+void ProcessPropertiesDialog::setData(const SystemStatus &status,
+                                      const SystemStatus &prevStatus,
+                                      const Process &proc,
+                                      const Process &prevProc) {
+    process = proc;
+    processDead = false;
+
+    setWindowTitle(("Properties " + std::to_string(process.pid)).c_str());
+
+    auto &p = proc;
+    auto &pv = prevProc;
+    tabGeneral->setData(status, prevStatus, p, pv);
+    tabThreads->setData(status, prevStatus, p, pv);
+    tabDisk->setData(status, prevStatus, p, pv);
+    tabNetwork->setData(status, prevStatus, p, pv);
+}
+
+void ProcessPropertiesDialog::updateData(const SystemStatus &status,
+                                         const SystemStatus &prevStatus,
+                                         const std::map<Pid_t, Process> &processes,
+                                         const std::map<Pid_t, Process> &prevProc) {
     if (processDead || processes.find(process.pid) == processes.end()) {
         if (!processDead) {
             processDead = true;
@@ -60,9 +75,9 @@ void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,
     } else {
         auto &p = processes.at(process.pid);
         auto &pv = prevProc.at(process.pid);
-        tabGeneral->setData(status, prevStatus, p, pv);
-        tabThreads->setData(status, prevStatus, p, pv);
-        tabDisk->setData(status, prevStatus, p, pv);
-        tabNetwork->setData(status, prevStatus, p, pv);
+        tabGeneral->updateData(status, prevStatus, p, pv);
+        tabThreads->updateData(status, prevStatus, p, pv);
+        tabDisk->updateData(status, prevStatus, p, pv);
+        tabNetwork->updateData(status, prevStatus, p, pv);
     }
 }
