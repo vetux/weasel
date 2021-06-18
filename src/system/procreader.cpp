@@ -186,7 +186,7 @@ void parseProcEnviron(Process &proc) {
 
 void parseProcIo(Process &proc) {
     try {
-        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid), std::string("\0", 1)));
+        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid)));
         proc.rchar = std::stoul(d.at("rchar"));
         proc.wchar = std::stoul(d.at("wchar"));
         proc.syscr = std::stoul(d.at("syscr"));

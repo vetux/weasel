@@ -21,6 +21,19 @@
 
 #include <QVBoxLayout>
 #include <QLineEdit>
+#include <QSpacerItem>
+
+unsigned long getRate(float delta,
+                      unsigned long current,
+                      unsigned long previous) {
+    auto diff = current - previous;
+    if (diff == 0) {
+        return 0;
+    } else {
+        auto scale = delta == 0 ? 0 : 1 / delta;
+        return static_cast<unsigned long>(diff * scale);
+    }
+}
 
 DiskTab::DiskTab(QWidget *parent)
         : QWidget(parent) {
@@ -31,14 +44,23 @@ DiskTab::DiskTab(QWidget *parent)
     statReadBytesTitleLabel = new QLabel(this);
     statReadBytesLabel = new QLineEdit(this);
 
+    statReadBytesRateTitleLabel = new QLabel(this);
+    statReadBytesRateLabel = new QLineEdit(this);
+
     statWriteBytesTitleLabel = new QLabel(this);
     statWriteBytesLabel = new QLineEdit(this);
+
+    statWriteBytesRateTitleLabel = new QLabel(this);
+    statWriteBytesRateLabel = new QLineEdit(this);
 
     openFilesTitleLabel->setText("Open Files");
     openFilesPushButton->setText("Open");
 
-    statReadBytesTitleLabel->setText("I/O Read");
-    statWriteBytesTitleLabel->setText("I/O Write");
+    statReadBytesTitleLabel->setText("I/O Read Total");
+    statReadBytesRateTitleLabel->setText("I/O Read Rate");
+
+    statWriteBytesTitleLabel->setText("I/O Write Total");
+    statWriteBytesRateTitleLabel->setText("I/O Write Rate");
 
     statReadBytesLabel->setReadOnly(true);
     statWriteBytesLabel->setReadOnly(true);
@@ -47,12 +69,11 @@ DiskTab::DiskTab(QWidget *parent)
     auto r = metrics.boundingRect(statWriteBytesTitleLabel->text());
 
     statReadBytesTitleLabel->setMinimumWidth(r.width());
+    statReadBytesRateTitleLabel->setMinimumWidth(r.width());
     statWriteBytesTitleLabel->setMinimumWidth(r.width());
+    statWriteBytesRateTitleLabel->setMinimumWidth(r.width());
 
     setLayout(new QVBoxLayout());
-    layout()->addWidget(openFilesTitleLabel);
-    layout()->addWidget(openFilesListWidget);
-    layout()->addWidget(openFilesPushButton);
 
     auto *layoutWidget = new QWidget(this);
     layoutWidget->setLayout(new QHBoxLayout());
@@ -67,10 +88,36 @@ DiskTab::DiskTab(QWidget *parent)
     layoutWidget->setLayout(new QHBoxLayout());
     layoutWidget->layout()->setMargin(0);
 
+    layoutWidget->layout()->addWidget(statReadBytesRateTitleLabel);
+    (dynamic_cast<QHBoxLayout *>(layoutWidget->layout()))->addWidget(statReadBytesRateLabel, 1);
+
+    layout()->addWidget(layoutWidget);
+
+    layout()->addItem(new QSpacerItem(0,10));
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QHBoxLayout());
+    layoutWidget->layout()->setMargin(0);
+
     layoutWidget->layout()->addWidget(statWriteBytesTitleLabel);
     (dynamic_cast<QHBoxLayout *>(layoutWidget->layout()))->addWidget(statWriteBytesLabel, 1);
 
     layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QHBoxLayout());
+    layoutWidget->layout()->setMargin(0);
+
+    layoutWidget->layout()->addWidget(statWriteBytesRateTitleLabel);
+    (dynamic_cast<QHBoxLayout *>(layoutWidget->layout()))->addWidget(statWriteBytesRateLabel, 1);
+
+    layout()->addWidget(layoutWidget);
+
+    layout()->addItem(new QSpacerItem(0,10));
+
+    layout()->addWidget(openFilesTitleLabel);
+    layout()->addWidget(openFilesListWidget);
+    layout()->addWidget(openFilesPushButton);
 
     connect(openFilesPushButton, SIGNAL(pressed()), this, SLOT(onOpenFilePressed()));
 }
@@ -79,6 +126,9 @@ void DiskTab::setData(const SystemStatus &status,
                       const SystemStatus &prevStatus,
                       const Process &proc,
                       const Process &prevProc) {
+    lastUpdate = std::chrono::high_resolution_clock::now();
+    auto delta = std::chrono::high_resolution_clock::now() - lastUpdate;
+
     openFilesListWidget->clear();
     for (auto &f : proc.openFiles) {
         openFilesListWidget->addItem(f.c_str());
@@ -86,12 +136,26 @@ void DiskTab::setData(const SystemStatus &status,
 
     statReadBytesLabel->setText(std::to_string(proc.rchar).c_str());
     statWriteBytesLabel->setText(std::to_string(proc.wchar).c_str());
+
+    auto rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
+                        proc.rchar,
+                        prevProc.rchar);
+    statReadBytesRateLabel->setText(std::to_string(rate).c_str());
+
+    rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
+                   proc.wchar,
+                   prevProc.wchar);
+    statWriteBytesRateLabel->setText(std::to_string(rate).c_str());
 }
 
 void DiskTab::updateData(const SystemStatus &status,
                          const SystemStatus &prevStatus,
                          const Process &proc,
                          const Process &prevProc) {
+    auto start = std::chrono::high_resolution_clock::now();
+    auto delta = start - lastUpdate;
+    lastUpdate = start;
+
     auto index = openFilesListWidget->currentIndex();
     openFilesListWidget->clear();
     for (auto &f : proc.openFiles) {
@@ -101,12 +165,24 @@ void DiskTab::updateData(const SystemStatus &status,
 
     statReadBytesLabel->setText(std::to_string(proc.rchar).c_str());
     statWriteBytesLabel->setText(std::to_string(proc.wchar).c_str());
+
+    auto rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
+                        proc.rchar,
+                        prevProc.rchar);
+    statReadBytesRateLabel->setText(std::to_string(rate).c_str());
+
+    rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
+                   proc.wchar,
+                   prevProc.wchar);
+    statWriteBytesRateLabel->setText(std::to_string(rate).c_str());
 }
 
 void DiskTab::clearData() {
     openFilesListWidget->clear();
     statReadBytesLabel->setText("");
+    statReadBytesRateLabel->setText("");
     statWriteBytesLabel->setText("");
+    statWriteBytesRateLabel->setText("");
 }
 
 void DiskTab::onOpenFilePressed() {

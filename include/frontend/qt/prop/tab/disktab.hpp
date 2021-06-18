@@ -24,6 +24,7 @@
 #include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
+#include <chrono>
 
 #include "system/process.hpp"
 #include "system/systemstatus.hpp"
@@ -52,6 +53,8 @@ private slots:
     void onOpenFilePressed();
 
 private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> lastUpdate;
+    
     QLabel *openFilesTitleLabel;
     QListWidget *openFilesListWidget;
     QPushButton *openFilesPushButton;
@@ -59,8 +62,14 @@ private:
     QLabel *statReadBytesTitleLabel;
     QLineEdit *statReadBytesLabel;
 
+    QLabel *statReadBytesRateTitleLabel;
+    QLineEdit *statReadBytesRateLabel;
+
     QLabel *statWriteBytesTitleLabel;
     QLineEdit *statWriteBytesLabel;
+
+    QLabel *statWriteBytesRateTitleLabel;
+    QLineEdit *statWriteBytesRateLabel;
 };
 
 #endif //WEASEL_DISKTAB_HPP
