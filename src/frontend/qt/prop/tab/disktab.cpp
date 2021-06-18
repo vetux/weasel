@@ -56,11 +56,11 @@ DiskTab::DiskTab(QWidget *parent)
     openFilesTitleLabel->setText("Open Files");
     openFilesPushButton->setText("Open");
 
-    statReadBytesTitleLabel->setText("I/O Read Total");
-    statReadBytesRateTitleLabel->setText("I/O Read Rate");
+    statReadBytesTitleLabel->setText("Read Total");
+    statReadBytesRateTitleLabel->setText("Read Rate");
 
-    statWriteBytesTitleLabel->setText("I/O Write Total");
-    statWriteBytesRateTitleLabel->setText("I/O Write Rate");
+    statWriteBytesTitleLabel->setText("Write Total");
+    statWriteBytesRateTitleLabel->setText("Write Rate");
 
     statReadBytesLabel->setReadOnly(true);
     statWriteBytesLabel->setReadOnly(true);
