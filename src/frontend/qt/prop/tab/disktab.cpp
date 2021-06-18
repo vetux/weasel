@@ -20,6 +20,7 @@
 #include "frontend/qt/prop/tab/disktab.hpp"
 
 #include <QVBoxLayout>
+#include <QLineEdit>
 
 DiskTab::DiskTab(QWidget *parent)
         : QWidget(parent) {
@@ -27,13 +28,49 @@ DiskTab::DiskTab(QWidget *parent)
     openFilesListWidget = new QListWidget(this);
     openFilesPushButton = new QPushButton(this);
 
+    statReadBytesTitleLabel = new QLabel(this);
+    statReadBytesLabel = new QLineEdit(this);
+
+    statWriteBytesTitleLabel = new QLabel(this);
+    statWriteBytesLabel = new QLineEdit(this);
+
     openFilesTitleLabel->setText("Open Files");
     openFilesPushButton->setText("Open");
+
+    statReadBytesTitleLabel->setText("I/O Read");
+    statWriteBytesTitleLabel->setText("I/O Write");
+
+    statReadBytesLabel->setReadOnly(true);
+    statWriteBytesLabel->setReadOnly(true);
+
+    auto metrics = QFontMetrics(statWriteBytesTitleLabel->font());
+    auto r = metrics.boundingRect(statWriteBytesTitleLabel->text());
+
+    statReadBytesTitleLabel->setMinimumWidth(r.width());
+    statWriteBytesTitleLabel->setMinimumWidth(r.width());
 
     setLayout(new QVBoxLayout());
     layout()->addWidget(openFilesTitleLabel);
     layout()->addWidget(openFilesListWidget);
     layout()->addWidget(openFilesPushButton);
+
+    auto *layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QHBoxLayout());
+    layoutWidget->layout()->setMargin(0);
+
+    layoutWidget->layout()->addWidget(statReadBytesTitleLabel);
+    (dynamic_cast<QHBoxLayout *>(layoutWidget->layout()))->addWidget(statReadBytesLabel, 1);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QHBoxLayout());
+    layoutWidget->layout()->setMargin(0);
+
+    layoutWidget->layout()->addWidget(statWriteBytesTitleLabel);
+    (dynamic_cast<QHBoxLayout *>(layoutWidget->layout()))->addWidget(statWriteBytesLabel, 1);
+
+    layout()->addWidget(layoutWidget);
 
     connect(openFilesPushButton, SIGNAL(pressed()), this, SLOT(onOpenFilePressed()));
 }
@@ -46,6 +83,9 @@ void DiskTab::setData(const SystemStatus &status,
     for (auto &f : proc.openFiles) {
         openFilesListWidget->addItem(f.c_str());
     }
+
+    statReadBytesLabel->setText(std::to_string(proc.rchar).c_str());
+    statWriteBytesLabel->setText(std::to_string(proc.wchar).c_str());
 }
 
 void DiskTab::updateData(const SystemStatus &status,
@@ -58,10 +98,15 @@ void DiskTab::updateData(const SystemStatus &status,
         openFilesListWidget->addItem(f.c_str());
     }
     openFilesListWidget->setCurrentIndex(index);
+
+    statReadBytesLabel->setText(std::to_string(proc.rchar).c_str());
+    statWriteBytesLabel->setText(std::to_string(proc.wchar).c_str());
 }
 
 void DiskTab::clearData() {
     openFilesListWidget->clear();
+    statReadBytesLabel->setText("");
+    statWriteBytesLabel->setText("");
 }
 
 void DiskTab::onOpenFilePressed() {

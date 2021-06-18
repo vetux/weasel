@@ -55,6 +55,12 @@ private:
     QLabel *openFilesTitleLabel;
     QListWidget *openFilesListWidget;
     QPushButton *openFilesPushButton;
+
+    QLabel *statReadBytesTitleLabel;
+    QLineEdit *statReadBytesLabel;
+
+    QLabel *statWriteBytesTitleLabel;
+    QLineEdit *statWriteBytesLabel;
 };
 
 #endif //WEASEL_DISKTAB_HPP
