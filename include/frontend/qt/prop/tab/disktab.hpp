@@ -22,10 +22,19 @@
 
 #include <QWidget>
 
+#include "system/process.hpp"
+#include "system/systemstatus.hpp"
+
 class DiskTab : public QWidget {
 Q_OBJECT
 public:
     explicit DiskTab(QWidget *parent = nullptr);
+
+public slots:
+    void setData(const SystemStatus &status,
+                 const SystemStatus &prevStatus,
+                 const Process &proc,
+                 const Process &prevProc);
 };
 
 #endif //WEASEL_DISKTAB_HPP

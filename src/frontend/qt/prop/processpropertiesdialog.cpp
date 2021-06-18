@@ -46,5 +46,8 @@ void ProcessPropertiesDialog::onRefresh(const SystemStatus &status,
                                         const SystemStatus &prevStatus,
                                         const std::map<Pid_t, Process> &processes,
                                         const std::map<Pid_t, Process> &prevProc) {
-
+    tabGeneral->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
+    tabThreads->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
+    tabDisk->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
+    tabNetwork->setData(status, prevStatus, processes.at(process.pid), prevProc.at(process.pid));
 }

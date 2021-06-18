@@ -22,10 +22,19 @@
 
 #include <QWidget>
 
+#include "system/process.hpp"
+#include "system/systemstatus.hpp"
+
 class NetworkTab : public QWidget {
 Q_OBJECT
 public:
     explicit NetworkTab(QWidget *parent = nullptr);
+
+public slots:
+    void setData(const SystemStatus &status,
+                 const SystemStatus &prevStatus,
+                 const Process &proc,
+                 const Process &prevProc);
 };
 
 #endif //WEASEL_NETWORKTAB_HPP

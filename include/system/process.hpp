@@ -35,7 +35,7 @@ struct Process {
     std::string commandLine{};
 
     // /proc/[pid]/environ
-    std::string environ{};
+    std::vector<std::string> environ{};
 
     // /proc/[pid]/io
     unsigned long rchar{};

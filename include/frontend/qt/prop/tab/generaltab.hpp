@@ -22,10 +22,44 @@
 
 #include <QWidget>
 
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QListWidget>
+
+#include "system/process.hpp"
+#include "system/systemstatus.hpp"
+
 class GeneralTab : public QWidget {
 Q_OBJECT
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
+
+public slots:
+
+    void setData(const SystemStatus &status,
+                    const SystemStatus &prevStatus,
+                    const Process &proc,
+                    const Process &prevProc);
+
+private:
+    QLabel *userTitleLabel;
+    QLineEdit *userIdLabel;
+    QLineEdit *userNameLabel;
+
+    QLabel *commandLineTitleLabel;
+    QLineEdit *commandLineLabel;
+
+    QLabel *executablePathTitleLabel;
+    QLineEdit *executablePathLabel;
+    QPushButton *executablePathOpenPushButton;
+
+    QLabel *rootDirTitleLabel;
+    QLineEdit *rootDirLabel;
+    QPushButton *rootDirOpenPushButton;
+
+    QLabel *environTitleLabel;
+    QListWidget *environListWidget;
 };
 
 #endif //WEASEL_GENERALTAB_HPP

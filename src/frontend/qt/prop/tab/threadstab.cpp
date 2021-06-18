@@ -20,3 +20,8 @@
 #include "frontend/qt/prop/tab/threadstab.hpp"
 
 ThreadsTab::ThreadsTab(QWidget *parent) {}
+
+void ThreadsTab::setData(const SystemStatus &status, const SystemStatus &prevStatus, const Process &proc,
+                         const Process &prevProc) {
+
+}

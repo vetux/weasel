@@ -176,6 +176,7 @@ void MainWindow::processPropertiesRequested(const Process &proc) {
             });
     dialogs.insert(dialog);
     dialog->show();
+    dialog->onRefresh(prevStatus, prevStatus, prevProc, prevProc);
 }
 
 void MainWindow::onActionTriggered(QAction *action) {

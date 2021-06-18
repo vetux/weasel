@@ -178,13 +178,15 @@ void parseProcCmdline(Process &proc) {
 
 void parseProcEnviron(Process &proc) {
     try {
-        proc.environ = readText(ProcPath::getProcessEnvironFile(proc.pid));
+        auto s = readText(ProcPath::getProcessEnvironFile(proc.pid));
+        replace(s, "\n", "");
+        proc.environ = splitString(s, std::string("\0", 1));
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
 void parseProcIo(Process &proc) {
     try {
-        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid)));
+        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid), std::string("\0", 1)));
         proc.rchar = std::stoul(d.at("rchar"));
         proc.wchar = std::stoul(d.at("wchar"));
         proc.syscr = std::stoul(d.at("syscr"));
@@ -212,7 +214,7 @@ void parseProcFd(Process &proc) {
 
 void parseProcExe(Process &proc) {
     try {
-        proc.executablePath = getRealPath(ProcPath::getProcessRootDirectory(proc.pid));
+        proc.executablePath = getRealPath(ProcPath::getProcessExeDirectory(proc.pid));
     } catch (const std::exception &e) {} //Assume permissions error
 }
 

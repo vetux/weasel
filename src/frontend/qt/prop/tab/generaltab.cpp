@@ -19,4 +19,125 @@
 
 #include "frontend/qt/prop/tab/generaltab.hpp"
 
-GeneralTab::GeneralTab(QWidget *parent) {}
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+
+#include "system/user.hpp"
+
+GeneralTab::GeneralTab(QWidget *parent)
+        : QWidget(parent) {
+    setLayout(new QVBoxLayout());
+
+    userTitleLabel = new QLabel(this);
+    userIdLabel = new QLineEdit(this);
+    userNameLabel = new QLineEdit(this);
+
+    commandLineTitleLabel = new QLabel(this);
+    commandLineLabel = new QLineEdit(this);
+
+    executablePathTitleLabel = new QLabel(this);
+    executablePathLabel = new QLineEdit(this);
+    executablePathOpenPushButton = new QPushButton(this);
+
+    rootDirTitleLabel = new QLabel(this);
+    rootDirLabel = new QLineEdit(this);
+    rootDirOpenPushButton = new QPushButton(this);
+
+    environTitleLabel = new QLabel(this);
+    environListWidget = new QListWidget(this);
+
+    userIdLabel->setReadOnly(true);
+    userNameLabel->setReadOnly(true);
+    commandLineLabel->setReadOnly(true);
+    executablePathLabel->setReadOnly(true);
+    rootDirLabel->setReadOnly(true);
+
+    userTitleLabel->setText("User");
+    commandLineTitleLabel->setText("Commandline");
+    executablePathTitleLabel->setText("Executable");
+    rootDirTitleLabel->setText("Root Directory");
+    environTitleLabel->setText("Environment");
+
+    executablePathOpenPushButton->setText("Open");
+    rootDirOpenPushButton->setText("Open");
+
+    auto *layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    auto *subLayoutWidget = new QWidget(this);
+    subLayoutWidget->setLayout(new QHBoxLayout());
+    subLayoutWidget->layout()->setMargin(0);
+
+    subLayoutWidget->layout()->addWidget(userIdLabel);
+    subLayoutWidget->layout()->addWidget(userNameLabel);
+
+    layoutWidget->layout()->addWidget(userTitleLabel);
+    layoutWidget->layout()->addWidget(subLayoutWidget);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    layoutWidget->layout()->addWidget(commandLineTitleLabel);
+    layoutWidget->layout()->addWidget(commandLineLabel);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    subLayoutWidget = new QWidget(this);
+    subLayoutWidget->setLayout(new QHBoxLayout());
+    subLayoutWidget->layout()->setMargin(0);
+
+    subLayoutWidget->layout()->addWidget(executablePathLabel);
+    subLayoutWidget->layout()->addWidget(executablePathOpenPushButton);
+
+    layoutWidget->layout()->addWidget(executablePathTitleLabel);
+    layoutWidget->layout()->addWidget(subLayoutWidget);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    subLayoutWidget = new QWidget(this);
+    subLayoutWidget->setLayout(new QHBoxLayout());
+    subLayoutWidget->layout()->setMargin(0);
+
+    subLayoutWidget->layout()->addWidget(rootDirLabel);
+    subLayoutWidget->layout()->addWidget(rootDirOpenPushButton);
+
+    layoutWidget->layout()->addWidget(rootDirTitleLabel);
+    layoutWidget->layout()->addWidget(subLayoutWidget);
+
+    layout()->addWidget(layoutWidget);
+
+    layoutWidget = new QWidget(this);
+    layoutWidget->setLayout(new QVBoxLayout());
+
+    layoutWidget->layout()->addWidget(environTitleLabel);
+    layoutWidget->layout()->addWidget(environListWidget);
+
+    layout()->addWidget(layoutWidget);
+}
+
+void GeneralTab::setData(const SystemStatus &status,
+                         const SystemStatus &prevStatus,
+                         const Process &proc,
+                         const Process &prevProc) {
+    userIdLabel->setText(std::to_string(proc.uid).c_str());
+    userNameLabel->setText(User::getUserName(proc.uid).c_str());
+
+    commandLineLabel->setText(proc.commandLine.c_str());
+
+    executablePathLabel->setText(proc.executablePath.c_str());
+
+    rootDirLabel->setText(proc.rootDirectory.c_str());
+
+    environListWidget->clear();
+    for (auto &e : proc.environ) {
+        environListWidget->addItem(e.c_str());
+    }
+}
