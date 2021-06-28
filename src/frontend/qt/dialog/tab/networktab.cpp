@@ -19,22 +19,44 @@
 
 #include "frontend/qt/dialog/tab/networktab.hpp"
 
-NetworkTab::NetworkTab(QWidget *parent) {}
+#include <QVBoxLayout>
+
+static QString getFormattedConnectionString(const Socket &sock) {
+    std::string prefix;
+    if (sock.protocol == TCP)
+        prefix = "TCP ";
+    else
+        prefix = "UDP ";
+    return (prefix
+            + sock.localEndpoint.address + ":" + std::to_string(sock.localEndpoint.port)
+            + " -> "
+            + sock.remoteEndpoint.address + ":" +
+            std::to_string(sock.remoteEndpoint.port)).c_str();
+}
+
+NetworkTab::NetworkTab(QWidget *parent) {
+    setLayout(new QVBoxLayout());
+    socketsList = new QListWidget(this);
+    layout()->addWidget(socketsList);
+}
 
 void NetworkTab::setData(const SystemStatus &status,
                          const SystemStatus &prevStatus,
                          const Process &proc,
                          const Process &prevProc) {
-
+    socketsList->clear();
+    for (auto &socket : proc.sockets) {
+        socketsList->addItem(getFormattedConnectionString(socket));
+    }
 }
 
 void NetworkTab::updateData(const SystemStatus &status,
                             const SystemStatus &prevStatus,
                             const Process &proc,
                             const Process &prevProc) {
-
+    setData(status, prevStatus, proc, prevProc);
 }
 
 void NetworkTab::clearData() {
-
+    socketsList->clear();
 }

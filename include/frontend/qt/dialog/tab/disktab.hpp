@@ -57,7 +57,6 @@ private:
     
     QLabel *openFilesTitleLabel;
     QListWidget *openFilesListWidget;
-    QPushButton *openFilesPushButton;
 
     QLabel *statReadBytesTitleLabel;
     QLineEdit *statReadBytesLabel;

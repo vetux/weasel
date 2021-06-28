@@ -53,7 +53,6 @@ DiskTab::DiskTab(QWidget *parent)
         : QWidget(parent) {
     openFilesTitleLabel = new QLabel(this);
     openFilesListWidget = new QListWidget(this);
-    openFilesPushButton = new QPushButton(this);
 
     statReadBytesTitleLabel = new QLabel(this);
     statReadBytesLabel = new QLineEdit(this);
@@ -68,7 +67,6 @@ DiskTab::DiskTab(QWidget *parent)
     statWriteBytesRateLabel = new QLineEdit(this);
 
     openFilesTitleLabel->setText("Open Files");
-    openFilesPushButton->setText("Open");
 
     statReadBytesTitleLabel->setText("Read Total");
     statReadBytesRateTitleLabel->setText("Read Rate");
@@ -131,9 +129,6 @@ DiskTab::DiskTab(QWidget *parent)
 
     layout()->addWidget(openFilesTitleLabel);
     layout()->addWidget(openFilesListWidget);
-    layout()->addWidget(openFilesPushButton);
-
-    connect(openFilesPushButton, SIGNAL(pressed()), this, SLOT(onOpenFilePressed()));
 }
 
 void DiskTab::setData(const SystemStatus &status,

@@ -21,6 +21,7 @@
 #define WEASEL_NETWORKTAB_HPP
 
 #include <QWidget>
+#include <QListWidget>
 
 #include "system/process.hpp"
 #include "system/systemstatus.hpp"
@@ -43,6 +44,9 @@ public slots:
                     const Process &prevProc);
 
     void clearData();
+
+private:
+    QListWidget *socketsList;
 };
 
 #endif //WEASEL_NETWORKTAB_HPP
