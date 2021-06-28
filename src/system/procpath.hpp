@@ -37,6 +37,9 @@
 #define PATH_ROOT std::string("/root")
 #define PATH_CMDLINE std::string("/cmdline")
 #define PATH_MEMINFO std::string("/meminfo")
+#define PATH_NET std::string("/net")
+#define PATH_TCP std::string("/tcp")
+#define PATH_UDP std::string("/udp")
 
 inline std::string operator+(const std::string &l, Pid_t r) {
     return l + std::to_string(r);
@@ -125,6 +128,14 @@ namespace ProcPath {
 
     inline std::string getMemoryInfoFile() {
         return PATH_PROC + PATH_MEMINFO;
+    }
+
+    inline std::string getProcNetTcp() {
+        return PATH_PROC + PATH_NET + PATH_TCP;
+    }
+
+    inline std::string getProcNetUdp() {
+        return PATH_PROC + PATH_NET + PATH_UDP;
     }
 };
 

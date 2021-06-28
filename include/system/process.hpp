@@ -26,6 +26,7 @@
 #include "system/thread.hpp"
 #include "system/types.hpp"
 #include "system/signal.hpp"
+#include "system/socket.hpp"
 
 struct Process {
     Pid_t pid{}; // The process id, equal to threads[0].tid
@@ -54,6 +55,8 @@ struct Process {
 
     // /proc/[pid]/exe
     std::string executablePath{};
+
+    std::vector<Socket> sockets;
 
     std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
 

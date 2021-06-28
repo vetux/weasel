@@ -32,6 +32,11 @@
 
 #include "system/procpath.hpp"
 #include "system/syscalls.hpp"
+#include "system/procnetreader.hpp"
+#include "system/fileio.hpp"
+#include "system/stringutil.hpp"
+
+#define READLINK_BUFFER_SIZE 512
 
 inline bool isAsciiNumber(char c) {
     return c >= '0' && c <= '9';
@@ -61,90 +66,24 @@ SchedulingPolicy convertPolicy(uint32_t policy) {
     }
 }
 
-std::string readText(const std::string &filePath, const std::string &newLine = "\n") {
-    std::string ret;
-    std::ifstream stream;
-
-    stream.open(filePath);
-
-    if (stream.fail()) {
-        throw std::runtime_error("Failed to read text at " + filePath + " error: " + strerror(errno));
-    }
-
-    std::string tmp;
-    while (std::getline(stream, tmp)) {
-        ret += tmp + newLine;
-    }
-
-    return ret;
-}
-
-std::vector<std::string> readLines(const std::string &str) {
-    std::vector<std::string> ret;
-    std::stringstream stream(str);
-
-    std::string tmp;
-    while (std::getline(stream, tmp)) {
-        ret.emplace_back(tmp);
-    }
-
-    return ret;
-}
-
-void removeSurroundingWhiteSpace(std::string &str) {
-    //Preceding
-    auto space = str.find_first_of(' ');
-    while (space == 0) {
-        str.erase(space, 1);
-        space = str.find_first_of(' ');
-    }
-
-    //Trailing
-    space = str.find_last_of(' ');
-    while (!str.empty() && space == str.size() - 1) {
-        str.erase(space, 1);
-        space = str.find_last_of(' ');
-    }
-}
-
-static void replace(std::string &str, const std::string &v, const std::string &r) {
-    size_t pos = str.find(v);
-    while (pos != std::string::npos) {
-        str.replace(pos, v.size(), r);
-        pos = str.find(v);
-    }
-}
-
-std::vector<std::string> splitString(const std::string &str, const std::string &delimiter) {
-    if (str.empty())
-        return {};
-
-    std::vector<std::string> ret;
-
-    size_t startPos = 0;
-    size_t pos = str.find(delimiter);
-    while (pos != std::string::npos) {
-        if (pos != 0) {
-            ret.emplace_back(str.substr(startPos, pos - startPos));
-        }
-
-        if (pos == str.size() - 1)
-            break;
-
-        startPos = pos + 1;
-        pos = str.find(delimiter, pos + 1);
-    }
-
-    ret.emplace_back(str.substr(startPos, pos));
-
-    return ret;
-}
-
 std::string getRealPath(const std::string &symLinkPath) {
     auto *p = realpath(symLinkPath.c_str(), NULL);
     if (p == NULL)
         throw std::runtime_error("Failed to get real path for " + symLinkPath);
     return p;
+}
+
+std::string readLink(const std::string &link) {
+    char *l = new char[READLINK_BUFFER_SIZE];
+    memset(l, 0, READLINK_BUFFER_SIZE);
+    auto r = readlink(link.c_str(), l, READLINK_BUFFER_SIZE);
+    if (r == -1) {
+        delete[]l;
+        throw std::runtime_error("Failed to read link at " + link);
+    }
+    std::string ret(l, r);
+    delete[]l;
+    return ret;
 }
 
 std::map<std::string, std::string> parseProcStr(const std::string &str) {
@@ -160,9 +99,9 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
         std::string name = line.substr(0, dot);
         std::string value = line.substr(dot + 1);
 
-        replace(value, "\t", " ");
-        replace(value, "  ", " ");
-        removeSurroundingWhiteSpace(value);
+        StringUtil::replace(value, "\t", " ");
+        StringUtil::replace(value, "  ", " ");
+        StringUtil::removeSurroundingWhiteSpace(value);
 
         ret[name] = value;
     }
@@ -170,23 +109,49 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
     return ret;
 }
 
+Socket parseSocketString(const std::string &socketString) {
+    const int prefixLength = std::string("socket:[").size();
+    return ProcNetReader::getSocketFromInode(socketString.substr(prefixLength, socketString.size() - 1 - prefixLength));
+}
+
+void parseFileDescriptor(Process &proc, const std::filesystem::path &path) {
+    //Ignore stdin, stdout and stderr because every process on linux should theoretically have these.
+    if (path.filename() == "0" || path.filename() == "1" || path.filename() == "2") {
+        return;
+    }
+
+    std::string symLinkPath = readLink(path);
+
+    // Check if symlink points to a file or something else.
+    // (If a file is accessible with the name socket:[XXX] this obviously will give false positives but there does not seem to be a clean way of doing this.
+    if (access(symLinkPath.c_str(), F_OK) == 0) {
+        //Assume the file descriptor refers to a file
+        proc.openFiles.emplace_back(getRealPath(symLinkPath));
+    } else {
+        if (symLinkPath.find("socket:[") == 0) {
+            //Assume the file descriptor refers to a socket
+            proc.sockets.emplace_back(parseSocketString(symLinkPath));
+        }
+    }
+}
+
 void parseProcCmdline(Process &proc) {
     try {
-        proc.commandLine = readText(ProcPath::getProcessCommandLineFile(proc.pid), " ");
+        proc.commandLine = FileIO::readText(ProcPath::getProcessCommandLineFile(proc.pid), " ");
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
 void parseProcEnviron(Process &proc) {
     try {
-        auto s = readText(ProcPath::getProcessEnvironFile(proc.pid));
-        replace(s, "\n", "");
-        proc.environ = splitString(s, std::string("\0", 1));
+        auto s = FileIO::readText(ProcPath::getProcessEnvironFile(proc.pid));
+        StringUtil::replace(s, "\n", "");
+        proc.environ = StringUtil::splitString(s, std::string("\0", 1));
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
 void parseProcIo(Process &proc) {
     try {
-        const auto d = parseProcStr(readText(ProcPath::getProcessIoFile(proc.pid)));
+        const auto d = parseProcStr(FileIO::readText(ProcPath::getProcessIoFile(proc.pid)));
         proc.rchar = std::stoul(d.at("rchar"));
         proc.wchar = std::stoul(d.at("wchar"));
         proc.syscr = std::stoul(d.at("syscr"));
@@ -207,14 +172,7 @@ void parseProcFd(Process &proc) {
     try {
         const auto p = ProcPath::getProcessFdDirectory(proc.pid);
         for (auto &f : std::filesystem::directory_iterator(p)) {
-            if (f.path().filename() == "0")
-                proc.openFiles.emplace_back("stdin");
-            else if (f.path().filename() == "1")
-                proc.openFiles.emplace_back("stdout");
-            else if (f.path().filename() == "2")
-                proc.openFiles.emplace_back("stderr");
-            else
-                proc.openFiles.emplace_back(getRealPath(f.path()));
+            parseFileDescriptor(proc, f);
         }
     } catch (const std::exception &e) {} //Assume permissions error
 }
@@ -227,7 +185,7 @@ void parseProcExe(Process &proc) {
 
 void parseThreadStat(Thread &thread) {
     try {
-        auto text = readText(ProcPath::getThreadStatFile(thread.pid, thread.tid));
+        auto text = FileIO::readText(ProcPath::getThreadStatFile(thread.pid, thread.tid));
         auto firstBracket = text.find_first_of('(');
         auto lastBracket = text.find_last_of(')');
 
@@ -235,7 +193,7 @@ void parseThreadStat(Thread &thread) {
 
         text.erase(0, lastBracket + 1);
 
-        auto split = splitString(text, " ");
+        auto split = StringUtil::splitString(text, " ");
 
         thread.state = split.at(0)[0];
         thread.ppid = std::stoi(split.at(1));
@@ -353,7 +311,8 @@ void parseThreadStat(Thread &thread) {
 
 void parseThreadStatm(Thread &thread) {
     try {
-        auto split = splitString(readText(ProcPath::getThreadStatMFile(thread.pid, thread.tid)), " ");
+        auto split = StringUtil::splitString(FileIO::readText(ProcPath::getThreadStatMFile(thread.pid, thread.tid)),
+                                             " ");
         thread.size = std::stoul(split.at(0));
         thread.resident = std::stoul(split.at(1));
         thread.shared = std::stoul(split.at(2));
@@ -428,16 +387,16 @@ bool isPID(const std::string &name) {
 
 namespace ProcReader {
     SystemStatus readSystemStatus() {
-        auto statContents = readText(ProcPath::getProcStatFile());
-        replace(statContents, "  ", " "); //Replace double whitespace
+        auto statContents = FileIO::readText(ProcPath::getProcStatFile());
+        StringUtil::replace(statContents, "  ", " "); //StringUtil::replace double whitespace
 
-        auto stat = readLines(statContents);
-        auto memInfo = parseProcStr(readText(ProcPath::getMemoryInfoFile()));
+        auto stat = FileIO::readLines(statContents);
+        auto memInfo = parseProcStr(FileIO::readText(ProcPath::getMemoryInfoFile()));
 
         SystemStatus ret{};
 
         for (auto &line : stat) {
-            auto lineSplit = splitString(line, " ");
+            auto lineSplit = StringUtil::splitString(line, " ");
             if (lineSplit.at(0).rfind("cpu", 0) == 0) {
                 if (lineSplit.at(0) == "cpu") {
                     ret.cpu = readCore(lineSplit);
