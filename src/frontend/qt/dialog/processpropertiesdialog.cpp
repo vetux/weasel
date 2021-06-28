@@ -81,3 +81,7 @@ void ProcessPropertiesDialog::updateData(const SystemStatus &status,
         tabNetwork->updateData(status, prevStatus, p, pv);
     }
 }
+
+const Process &ProcessPropertiesDialog::getProcess() {
+    return process;
+}

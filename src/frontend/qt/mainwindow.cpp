@@ -167,6 +167,13 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
 }
 
 void MainWindow::processPropertiesRequested(const Process &proc) {
+    //Check if a dialog already exists for the passed process
+    for (auto *dialog : dialogs) {
+        if (dialog->getProcess().pid == proc.pid) {
+            dialog->activateWindow();
+            return;
+        }
+    }
     auto *dialog = new ProcessPropertiesDialog(this);
     connect(dialog,
             &QDialog::finished,

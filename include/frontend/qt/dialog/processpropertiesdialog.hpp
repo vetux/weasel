@@ -50,6 +50,8 @@ public slots:
                     const std::map<Pid_t, Process> &proc,
                     const std::map<Pid_t, Process> &prevProc);
 
+    const Process &getProcess();
+
 private:
     Process process;
 
