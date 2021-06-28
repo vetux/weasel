@@ -110,12 +110,23 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
     return ret;
 }
 
-Socket parseSocketString(const std::string &socketString) {
+Socket parseSocketString(const std::string &socketString, const NetworkStatus &netStat) {
     const int prefixLength = std::string("socket:[").size();
-    return ProcNetReader::getSocketFromInode(socketString.substr(prefixLength, socketString.size() - 1 - prefixLength));
+    auto inode = socketString.substr(prefixLength, socketString.size() - 1 - prefixLength);
+    for (auto &socket : netStat.tcp) {
+        if (socket.inode == inode) {
+            return socket;
+        }
+    }
+    for (auto &socket : netStat.udp) {
+        if (socket.inode == inode) {
+            return socket;
+        }
+    }
+    throw std::runtime_error("Failed to find socket with inode " + inode);
 }
 
-void parseFileDescriptor(Process &proc, const std::filesystem::path &path) {
+void parseFileDescriptor(Process &proc, const std::filesystem::path &path, const NetworkStatus &netStat) {
     //Ignore stdin, stdout and stderr because every process on linux should theoretically have these.
     if (path.filename() == "0" || path.filename() == "1" || path.filename() == "2") {
         return;
@@ -132,7 +143,7 @@ void parseFileDescriptor(Process &proc, const std::filesystem::path &path) {
         if (symLinkPath.find("socket:[") == 0) {
             //Assume the file descriptor refers to a socket
             try {
-                proc.sockets.emplace_back(parseSocketString(symLinkPath));
+                proc.sockets.emplace_back(parseSocketString(symLinkPath, netStat));
             }
             catch (std::exception &e) {} //Assume socket dead
         }
@@ -172,11 +183,11 @@ void parseProcRoot(Process &proc) {
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
-void parseProcFd(Process &proc) {
+void parseProcFd(Process &proc, const NetworkStatus &netStat) {
     try {
         const auto p = ProcPath::getProcessFdDirectory(proc.pid);
         for (auto &f : std::filesystem::directory_iterator(p)) {
-            parseFileDescriptor(proc, f);
+            parseFileDescriptor(proc, f, netStat);
         }
     } catch (const std::exception &e) {} //Assume permissions error
 }
@@ -491,14 +502,18 @@ namespace ProcReader {
         return ret;
     }
 
-    std::map<Pid_t, Process> readProcesses() {
+    NetworkStatus readNetworkStatus() {
+        return ProcNetReader::getNetworkStatus();
+    }
+
+    std::map<Pid_t, Process> readProcesses(const NetworkStatus &netStat) {
         std::map<Pid_t, Process> ret;
         for (auto &fl : std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
             try {
                 auto filename = fl.path().filename();
                 if (isPID(filename)) {
                     auto pid = stringToPid(filename);
-                    ret[pid] = ProcReader::readProcess(pid);
+                    ret[pid] = ProcReader::readProcess(pid, netStat);
                 }
             }
             catch (const std::exception &e) {} // Assume process does not exist anymore
@@ -506,7 +521,7 @@ namespace ProcReader {
         return ret;
     }
 
-    Process readProcess(Pid_t pid) {
+    Process readProcess(Pid_t pid, const NetworkStatus &netStat) {
         Process p;
         p.pid = pid;
         p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
@@ -515,7 +530,7 @@ namespace ProcReader {
         parseProcEnviron(p);
         parseProcIo(p);
         parseProcRoot(p);
-        parseProcFd(p);
+        parseProcFd(p, netStat);
         parseProcExe(p);
 
         std::string dir = ProcPath::getProcessTasksDirectory(pid);

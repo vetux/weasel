@@ -17,27 +17,14 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_SOCKET_HPP
-#define WEASEL_SOCKET_HPP
+#ifndef WEASEL_NETWORKSTATUS_HPP
+#define WEASEL_NETWORKSTATUS_HPP
 
-#include <string>
+#include "system/socket.hpp"
 
-enum SocketProtocol {
-    UDP,
-    TCP
+struct NetworkStatus {
+    std::vector<Socket> tcp;
+    std::vector<Socket> udp;
 };
 
-struct IpEndpoint {
-    std::string address;
-    int port;
-};
-
-struct Socket {
-    SocketProtocol protocol;
-    IpEndpoint localEndpoint;
-    IpEndpoint remoteEndpoint;
-    std::string state;
-    std::string inode;
-};
-
-#endif //WEASEL_SOCKET_HPP
+#endif //WEASEL_NETWORKSTATUS_HPP

@@ -48,7 +48,7 @@ MainWindow::MainWindow(int pollingInterval) {
     connect(menuBar(), SIGNAL(triggered(QAction * )), this, SLOT(onActionTriggered(QAction * )));
 
     prevStatus = ProcReader::readSystemStatus();
-    prevProc = ProcReader::readProcesses();
+    prevProc = ProcReader::readProcesses(ProcReader::readNetworkStatus());
     refresh();
 
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
@@ -85,7 +85,7 @@ void MainWindow::onPollTimeOut() {
 
 void MainWindow::refresh() {
     auto systemStatus = ProcReader::readSystemStatus();
-    auto processes = ProcReader::readProcesses();
+    auto processes = ProcReader::readProcesses(ProcReader::readNetworkStatus());
 
     procTree->setContents(systemStatus, prevStatus, processes, prevProc);
     toolbar->setSystemStatus(systemStatus, prevStatus);
@@ -165,7 +165,6 @@ void MainWindow::threadPriorityChangeRequested(const Thread &thread, int priorit
         QMessageBox::warning(this, "Failed to signal process", e.what());
     }
 }
-
 
 void MainWindow::processPropertiesRequested(const Process &proc) {
     auto *dialog = new ProcessPropertiesDialog(this);

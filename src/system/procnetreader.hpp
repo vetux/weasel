@@ -20,10 +20,13 @@
 #ifndef WEASEL_PROCNETREADER_HPP
 #define WEASEL_PROCNETREADER_HPP
 
-#include "system/socket.hpp"
+#include <string>
+#include <vector>
+
+#include "system/networkstatus.hpp"
 
 namespace ProcNetReader {
-    Socket getSocketFromInode(const std::string &inode);
+    NetworkStatus getNetworkStatus();
 }
 
 #endif //WEASEL_PROCNETREADER_HPP

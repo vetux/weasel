@@ -27,6 +27,7 @@
 #include "system/thread.hpp"
 #include "system/process.hpp"
 #include "system/systemstatus.hpp"
+#include "system/networkstatus.hpp"
 
 namespace ProcReader {
     /**
@@ -35,15 +36,21 @@ namespace ProcReader {
     SystemStatus readSystemStatus();
 
     /**
+     *
+     * @return
+     */
+    NetworkStatus readNetworkStatus();
+
+    /**
      * @return The currently active processes from /proc/PID
      */
-    std::map<Pid_t, Process> readProcesses();
+    std::map<Pid_t, Process> readProcesses(const NetworkStatus &netStat);
 
     /**
      * @param pid The pid of the process to read.
      * @return The data for the process with pid
      */
-    Process readProcess(Pid_t pid);
+    Process readProcess(Pid_t pid, const NetworkStatus &netStat);
 
     /**
      * @param pid The pid of the process to read the thread of

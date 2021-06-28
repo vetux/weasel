@@ -86,31 +86,31 @@ static std::string getStateName(SocketProtocol protocol, std::string state) {
 }
 
 namespace ProcNetReader {
-    Socket getSocketFromInode(const std::string &inode) {
+    NetworkStatus getNetworkStatus() {
+        NetworkStatus ret;
+
         auto entries = readEntries(FileIO::readText(ProcPath::getProcNetTcp()));
         for (auto &entry : entries) {
-            if (entry.inode == inode) {
-                Socket ret;
-                ret.protocol = TCP;
-                ret.localEndpoint = getEndpoint(entry.localAddress);
-                ret.remoteEndpoint = getEndpoint(entry.remoteAddress);
-                ret.state = getStateName(TCP, entry.state);
-                return ret;
-            }
+            Socket socket;
+            socket.protocol = TCP;
+            socket.localEndpoint = getEndpoint(entry.localAddress);
+            socket.remoteEndpoint = getEndpoint(entry.remoteAddress);
+            socket.state = getStateName(TCP, entry.state);
+            socket.inode = entry.inode;
+            ret.tcp.emplace_back(socket);
         }
 
         entries = readEntries(FileIO::readText(ProcPath::getProcNetUdp()));
         for (auto &entry : entries) {
-            if (entry.inode == inode) {
-                Socket ret;
-                ret.protocol = UDP;
-                ret.localEndpoint = getEndpoint(entry.localAddress);
-                ret.remoteEndpoint = getEndpoint(entry.remoteAddress);
-                ret.state = getStateName(UDP, entry.state);
-                return ret;
-            }
+            Socket socket;
+            socket.protocol = UDP;
+            socket.localEndpoint = getEndpoint(entry.localAddress);
+            socket.remoteEndpoint = getEndpoint(entry.remoteAddress);
+            socket.state = getStateName(UDP, entry.state);
+            socket.inode = entry.inode;
+            ret.udp.emplace_back(socket);
         }
 
-        throw std::runtime_error("Socket Inode not found.");
+        return ret;
     }
 }
