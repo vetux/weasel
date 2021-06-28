@@ -23,6 +23,8 @@
 #include <QLineEdit>
 #include <QSpacerItem>
 
+#include "frontend/qt/storageconstants.hpp"
+
 unsigned long getRate(float delta,
                       unsigned long current,
                       unsigned long previous) {
@@ -32,6 +34,18 @@ unsigned long getRate(float delta,
     } else {
         auto scale = delta == 0 ? 0 : 1 / delta;
         return static_cast<unsigned long>(diff * scale);
+    }
+}
+
+std::string getFormattedRateString(unsigned long bytesPerSecond) {
+    if (bytesPerSecond < BYTES_KILOBYTE) {
+        return std::to_string(bytesPerSecond) + " B/s";
+    } else if (bytesPerSecond < BYTES_MEGABYTE) {
+        return std::to_string(bytesPerSecond / BYTES_KILOBYTE) + " KB/s";
+    } else if (bytesPerSecond < BYTES_GIGABYTE) {
+        return std::to_string(bytesPerSecond / BYTES_MEGABYTE) + " MB/s";
+    } else {
+        return std::to_string(bytesPerSecond / BYTES_GIGABYTE) + " GB/s";
     }
 }
 
@@ -93,7 +107,7 @@ DiskTab::DiskTab(QWidget *parent)
 
     layout()->addWidget(layoutWidget);
 
-    layout()->addItem(new QSpacerItem(0,10));
+    layout()->addItem(new QSpacerItem(0, 10));
 
     layoutWidget = new QWidget(this);
     layoutWidget->setLayout(new QHBoxLayout());
@@ -113,7 +127,7 @@ DiskTab::DiskTab(QWidget *parent)
 
     layout()->addWidget(layoutWidget);
 
-    layout()->addItem(new QSpacerItem(0,10));
+    layout()->addItem(new QSpacerItem(0, 10));
 
     layout()->addWidget(openFilesTitleLabel);
     layout()->addWidget(openFilesListWidget);
@@ -169,12 +183,13 @@ void DiskTab::updateData(const SystemStatus &status,
     auto rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
                         proc.rchar,
                         prevProc.rchar);
-    statReadBytesRateLabel->setText(std::to_string(rate).c_str());
+    statReadBytesRateLabel->setText(getFormattedRateString(rate).c_str());
 
     rate = getRate(std::chrono::duration_cast<std::chrono::milliseconds>(delta).count() / 1000.0f,
                    proc.wchar,
                    prevProc.wchar);
-    statWriteBytesRateLabel->setText(std::to_string(rate).c_str());
+
+    statWriteBytesRateLabel->setText(getFormattedRateString(rate).c_str());
 }
 
 void DiskTab::clearData() {
