@@ -28,10 +28,10 @@
 #include "system/process.hpp"
 #include "system/systemstatus.hpp"
 
-#include "frontend/qt/prop/tab/generaltab.hpp"
-#include "frontend/qt/prop/tab/threadstab.hpp"
-#include "frontend/qt/prop/tab/disktab.hpp"
-#include "frontend/qt/prop/tab/networktab.hpp"
+#include "frontend/qt/dialog/tab/generaltab.hpp"
+#include "frontend/qt/dialog/tab/threadstab.hpp"
+#include "frontend/qt/dialog/tab/disktab.hpp"
+#include "frontend/qt/dialog/tab/networktab.hpp"
 
 class ProcessPropertiesDialog : public QDialog {
 Q_OBJECT

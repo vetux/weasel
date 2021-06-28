@@ -23,7 +23,7 @@
 #include <QMainWindow>
 #include <QTimer>
 
-#include "frontend/qt/prop/processpropertiesdialog.hpp"
+#include "frontend/qt/dialog/processpropertiesdialog.hpp"
 #include "frontend/qt/settings/settingsdialog.hpp"
 #include "frontend/qt/toolbar/toolbarwidget.hpp"
 #include "frontend/qt/tree/processtreewidget.hpp"

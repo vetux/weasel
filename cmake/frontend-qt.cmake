@@ -10,11 +10,11 @@ message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
 set(Frontend.Qt.GuiHeaders
         include/frontend/qt/mainwindow.hpp
-        include/frontend/qt/prop/processpropertiesdialog.hpp
-        include/frontend/qt/prop/tab/disktab.hpp
-        include/frontend/qt/prop/tab/generaltab.hpp
-        include/frontend/qt/prop/tab/networktab.hpp
-        include/frontend/qt/prop/tab/threadstab.hpp
+        include/frontend/qt/dialog/processpropertiesdialog.hpp
+        include/frontend/qt/dialog/tab/disktab.hpp
+        include/frontend/qt/dialog/tab/generaltab.hpp
+        include/frontend/qt/dialog/tab/networktab.hpp
+        include/frontend/qt/dialog/tab/threadstab.hpp
         include/frontend/qt/settings/settingsdialog.hpp
         include/frontend/qt/toolbar/cpubarwidget.hpp
         include/frontend/qt/toolbar/memorybarwidget.hpp

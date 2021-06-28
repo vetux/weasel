@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "frontend/qt/prop/tab/threadstab.hpp"
+#include "frontend/qt/dialog/tab/threadstab.hpp"
 
 ThreadsTab::ThreadsTab(QWidget *parent) {}
 
