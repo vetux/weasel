@@ -19,9 +19,12 @@
 
 #include "system/stringutil.hpp"
 
+#include <sstream>
+
 namespace StringUtil {
-    void removeSurroundingWhiteSpace(std::string &str) {
+    std::string removeSurroundingWhiteSpace(const std::string &input) {
         //Preceding
+        auto str = input;
         auto space = str.find_first_of(' ');
         while (space == 0) {
             str.erase(space, 1);
@@ -34,6 +37,20 @@ namespace StringUtil {
             str.erase(space, 1);
             space = str.find_last_of(' ');
         }
+        return str;
+    }
+
+    std::string removeExtraWhitespace(const std::string &str) {
+        std::string ret;
+        for (int i = 0; i < str.size(); i++) {
+            ret += str.at(i);
+            if (str.at(i) == ' ') {
+                while (i + 1 < str.size() && str.at(i + 1) == ' ') {
+                    i++;
+                }
+            }
+        }
+        return ret;
     }
 
     void replace(std::string &str, const std::string &v, const std::string &r) {
@@ -65,6 +82,18 @@ namespace StringUtil {
         }
 
         ret.emplace_back(str.substr(startPos, pos));
+
+        return ret;
+    }
+
+    std::vector<std::string> readLines(const std::string &str) {
+        std::vector<std::string> ret;
+        std::stringstream stream(str);
+
+        std::string tmp;
+        while (std::getline(stream, tmp)) {
+            ret.emplace_back(tmp);
+        }
 
         return ret;
     }

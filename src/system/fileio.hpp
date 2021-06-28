@@ -25,8 +25,6 @@
 
 namespace FileIO {
     std::string readText(const std::string &filePath, const std::string &newLine = "\n");
-
-    std::vector<std::string> readLines(const std::string &str);
 }
 
 #endif //WEASEL_FILEIO_HPP

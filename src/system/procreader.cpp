@@ -101,7 +101,8 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
 
         StringUtil::replace(value, "\t", " ");
         StringUtil::replace(value, "  ", " ");
-        StringUtil::removeSurroundingWhiteSpace(value);
+        
+        value = StringUtil::removeSurroundingWhiteSpace(value);
 
         ret[name] = value;
     }
@@ -388,9 +389,9 @@ bool isPID(const std::string &name) {
 namespace ProcReader {
     SystemStatus readSystemStatus() {
         auto statContents = FileIO::readText(ProcPath::getProcStatFile());
-        StringUtil::replace(statContents, "  ", " "); //StringUtil::replace double whitespace
+        StringUtil::replace(statContents, "  ", " "); //replace double whitespace
 
-        auto stat = FileIO::readLines(statContents);
+        auto stat = StringUtil::readLines(statContents);
         auto memInfo = parseProcStr(FileIO::readText(ProcPath::getMemoryInfoFile()));
 
         SystemStatus ret{};

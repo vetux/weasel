@@ -24,11 +24,15 @@
 #include <vector>
 
 namespace StringUtil {
-    void removeSurroundingWhiteSpace(std::string &str);
+    std::string removeSurroundingWhiteSpace(const std::string &str);
+
+    std::string removeExtraWhitespace(const std::string &str);
 
     void replace(std::string &str, const std::string &v, const std::string &r);
 
     std::vector<std::string> splitString(const std::string &str, const std::string &delimiter);
+
+    std::vector<std::string> readLines(const std::string &str);
 }
 
 #endif //WEASEL_STRINGUTIL_HPP

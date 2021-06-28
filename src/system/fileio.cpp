@@ -42,16 +42,4 @@ namespace FileIO {
 
         return ret;
     }
-
-    std::vector<std::string> readLines(const std::string &str) {
-        std::vector<std::string> ret;
-        std::stringstream stream(str);
-
-        std::string tmp;
-        while (std::getline(stream, tmp)) {
-            ret.emplace_back(tmp);
-        }
-
-        return ret;
-    }
 }
