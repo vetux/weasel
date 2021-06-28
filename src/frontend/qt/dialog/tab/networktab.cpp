@@ -24,12 +24,12 @@
 static QString getFormattedConnectionString(const Socket &sock) {
     std::string prefix;
     if (sock.protocol == TCP)
-        prefix = "TCP ";
+        prefix = "TCP\t";
     else
-        prefix = "UDP ";
+        prefix = "UDP\t";
     return (prefix
             + sock.localEndpoint.address + ":" + std::to_string(sock.localEndpoint.port)
-            + " -> "
+            + "\t->\t"
             + sock.remoteEndpoint.address + ":" +
             std::to_string(sock.remoteEndpoint.port)).c_str();
 }

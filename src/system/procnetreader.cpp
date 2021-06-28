@@ -23,6 +23,7 @@
 #include "system/stringutil.hpp"
 
 #include <stdexcept>
+#include <sstream>
 
 struct ProcNetEntry {
     std::string localAddress;
@@ -49,12 +50,30 @@ static std::vector<ProcNetEntry> readEntries(const std::string &contents) {
     return ret;
 }
 
+static int convertHexToDecmial(const std::string &hex) {
+    int ret;
+    std::stringstream ss;
+    ss << std::hex << hex;
+    ss >> ret;
+    return ret;
+}
+
 static std::string convertHexAddress(const std::string &hex) {
-    return hex; //TODO: Convert hex address
+    std::vector<std::string> hexParts;
+    for (int i = 0; i < hex.size(); i += 2) {
+        hexParts.emplace(hexParts.begin(), hex.substr(i, 2));
+    }
+
+    std::string ret;
+    for (int i = 0; i < hexParts.size() - 1; i++) {
+        ret += std::to_string(convertHexToDecmial(hexParts.at(i))) + ".";
+    }
+    ret += std::to_string(convertHexToDecmial(hexParts.at(hexParts.size() - 1)));
+    return ret;
 }
 
 static int convertHexPort(const std::string &hex) {
-    return 0; //TODO: Convert hex port
+    return convertHexToDecmial(hex);
 }
 
 static IpEndpoint getEndpoint(const std::string &address) {
