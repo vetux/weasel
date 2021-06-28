@@ -101,7 +101,7 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
 
         StringUtil::replace(value, "\t", " ");
         StringUtil::replace(value, "  ", " ");
-        
+
         value = StringUtil::removeSurroundingWhiteSpace(value);
 
         ret[name] = value;
@@ -131,7 +131,10 @@ void parseFileDescriptor(Process &proc, const std::filesystem::path &path) {
     } else {
         if (symLinkPath.find("socket:[") == 0) {
             //Assume the file descriptor refers to a socket
-            proc.sockets.emplace_back(parseSocketString(symLinkPath));
+            try {
+                proc.sockets.emplace_back(parseSocketString(symLinkPath));
+            }
+            catch (std::exception &e) {} //Assume socket dead
         }
     }
 }
