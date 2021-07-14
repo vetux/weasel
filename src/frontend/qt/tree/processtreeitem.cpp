@@ -77,7 +77,13 @@ void ProcessTreeItem::setProcess(const SystemStatus &s,
     setName(QString("%0").arg(process.mainThread().comm.c_str()));
     setPid(QString("%0").arg(process.mainThread().pid));
     setUser(QString("%0").arg(User::getUserName(process.uid).c_str()));
-    setCpu(QString("%0").arg(getCpuPercentage(s, prevStatus, p.mainThread(), prevProc.mainThread()), 0, 'f', 2));
+
+    float cpu = getCpuPercentage(s, prevStatus, p.mainThread(), prevProc.mainThread());
+    if (cpu == 0)
+        setCpu("");
+    else
+        setCpu(QString("%0").arg(cpu, 0, 'f', 2));
+
     setVirtual(QString("%0").arg(getMemoryString(p.mainThread().vsize).c_str()));
     setResident(QString("%0").arg(getMemoryString(p.mainThread().resident * SystemStatus::getPageSize()).c_str()));
     setShared(QString("%0").arg(getMemoryString(p.mainThread().shared * SystemStatus::getPageSize()).c_str()));
