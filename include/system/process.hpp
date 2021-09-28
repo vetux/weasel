@@ -31,6 +31,7 @@
 struct Process {
     Pid_t pid{}; // The process id, equal to threads[0].tid
     Uid_t uid{}; // User ID retrieved via stat()
+    std::string userName; //The user name for the uid
 
     // /proc/[pid]/cmdline
     std::string commandLine{};

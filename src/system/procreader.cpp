@@ -35,6 +35,7 @@
 #include "system/procnetreader.hpp"
 #include "system/fileio.hpp"
 #include "system/stringutil.hpp"
+#include "system/user.hpp"
 
 #define READLINK_BUFFER_SIZE 512
 
@@ -525,6 +526,7 @@ namespace ProcReader {
         Process p;
         p.pid = pid;
         p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
+        p.userName = User::getUserName(p.uid);
 
         parseProcCmdline(p);
         parseProcEnviron(p);

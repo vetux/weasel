@@ -43,9 +43,21 @@ Uid_t User::getEffectiveUser() {
 }
 
 std::string User::getUserName(Uid_t uid) {
-    return getpwuid(uid)->pw_name;
+    errno = 0;
+    auto *ptr = getpwuid(uid);
+    if (ptr == nullptr) {
+        throw std::runtime_error("Failed to get user name for uid " + std::to_string(uid) + ": " + strerror(errno));
+    } else {
+        return ptr->pw_name;
+    }
 }
 
 Uid_t User::getUserId(const std::string &userName) {
-    return getpwnam(userName.c_str())->pw_uid;
+    errno = 0;
+    auto *ptr = getpwnam(userName.c_str());
+    if (ptr == nullptr) {
+        throw std::runtime_error("Failed to get user uid for name  " + userName + ": " + strerror(errno));
+    } else {
+        return ptr->pw_uid;
+    }
 }

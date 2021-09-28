@@ -19,8 +19,6 @@
 
 #include "frontend/qt/tree/processtreeitem.hpp"
 
-#include "system/user.hpp"
-
 #include "frontend/qt/strutil.hpp"
 #include "frontend/qt/storageconstants.hpp"
 
@@ -76,7 +74,7 @@ void ProcessTreeItem::setProcess(const SystemStatus &s,
     process = p;
     setName(QString("%0").arg(process.mainThread().comm.c_str()));
     setPid(QString("%0").arg(process.mainThread().pid));
-    setUser(QString("%0").arg(User::getUserName(process.uid).c_str()));
+    setUser(QString("%0").arg(process.userName.c_str()));
 
     float cpu = getCpuPercentage(s, prevStatus, p.mainThread(), prevProc.mainThread());
     if (cpu == 0)
