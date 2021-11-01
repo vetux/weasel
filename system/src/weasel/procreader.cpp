@@ -690,40 +690,6 @@ namespace ProcReader {
         parseProcessStatm(p);
         parseProcIo(p);
 
-        //Accumulate non main thread io values
-        unsigned long nrchar = 0;
-        unsigned long nwchar = 0;
-        unsigned long nsyscr = 0;
-        unsigned long nsyscw = 0;
-        unsigned long nread_bytes = 0;
-        unsigned long nwrite_bytes = 0;
-        unsigned long ncancelled_write_bytes = 0;
-
-        for (auto &pair: p.threads) {
-            if (pair.first != p.pid) {
-                auto &thread = pair.second;
-                nrchar += thread.rchar;
-                nwchar += thread.wchar;
-                nsyscr += thread.syscr;
-                nsyscw += thread.syscw;
-                nread_bytes += thread.read_bytes;
-                nwrite_bytes += thread.write_bytes;
-                ncancelled_write_bytes += thread.cancelled_write_bytes;
-            }
-        }
-
-        // Subtract non main thread io values from the main thread data
-        // because we store the total process io in the process structure and not in the main thread structure.
-        auto &mainThread = p.mainThread();
-
-        mainThread.rchar -= nrchar;
-        mainThread.wchar -= nwchar;
-        mainThread.syscr -= nsyscr;
-        mainThread.syscw -= nsyscw;
-        mainThread.read_bytes -= nread_bytes;
-        mainThread.write_bytes -= nwrite_bytes;
-        mainThread.cancelled_write_bytes -= ncancelled_write_bytes;
-
         return p;
     }
 

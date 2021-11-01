@@ -121,7 +121,8 @@ struct Process {
     unsigned int data{};
     unsigned int dt{};
 
-    // /proc/[pid]/io   -   The total io of all threads in the process, the main thread contains the subtracted values.
+    // /proc/[pid]/io   -   The total io of all threads in the process.
+    // /proc/[pid]/io appears to NOT be the same as /proc/[pid]/task/[pid]/io , we assume the process stat contains the accumulated values.
     unsigned long rchar{};
     unsigned long wchar{};
     unsigned long syscr{};
