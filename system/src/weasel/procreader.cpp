@@ -89,6 +89,17 @@ std::string readLink(const std::string &link) {
     return ret;
 }
 
+Socket parseSocketString(const std::string &socketString, const std::map<Inode_t, Socket> &netStat) {
+    auto prefixLength = std::string("socket:[").size();
+    auto inode = stringToInode(socketString.substr(prefixLength, socketString.size() - 1 - prefixLength));
+    for (auto &pair: netStat) {
+        if (pair.first == inode) {
+            return pair.second;
+        }
+    }
+    throw std::runtime_error("Failed to find socket with inode " + std::to_string(inode));
+}
+
 std::map<std::string, std::string> parseProcStr(const std::string &str) {
     std::map<std::string, std::string> ret;
 
@@ -119,28 +130,22 @@ void parseFileDescriptor(Process &proc, const std::filesystem::path &path, const
         return;
     }
 
-    //Retrieve file status from the file descriptor (Which is the filename)
-    struct stat fdStat{};
-    if (fstat(std::stoi(path.filename()), &fdStat) != 0)
-        throw std::runtime_error("Failed to fstat file descriptor "
-                                 + path.filename().string()
-                                 + ", error: "
-                                 + std::to_string(errno));
+    std::string symLinkPath = readLink(path);
 
-    if (S_ISSOCK(fdStat.st_mode)) {
-        //The file descriptor refers to a socket
-        try {
-            proc.sockets.emplace_back(netStat.at(fdStat.st_ino));
-        }
-        catch (std::exception &e) {} //Assume socket dead
-    } else {
-        //Assume the file descriptor refers to a file with a path which can be retrieved by resolving the symlink.
-
-        //Resolve the symlink
-        std::string symLinkPath = readLink(path);
-
-        //Call realpath on the resolved symlink
+    // Check if symlink points to a file or something else.
+    // (If a file is accessible with the name socket:[XXX] this obviously will give false positives
+    // but there does not seem to be a way to stat a file descriptor of another process.
+    if (access(symLinkPath.c_str(), F_OK) == 0) {
+        //Assume the file descriptor refers to a file
         proc.files.emplace_back(getRealPath(symLinkPath));
+    } else {
+        if (symLinkPath.find("socket:[") == 0) {
+            //Assume the file descriptor refers to a socket
+            try {
+                proc.sockets.emplace_back(parseSocketString(symLinkPath, netStat));
+            }
+            catch (std::exception &e) {} //Assume socket dead
+        }
     }
 }
 
