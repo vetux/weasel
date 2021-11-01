@@ -17,10 +17,39 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "system/systemstatus.hpp"
+#ifndef WEASEL_CPUSTATE_HPP
+#define WEASEL_CPUSTATE_HPP
 
-#include <unistd.h>
+#include <vector>
 
-int SystemStatus::getPageSize() {
-    return getpagesize();
-}
+struct CpuState {
+    struct Core {
+        unsigned long user;
+        unsigned long nice;
+        unsigned long system;
+        unsigned long idle;
+        unsigned long iowait;
+        unsigned long irq;
+        unsigned long softirq;
+        unsigned long steal;
+        unsigned long guest;
+        unsigned long guest_nice;
+    };
+
+    // /proc/stat
+    Core cpu;
+    std::vector<Core> cores;
+    long pageIn;
+    long pageOut;
+    long swapIn;
+    long swapOut;
+    long interrupts;
+    long contextSwitches;
+    unsigned long btime;
+    long processes;
+    long processesRunning;
+    long processesBlocked;
+    long softIRQ;
+};
+
+#endif //WEASEL_CPUSTATE_HPP

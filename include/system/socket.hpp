@@ -22,6 +22,8 @@
 
 #include <string>
 
+#include "system/types.hpp"
+
 enum SocketProtocol {
     UDP,
     TCP
@@ -33,11 +35,11 @@ struct IpEndpoint {
 };
 
 struct Socket {
+    Inode_t inode;
     SocketProtocol protocol;
     IpEndpoint localEndpoint;
     IpEndpoint remoteEndpoint;
     std::string state;
-    std::string inode;
 };
 
 #endif //WEASEL_SOCKET_HPP

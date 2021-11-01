@@ -23,6 +23,8 @@
 #include <QMainWindow>
 #include <QTimer>
 
+#include "system/snapshot.hpp"
+
 #include "frontend/qt/dialog/processpropertiesdialog.hpp"
 #include "frontend/qt/settings/settingsdialog.hpp"
 #include "frontend/qt/toolbar/toolbarwidget.hpp"

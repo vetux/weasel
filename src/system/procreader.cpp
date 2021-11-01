@@ -36,6 +36,7 @@
 #include "system/fileio.hpp"
 #include "system/stringutil.hpp"
 #include "system/user.hpp"
+#include "system/strformat.hpp"
 
 #define READLINK_BUFFER_SIZE 512
 
@@ -48,20 +49,20 @@ Mem_t getBytesFromKilobyte(const std::string &mem) {
     return stringToMem(str) * 1000;
 }
 
-SchedulingPolicy convertPolicy(uint32_t policy) {
+Thread::SchedulingPolicy convertPolicy(uint32_t policy) {
     switch (policy) {
         case SCHED_OTHER:
-            return OTHER;
+            return Thread::OTHER;
         case SCHED_BATCH:
-            return BATCH;
+            return Thread::BATCH;
         case SCHED_IDLE:
-            return IDLE;
+            return Thread::IDLE;
         case SCHED_FIFO:
-            return FIFO;
+            return Thread::FIFO;
         case SCHED_RR:
-            return RR;
+            return Thread::RR;
         case SCHED_DEADLINE:
-            return DEADLINE;
+            return Thread::DEADLINE;
         default:
             throw std::runtime_error("Invalid policy value");
     }
@@ -111,43 +112,34 @@ std::map<std::string, std::string> parseProcStr(const std::string &str) {
     return ret;
 }
 
-Socket parseSocketString(const std::string &socketString, const NetworkStatus &netStat) {
-    const int prefixLength = std::string("socket:[").size();
-    auto inode = socketString.substr(prefixLength, socketString.size() - 1 - prefixLength);
-    for (auto &socket : netStat.tcp) {
-        if (socket.inode == inode) {
-            return socket;
-        }
-    }
-    for (auto &socket : netStat.udp) {
-        if (socket.inode == inode) {
-            return socket;
-        }
-    }
-    throw std::runtime_error("Failed to find socket with inode " + inode);
-}
-
-void parseFileDescriptor(Process &proc, const std::filesystem::path &path, const NetworkStatus &netStat) {
-    //Ignore stdin, stdout and stderr because every process on linux should theoretically have these.
+void parseFileDescriptor(Process &proc, const std::filesystem::path &path, const std::map<Inode_t, Socket> &netStat) {
+    // Check for stdin / stdout / stderr file descriptor names because they are hardcoded and can be assumed to be present for all processes.
     if (path.filename() == "0" || path.filename() == "1" || path.filename() == "2") {
         return;
     }
 
-    std::string symLinkPath = readLink(path);
+    //Retrieve file status from the file descriptor (Which is the filename)
+    struct stat fdStat{};
+    if (fstat(std::stoi(path.filename()), &fdStat) != 0)
+        throw std::runtime_error("Failed to fstat file descriptor "
+                                 + path.filename().string()
+                                 + ", error: "
+                                 + std::to_string(errno));
 
-    // Check if symlink points to a file or something else.
-    // (If a file is accessible with the name socket:[XXX] this obviously will give false positives but there does not seem to be a clean way of doing this.
-    if (access(symLinkPath.c_str(), F_OK) == 0) {
-        //Assume the file descriptor refers to a file
-        proc.openFiles.emplace_back(getRealPath(symLinkPath));
-    } else {
-        if (symLinkPath.find("socket:[") == 0) {
-            //Assume the file descriptor refers to a socket
-            try {
-                proc.sockets.emplace_back(parseSocketString(symLinkPath, netStat));
-            }
-            catch (std::exception &e) {} //Assume socket dead
+    if (S_ISSOCK(fdStat.st_mode)) {
+        //The file descriptor refers to a socket
+        try {
+            proc.sockets.emplace_back(netStat.at(fdStat.st_ino));
         }
+        catch (std::exception &e) {} //Assume socket dead
+    } else {
+        //Assume the file descriptor refers to a file with a path which can be retrieved by resolving the symlink.
+
+        //Resolve the symlink
+        std::string symLinkPath = readLink(path);
+
+        //Call realpath on the resolved symlink
+        proc.files.emplace_back(getRealPath(symLinkPath));
     }
 }
 
@@ -184,10 +176,10 @@ void parseProcRoot(Process &proc) {
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
-void parseProcFd(Process &proc, const NetworkStatus &netStat) {
+void parseProcFd(Process &proc, const std::map<Inode_t, Socket> &netStat) {
     try {
         const auto p = ProcPath::getProcessFdDirectory(proc.pid);
-        for (auto &f : std::filesystem::directory_iterator(p)) {
+        for (auto &f: std::filesystem::directory_iterator(p)) {
             parseFileDescriptor(proc, f, netStat);
         }
     } catch (const std::exception &e) {} //Assume permissions error
@@ -353,8 +345,8 @@ Uid_t getFileOwnerUid(const std::filesystem::path &p) {
     } catch (const std::exception &e) {} //Assume permissions error
 }
 
-SystemStatus::Core readCore(const std::vector<std::string> &line) {
-    SystemStatus::Core ret{};
+CpuState::Core readCore(const std::vector<std::string> &line) {
+    CpuState::Core ret{};
     ret.user = std::stoul(line.at(1));
     ret.nice = std::stoul(line.at(2));
     ret.system = std::stoul(line.at(3));
@@ -394,7 +386,7 @@ SystemStatus::Core readCore(const std::vector<std::string> &line) {
 }
 
 bool isPID(const std::string &name) {
-    for (auto &c : name) {
+    for (auto &c: name) {
         if (!isAsciiNumber(c))
             return false;
     }
@@ -402,16 +394,15 @@ bool isPID(const std::string &name) {
 }
 
 namespace ProcReader {
-    SystemStatus readSystemStatus() {
+    CpuState readCpuState() {
         auto statContents = FileIO::readText(ProcPath::getProcStatFile());
         StringUtil::replace(statContents, "  ", " "); //replace double whitespace
 
         auto stat = StringUtil::readLines(statContents);
-        auto memInfo = parseProcStr(FileIO::readText(ProcPath::getMemoryInfoFile()));
 
-        SystemStatus ret{};
+        CpuState ret;
 
-        for (auto &line : stat) {
+        for (auto &line: stat) {
             auto lineSplit = StringUtil::splitString(line, " ");
             if (lineSplit.at(0).rfind("cpu", 0) == 0) {
                 if (lineSplit.at(0) == "cpu") {
@@ -443,6 +434,15 @@ namespace ProcReader {
             //Ignore unrecognized key for forward compatibility
         }
 
+        return ret;
+    }
+
+    MemoryState readMemoryState() {
+        auto memInfo = parseProcStr(FileIO::readText(ProcPath::getMemoryInfoFile()));
+
+        MemoryState ret{};
+
+        ret.pageSize = getpagesize();
         ret.total = getBytesFromKilobyte(memInfo["MemTotal"]);
         ret.free = getBytesFromKilobyte(memInfo["MemFree"]);
         ret.available = getBytesFromKilobyte(memInfo["MemAvailable"]);
@@ -503,13 +503,13 @@ namespace ProcReader {
         return ret;
     }
 
-    NetworkStatus readNetworkStatus() {
-        return ProcNetReader::getNetworkStatus();
+    std::map<Inode_t, Socket> readNetworkState() {
+        return ProcNetReader::getNetworkState();
     }
 
-    std::map<Pid_t, Process> readProcesses(const NetworkStatus &netStat) {
+    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat) {
         std::map<Pid_t, Process> ret;
-        for (auto &fl : std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
+        for (auto &fl: std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
             try {
                 auto filename = fl.path().filename();
                 if (isPID(filename)) {
@@ -522,7 +522,7 @@ namespace ProcReader {
         return ret;
     }
 
-    Process readProcess(Pid_t pid, const NetworkStatus &netStat) {
+    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat) {
         Process p;
         p.pid = pid;
         p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
@@ -536,7 +536,7 @@ namespace ProcReader {
         parseProcExe(p);
 
         std::string dir = ProcPath::getProcessTasksDirectory(pid);
-        for (auto &d : std::filesystem::directory_iterator(dir)) {
+        for (auto &d: std::filesystem::directory_iterator(dir)) {
             auto t = readThread(pid, stringToPid(d.path().filename()));
             if (t.tid == p.pid)
                 p.threads.emplace(p.threads.begin(), t);

@@ -22,10 +22,10 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "system/thread.hpp"
 #include "system/types.hpp"
-#include "system/signal.hpp"
 #include "system/socket.hpp"
 
 struct Process {
@@ -52,34 +52,17 @@ struct Process {
     std::string rootDirectory{};
 
     // /proc/[pid]/fd/
-    std::vector<std::string> openFiles{};
+    std::vector<Socket> sockets;
+    std::vector<std::string> files;
 
     // /proc/[pid]/exe
     std::string executablePath{};
 
-    std::vector<Socket> sockets;
-
     std::vector<Thread> threads{}; // The threads, the thread at index 0 is always the process main thread
 
-    const Thread &mainThread() const;
+    const Thread &mainThread() const { return threads.at(0); }
 
-    Thread &mainThread();
-
-    /**
-     * Send the signal to the process.
-     *
-     * @param signal The signal to send
-     */
-    void sendSignal(Signal signal) const;
-
-    /**
-     * Set the process nice value.
-     *
-     * The priority value is in the range -20 to 19, with -20 being the highest priority and 19 being the lowest priority.
-     *
-     * @param priority The priority to set.
-     */
-    void setPriority(int priority) const;
+    Thread &mainThread() { return threads.at(0); }
 };
 
 #endif //WEASEL_PROCESS_HPP

@@ -35,64 +35,64 @@ static pid_t convertPID(Pid_t pid) {
     return static_cast<pid_t>(pid);
 }
 
-static int convertSignal(Signal signal) {
+static int convertSignal(Thread::Signal signal) {
     switch (signal) {
-        case SIGNAL_SIGHUP:
+        case Thread::SIGNAL_SIGHUP:
             return SIGHUP;
-        case SIGNAL_SIGINT:
+        case Thread::SIGNAL_SIGINT:
             return SIGINT;
-        case SIGNAL_SIGQUIT:
+        case Thread::SIGNAL_SIGQUIT:
             return SIGQUIT;
-        case SIGNAL_SIGILL:
+        case Thread::SIGNAL_SIGILL:
             return SIGILL;
-        case SIGNAL_SIGABRT:
+        case Thread::SIGNAL_SIGABRT:
             return SIGABRT;
-        case SIGNAL_SIGFPE:
+        case Thread::SIGNAL_SIGFPE:
             return SIGFPE;
-        case SIGNAL_SIGKILL:
+        case Thread:: SIGNAL_SIGKILL:
             return SIGKILL;
-        case SIGNAL_SIGSEGV:
+        case Thread::SIGNAL_SIGSEGV:
             return SIGSEGV;
-        case SIGNAL_SIGPIPE:
+        case Thread::SIGNAL_SIGPIPE:
             return SIGPIPE;
-        case SIGNAL_SIGALRM:
+        case Thread::SIGNAL_SIGALRM:
             return SIGALRM;
-        case SIGNAL_SIGTERM:
+        case Thread::SIGNAL_SIGTERM:
             return SIGTERM;
-        case SIGNAL_SIGUSR1:
+        case Thread::SIGNAL_SIGUSR1:
             return SIGUSR1;
-        case SIGNAL_SIGUSR2:
+        case Thread::SIGNAL_SIGUSR2:
             return SIGUSR2;
-        case SIGNAL_SIGCHLD:
+        case Thread::SIGNAL_SIGCHLD:
             return SIGCHLD;
-        case SIGNAL_SIGCONT:
+        case Thread::SIGNAL_SIGCONT:
             return SIGCONT;
-        case SIGNAL_SIGSTOP:
+        case Thread::SIGNAL_SIGSTOP:
             return SIGSTOP;
-        case SIGNAL_SIGTSTP:
+        case Thread::SIGNAL_SIGTSTP:
             return SIGTSTP;
-        case SIGNAL_SIGTTIN:
+        case Thread::SIGNAL_SIGTTIN:
             return SIGTTIN;
-        case SIGNAL_SIGTTOU:
+        case Thread::SIGNAL_SIGTTOU:
             return SIGTTOU;
         default:
             throw std::runtime_error("Unrecognized signal value");
     }
 }
 
-static int convertPolicy(SchedulingPolicy policy) {
+static int convertPolicy(Thread::SchedulingPolicy policy) {
     switch (policy) {
-        case OTHER:
+        case Thread::OTHER:
             return SCHED_OTHER;
-        case BATCH:
+        case Thread::BATCH:
             return SCHED_BATCH;
-        case IDLE:
+        case Thread::IDLE:
             return SCHED_IDLE;
-        case FIFO:
+        case Thread::FIFO:
             return SCHED_FIFO;
-        case RR:
+        case Thread::RR:
             return SCHED_RR;
-        case DEADLINE:
+        case Thread::DEADLINE:
             return SCHED_DEADLINE;
         default:
             throw std::runtime_error("Unrecognized policy value");

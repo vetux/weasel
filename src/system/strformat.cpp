@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <system/types.hpp>
+#include "system/strformat.hpp"
 
 Pid_t stringToPid(const std::string &str) {
     if (str.empty())
@@ -40,3 +40,6 @@ Mem_t stringToMem(const std::string &str) {
         return std::stol(str);
 }
 
+Inode_t stringToInode(const std::string &str) {
+    return std::stoul(str);
+}

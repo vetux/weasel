@@ -17,16 +17,16 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_SCHEDULINGPOLICY_HPP
-#define WEASEL_SCHEDULINGPOLICY_HPP
+#include "system/snapshot.hpp"
 
-enum SchedulingPolicy {
-    OTHER,
-    BATCH,
-    IDLE,
-    FIFO,
-    RR,
-    DEADLINE
-};
+#include "system/procreader.hpp"
 
-#endif //WEASEL_SCHEDULINGPOLICY_HPP
+Snapshot Snapshot::create() {
+    Snapshot ret;
+    ret.cpu = ProcReader::readCpuState();
+    ret.memory = ProcReader::readMemoryState();
+    ret.sockets = ProcReader::readNetworkState();
+    ret.processes = ProcReader::readProcesses(ret.sockets);
+    return ret;
+}
+

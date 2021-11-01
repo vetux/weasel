@@ -22,11 +22,12 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
-#include "system/networkstatus.hpp"
+#include "system/socket.hpp"
 
 namespace ProcNetReader {
-    NetworkStatus getNetworkStatus();
+    std::map<Inode_t , Socket> getNetworkState();
 }
 
 #endif //WEASEL_PROCNETREADER_HPP

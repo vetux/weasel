@@ -22,11 +22,40 @@
 
 #include <string>
 
-#include "system/schedulingpolicy.hpp"
 #include "system/types.hpp"
-#include "system/signal.hpp"
 
 struct Thread {
+    enum SchedulingPolicy {
+        OTHER,
+        BATCH,
+        IDLE,
+        FIFO,
+        RR,
+        DEADLINE
+    };
+
+    enum Signal {
+        SIGNAL_SIGHUP,
+        SIGNAL_SIGINT,
+        SIGNAL_SIGQUIT,
+        SIGNAL_SIGILL,
+        SIGNAL_SIGABRT,
+        SIGNAL_SIGFPE,
+        SIGNAL_SIGKILL,
+        SIGNAL_SIGSEGV,
+        SIGNAL_SIGPIPE,
+        SIGNAL_SIGALRM,
+        SIGNAL_SIGTERM,
+        SIGNAL_SIGUSR1,
+        SIGNAL_SIGUSR2,
+        SIGNAL_SIGCHLD,
+        SIGNAL_SIGCONT,
+        SIGNAL_SIGSTOP,
+        SIGNAL_SIGTSTP,
+        SIGNAL_SIGTTIN,
+        SIGNAL_SIGTTOU
+    };
+
     Pid_t pid{}; // The pid of the process which this thread belongs to, (main thread tid == pid)
     Pid_t tid{}; // The thread id
 

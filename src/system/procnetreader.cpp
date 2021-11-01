@@ -18,18 +18,20 @@
  */
 
 #include "system/procnetreader.hpp"
-#include "system/procpath.hpp"
-#include "system/fileio.hpp"
-#include "system/stringutil.hpp"
 
 #include <stdexcept>
 #include <sstream>
+
+#include "system/procpath.hpp"
+#include "system/fileio.hpp"
+#include "system/stringutil.hpp"
+#include "system/strformat.hpp"
 
 struct ProcNetEntry {
     std::string localAddress;
     std::string remoteAddress;
     std::string state;
-    std::string inode;
+    Inode_t inode{};
 };
 
 static std::vector<ProcNetEntry> readEntries(const std::string &contents) {
@@ -44,7 +46,7 @@ static std::vector<ProcNetEntry> readEntries(const std::string &contents) {
         entry.localAddress = split.at(1);
         entry.remoteAddress = split.at(2);
         entry.state = split.at(3);
-        entry.inode = split.at(9);
+        entry.inode = stringToInode(split.at(9));
         ret.emplace_back(entry);
     }
     return ret;
@@ -86,8 +88,8 @@ static std::string getStateName(SocketProtocol protocol, std::string state) {
 }
 
 namespace ProcNetReader {
-    NetworkStatus getNetworkStatus() {
-        NetworkStatus ret;
+    std::map<Inode_t, Socket> getNetworkState() {
+        std::map<Inode_t, Socket> ret;
 
         auto entries = readEntries(FileIO::readText(ProcPath::getProcNetTcp()));
         for (auto &entry : entries) {
@@ -97,7 +99,7 @@ namespace ProcNetReader {
             socket.remoteEndpoint = getEndpoint(entry.remoteAddress);
             socket.state = getStateName(TCP, entry.state);
             socket.inode = entry.inode;
-            ret.tcp.emplace_back(socket);
+            ret.insert(std::pair<Inode_t, Socket>(entry.inode, socket));
         }
 
         entries = readEntries(FileIO::readText(ProcPath::getProcNetUdp()));
@@ -108,7 +110,7 @@ namespace ProcNetReader {
             socket.remoteEndpoint = getEndpoint(entry.remoteAddress);
             socket.state = getStateName(UDP, entry.state);
             socket.inode = entry.inode;
-            ret.udp.emplace_back(socket);
+            ret.insert(std::pair<Inode_t, Socket>(entry.inode, socket));
         }
 
         return ret;

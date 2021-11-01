@@ -17,41 +17,13 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_SYSTEMSTATUS_HPP
-#define WEASEL_SYSTEMSTATUS_HPP
-
-#include <vector>
+#ifndef WEASEL_MEMORYSTATE_HPP
+#define WEASEL_MEMORYSTATE_HPP
 
 #include "system/types.hpp"
 
-struct SystemStatus {
-    struct Core {
-        unsigned long user;
-        unsigned long nice;
-        unsigned long system;
-        unsigned long idle;
-        unsigned long iowait;
-        unsigned long irq;
-        unsigned long softirq;
-        unsigned long steal;
-        unsigned long guest;
-        unsigned long guest_nice;
-    };
-
-    // /proc/stat
-    Core cpu;
-    std::vector<Core> cores;
-    long pageIn;
-    long pageOut;
-    long swapIn;
-    long swapOut;
-    long interrupts;
-    long contextSwitches;
-    unsigned long btime;
-    long processes;
-    long processesRunning;
-    long processesBlocked;
-    long softIRQ;
+struct MemoryState {
+    int pageSize;
 
     // /proc/meminfo
     Mem_t total;
@@ -111,11 +83,6 @@ struct SystemStatus {
     Mem_t directMap4M;
     Mem_t directMap2M;
     Mem_t directMap1G;
-
-    /**
-     * @return The page size in bytes
-     */
-    static int getPageSize();
 };
 
-#endif //WEASEL_SYSTEMSTATUS_HPP
+#endif //WEASEL_MEMORYSTATE_HPP

@@ -47,7 +47,7 @@ namespace User {
     Uid_t getEffectiveUser();
 
     /**
-     * Find the username for a given pid.
+     * Find the username for a given uid.
      *
      * @param pid The uid of the user to find the name of
      * @return The name of the user with the pid
@@ -55,10 +55,10 @@ namespace User {
     std::string getUserName(Uid_t pid);
 
     /**
-     * Find the userid for a given name.
+     * Find the uid for a given name.
      *
-     * @param userName The name of the user to find the pid of
-     * @return The pid of the user with the name
+     * @param userName The name of the user to find the uid of
+     * @return The uid of the user with the name
      */
     Uid_t getUserId(const std::string &userName);
 }

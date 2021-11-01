@@ -25,11 +25,6 @@
 typedef long Pid_t;
 typedef long Uid_t;
 typedef long Mem_t;
-
-Pid_t stringToPid(const std::string &str);
-
-Uid_t stringToUid(const std::string &str);
-
-Mem_t stringToMem(const std::string &str);
+typedef unsigned long Inode_t; // https://github.com/torvalds/linux/blob/8bb7eca972ad531c9b149c0a51ab43a417385813/include/linux/fs.h#L644
 
 #endif //WEASEL_TYPES_HPP

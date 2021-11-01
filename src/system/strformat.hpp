@@ -17,35 +17,17 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_SIGNAL_HPP
-#define WEASEL_SIGNAL_HPP
+#ifndef WEASEL_STRFORMAT_HPP
+#define WEASEL_STRFORMAT_HPP
 
-#include <string>
+#include "system/types.hpp"
 
-enum Signal {
-    SIGNAL_SIGHUP,
-    SIGNAL_SIGINT,
-    SIGNAL_SIGQUIT,
-    SIGNAL_SIGILL,
-    SIGNAL_SIGABRT,
-    SIGNAL_SIGFPE,
-    SIGNAL_SIGKILL,
-    SIGNAL_SIGSEGV,
-    SIGNAL_SIGPIPE,
-    SIGNAL_SIGALRM,
-    SIGNAL_SIGTERM,
-    SIGNAL_SIGUSR1,
-    SIGNAL_SIGUSR2,
-    SIGNAL_SIGCHLD,
-    SIGNAL_SIGCONT,
-    SIGNAL_SIGSTOP,
-    SIGNAL_SIGTSTP,
-    SIGNAL_SIGTTIN,
-    SIGNAL_SIGTTOU
-};
+Pid_t stringToPid(const std::string &str);
 
-std::string signalToString(Signal sig);
+Uid_t stringToUid(const std::string &str);
 
-Signal stringToSignal(const std::string &str);
+Mem_t stringToMem(const std::string &str);
 
-#endif //WEASEL_SIGNAL_HPP
+Inode_t stringToInode(const std::string &str);
+
+#endif //WEASEL_STRFORMAT_HPP

@@ -17,14 +17,23 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_NETWORKSTATUS_HPP
-#define WEASEL_NETWORKSTATUS_HPP
+#ifndef WEASEL_SNAPSHOT_HPP
+#define WEASEL_SNAPSHOT_HPP
 
-#include "system/socket.hpp"
+#include <map>
 
-struct NetworkStatus {
-    std::vector<Socket> tcp;
-    std::vector<Socket> udp;
+#include "system/cpustate.hpp"
+#include "system/memorystate.hpp"
+#include "system/process.hpp"
+
+struct Snapshot {
+    static Snapshot create();
+
+    CpuState cpu;
+    MemoryState memory{};
+
+    std::map<Inode_t, Socket> sockets;
+    std::map<Pid_t, Process> processes;
 };
 
-#endif //WEASEL_NETWORKSTATUS_HPP
+#endif //WEASEL_SNAPSHOT_HPP

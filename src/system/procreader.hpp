@@ -26,31 +26,26 @@
 
 #include "system/thread.hpp"
 #include "system/process.hpp"
-#include "system/systemstatus.hpp"
-#include "system/networkstatus.hpp"
+#include "system/cpustate.hpp"
+#include "system/memorystate.hpp"
 
 namespace ProcReader {
-    /**
-     * @return The system status read from /proc/stat
-     */
-    SystemStatus readSystemStatus();
+    CpuState readCpuState();
 
-    /**
-     *
-     * @return
-     */
-    NetworkStatus readNetworkStatus();
+    MemoryState readMemoryState();
+
+    std::map<Inode_t, Socket> readNetworkState();
 
     /**
      * @return The currently active processes from /proc/PID
      */
-    std::map<Pid_t, Process> readProcesses(const NetworkStatus &netStat);
+    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat);
 
     /**
      * @param pid The pid of the process to read.
      * @return The data for the process with pid
      */
-    Process readProcess(Pid_t pid, const NetworkStatus &netStat);
+    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat);
 
     /**
      * @param pid The pid of the process to read the thread of
