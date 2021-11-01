@@ -9,19 +9,19 @@ message("Python_LIBRARIES:${Python_LIBRARIES}")
 message("Python_INCLUDE_DIRS:${Python_INCLUDE_DIRS}")
 
 set(Frontend.Qt.GuiHeaders
-        include/frontend/qt/mainwindow.hpp
-        include/frontend/qt/dialog/processpropertiesdialog.hpp
-        include/frontend/qt/dialog/tab/disktab.hpp
-        include/frontend/qt/dialog/tab/generaltab.hpp
-        include/frontend/qt/dialog/tab/networktab.hpp
-        include/frontend/qt/dialog/tab/threadstab.hpp
-        include/frontend/qt/settings/settingsdialog.hpp
-        include/frontend/qt/toolbar/cpubarwidget.hpp
-        include/frontend/qt/toolbar/memorybarwidget.hpp
-        include/frontend/qt/toolbar/toolbarwidget.hpp
-        include/frontend/qt/tree/processtreewidget.hpp)
+        frontend/include/mainwindow.hpp
+        frontend/include/dialog/processpropertiesdialog.hpp
+        frontend/include/dialog/tab/disktab.hpp
+        frontend/include/dialog/tab/generaltab.hpp
+        frontend/include/dialog/tab/networktab.hpp
+        frontend/include/dialog/tab/threadstab.hpp
+        frontend/include/settings/settingsdialog.hpp
+        frontend/include/toolbar/cpubarwidget.hpp
+        frontend/include/toolbar/memorybarwidget.hpp
+        frontend/include/toolbar/toolbarwidget.hpp
+        frontend/include/tree/processtreewidget.hpp)
 
-file(GLOB_RECURSE Frontend.Qt.Source src/frontend/qt/*.cpp)
+file(GLOB_RECURSE Frontend.Qt.Source frontend/src/*.cpp)
 
 qt5_wrap_cpp(Frontend.Qt.WrappedSource ${Frontend.Qt.GuiHeaders})
 
@@ -32,5 +32,9 @@ target_link_libraries(weasel-qt weasel)
 target_link_libraries(weasel-qt Qt5::Core Qt5::Widgets) # Qt5
 target_link_libraries(weasel-qt ${Python_LIBRARIES}) # Python
 
-target_include_directories(weasel-qt PUBLIC include/)
-target_include_directories(weasel-qt PUBLIC src/)
+target_include_directories(weasel-qt PUBLIC frontend/include/)
+target_include_directories(weasel-qt PUBLIC frontend/src/)
+
+# Change the output file name of the qt frontend to weasel
+# because on linux the library filename is libweasel.so and therefore the executable can be named weasel
+set_target_properties(weasel-qt PROPERTIES OUTPUT_NAME weasel)
