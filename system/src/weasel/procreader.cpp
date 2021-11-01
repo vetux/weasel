@@ -73,7 +73,9 @@ std::string getRealPath(const std::string &symLinkPath) {
     auto *p = realpath(symLinkPath.c_str(), NULL);
     if (p == NULL)
         throw std::runtime_error("Failed to get real path for " + symLinkPath);
-    return p;
+    std::string ret(p);
+    delete p;
+    return ret;
 }
 
 std::string readLink(const std::string &link) {
