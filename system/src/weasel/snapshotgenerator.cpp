@@ -175,6 +175,32 @@ const Snapshot &SnapshotGenerator::next() {
         }
     }
 
+    //Find dead sockets
+    for (auto &pair: oldSnapshot.sockets) {
+        auto it = currentSnapshot.sockets.find(pair.first);
+        if (it == currentSnapshot.sockets.end()) {
+            // Socket is dead
+            currentSnapshot.deadSockets[pair.first] = pair.second;
+        } else {
+            // This check only verifies endpoint, protocol and inode
+            // if a socket with the same endpoint protocol and inode is spawned this wont be detected but this should suffice.
+            if (pair.second != it->second) {
+                // Newly spawned socket with same inode
+                currentSnapshot.deadSockets[pair.first] = pair.second;
+                currentSnapshot.spawnedSockets.insert(pair.first);
+            }
+        }
+    }
+
+    //Find new sockets
+    for (auto &pair: currentSnapshot.sockets) {
+        auto it = oldSnapshot.sockets.find(pair.first);
+        if (it == oldSnapshot.sockets.end()) {
+            // New socket
+            currentSnapshot.spawnedSockets.insert(pair.first);
+        }
+    }
+
     //Calculate total cpu load
     currentSnapshot.cpu.cpu.load = getCpuLoad(currentSnapshot.cpu.cpu, oldSnapshot.cpu.cpu);
 

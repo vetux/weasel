@@ -30,11 +30,27 @@ enum SocketProtocol {
 };
 
 struct IpEndpoint {
+    bool operator==(const IpEndpoint &other) const {
+        return address == other.address
+               && port == other.port;
+    }
+
     std::string address;
     int port;
 };
 
 struct Socket {
+    bool operator==(const Socket &other) const {
+        return inode == other.inode
+               && protocol == other.protocol
+               && localEndpoint == other.localEndpoint
+               && remoteEndpoint == other.remoteEndpoint;
+    }
+
+    bool operator!=(const Socket &other) const {
+        return !(*this == other);
+    }
+
     Inode_t inode;
     SocketProtocol protocol;
     IpEndpoint localEndpoint;
