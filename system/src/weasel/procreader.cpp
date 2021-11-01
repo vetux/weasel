@@ -77,16 +77,14 @@ std::string getRealPath(const std::string &symLinkPath) {
 }
 
 std::string readLink(const std::string &link) {
-    char *l = new char[READLINK_BUFFER_SIZE];
-    memset(l, 0, READLINK_BUFFER_SIZE);
-    auto r = readlink(link.c_str(), l, READLINK_BUFFER_SIZE);
+    char l[READLINK_BUFFER_SIZE];
+    for (char &i: l)
+        i = 0;
+    ssize_t r = readlink(link.c_str(), l, READLINK_BUFFER_SIZE);
     if (r == -1) {
-        delete[]l;
         throw std::runtime_error("Failed to read link at " + link);
     }
-    std::string ret(l, r);
-    delete[]l;
-    return ret;
+    return std::string(l, r);
 }
 
 Socket parseSocketString(const std::string &socketString, const std::map<Inode_t, Socket> &netStat) {
