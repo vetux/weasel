@@ -92,11 +92,9 @@ std::string readLink(const std::string &link) {
 Socket parseSocketString(const std::string &socketString, const std::map<Inode_t, Socket> &netStat) {
     auto prefixLength = std::string("socket:[").size();
     auto inode = stringToInode(socketString.substr(prefixLength, socketString.size() - 1 - prefixLength));
-    for (auto &pair: netStat) {
-        if (pair.first == inode) {
-            return pair.second;
-        }
-    }
+    auto it = netStat.find(inode);
+    if (it != netStat.end())
+        return it->second;
     throw std::runtime_error("Failed to find socket with inode " + std::to_string(inode));
 }
 
@@ -677,7 +675,7 @@ namespace ProcReader {
         std::string dir = ProcPath::getProcessTasksDirectory(pid);
         for (auto &d: std::filesystem::directory_iterator(dir)) {
             auto t = readThread(pid, stringToPid(d.path().filename()));
-            p.threads[t.tid] = readThread(pid, stringToPid(d.path().filename()));
+            p.threads[t.tid] = t;
         }
 
         parseProcessCmdline(p);
