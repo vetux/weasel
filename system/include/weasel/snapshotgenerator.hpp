@@ -43,11 +43,16 @@ public:
         processReadFlags.erase(pid);
     }
 
+    void setDefaultReadFlags(ProcessReadFlags flags) {
+        defaultReadFlags = flags;
+    }
+
 private:
     std::chrono::high_resolution_clock::time_point lastCreate;
     Snapshot currentSnapshot;
 
     std::map<Pid_t, ProcessReadFlags> processReadFlags;
+    ProcessReadFlags defaultReadFlags = READ_NONE;
 };
 
 #endif //WEASEL_SNAPSHOTGENERATOR_HPP

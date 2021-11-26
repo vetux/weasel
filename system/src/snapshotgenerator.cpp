@@ -81,7 +81,7 @@ const Snapshot &SnapshotGenerator::next() {
     currentSnapshot.cpu = ProcReader::readCpuState();
     currentSnapshot.memory = ProcReader::readMemoryState();
     currentSnapshot.sockets = ProcReader::readNetworkState();
-    currentSnapshot.processes = ProcReader::readProcesses(currentSnapshot.sockets, processReadFlags);
+    currentSnapshot.processes = ProcReader::readProcesses(currentSnapshot.sockets, processReadFlags, defaultReadFlags);
 
     for (auto &pair: currentSnapshot.processes) {
         auto &process = pair.second;

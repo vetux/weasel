@@ -41,7 +41,9 @@ namespace ProcReader {
     /**
      * @return The currently active processes from /proc/PID
      */
-    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat, const std::map<Pid_t, ProcessReadFlags> &flags);
+    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat,
+                                           const std::map<Pid_t, ProcessReadFlags> &flags,
+                                           ProcessReadFlags defaultFlags);
 
     /**
      * @param pid The pid of the process to read.

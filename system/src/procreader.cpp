@@ -649,7 +649,8 @@ namespace ProcReader {
     }
 
     std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat,
-                                           const std::map<Pid_t, ProcessReadFlags> &flags) {
+                                           const std::map<Pid_t, ProcessReadFlags> &flags,
+                                           ProcessReadFlags defaultFlags) {
         std::map<Pid_t, Process> ret;
         for (auto &fl: std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
             try {
@@ -657,7 +658,7 @@ namespace ProcReader {
                 if (isPID(filename)) {
                     auto pid = stringToPid(filename);
                     auto it = flags.find(pid);
-                    ret[pid] = ProcReader::readProcess(pid, netStat, it != flags.end() ? it->second : READ_NONE);
+                    ret[pid] = ProcReader::readProcess(pid, netStat, it != flags.end() ? it->second : defaultFlags);
                 }
             }
             catch (const std::exception &e) {} // Assume process does not exist anymore
