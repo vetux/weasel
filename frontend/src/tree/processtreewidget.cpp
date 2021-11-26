@@ -91,6 +91,7 @@ ProcessTreeWidget::ProcessTreeWidget(QWidget *parent) : QWidget(parent) {
     model.setHorizontalHeaderLabels({"Name", "PID", "User", "Cpu", "Virtual", "Resident", "Shared", "Command"});
 
     treeView->setModel(&model);
+    treeView->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 
     connect(treeView,
             SIGNAL(doubleClicked(const QModelIndex &)),
@@ -218,8 +219,8 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
                             treeView->expandRecursively(item->index());
                         } else if (action->text() == "Collapse All") {
                             auto recursiveItems = getItemsRecursive(item->getPid(), items);
-                            for (auto rItem = recursiveItems.begin(); rItem != recursiveItems.end(); rItem++) {
-                                treeView->collapse((*rItem)->index());
+                            for (auto rItem: recursiveItems) {
+                                treeView->collapse(rItem->index());
                                 treeView->update();
                             }
                         } else if (action->text() == "Properties") {
