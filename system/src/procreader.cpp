@@ -648,14 +648,16 @@ namespace ProcReader {
         return ProcNetReader::getNetworkState();
     }
 
-    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat) {
+    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat,
+                                           const std::map<Pid_t, ProcessReadFlags> &flags) {
         std::map<Pid_t, Process> ret;
         for (auto &fl: std::filesystem::directory_iterator(ProcPath::getProcDirectory())) {
             try {
                 auto filename = fl.path().filename();
                 if (isPID(filename)) {
                     auto pid = stringToPid(filename);
-                    ret[pid] = ProcReader::readProcess(pid, netStat);
+                    auto it = flags.find(pid);
+                    ret[pid] = ProcReader::readProcess(pid, netStat, it != flags.end() ? it->second : READ_NONE);
                 }
             }
             catch (const std::exception &e) {} // Assume process does not exist anymore
@@ -663,42 +665,56 @@ namespace ProcReader {
         return ret;
     }
 
-    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat) {
+    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat, ProcessReadFlags flags) {
         Process p;
         p.pid = pid;
         p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
         p.userName = User::getUserName(p.uid);
 
-        // Parse threads before parsing the process stat so that the process stat data
-        // may contain additional cycles, etc which happened between reading thread data and process data
-        // but never less.
-        std::string dir = ProcPath::getProcessTasksDirectory(pid);
-        for (auto &d: std::filesystem::directory_iterator(dir)) {
-            auto t = readThread(pid, stringToPid(d.path().filename()));
-            p.threads[t.tid] = t;
+        bool parseThreadIo = (flags & READ_THREAD_IO) == READ_THREAD_IO;
+
+        if ((flags & READ_PROCESS_THREADS) == READ_PROCESS_THREADS) {
+            // Parse threads before parsing the process data so that the process data
+            // may contain additional cycles, etc which happened between reading thread data and process data
+            // but never less.
+            std::string dir = ProcPath::getProcessTasksDirectory(pid);
+            for (auto &d: std::filesystem::directory_iterator(dir)) {
+                auto t = readThread(pid, stringToPid(d.path().filename()), parseThreadIo);
+                p.threads[t.tid] = t;
+            }
+        } else {
+            p.threads[pid] = readThread(pid, pid, parseThreadIo);
+        }
+
+        if ((flags & READ_PROCESS_FD) == READ_PROCESS_FD) {
+            parseProcessFd(p, netStat);
+        }
+
+        if ((flags & READ_PROCESS_IO) == READ_PROCESS_IO) {
+            parseProcIo(p);
         }
 
         parseProcessCmdline(p);
         parseProcessEnviron(p);
         parseProcessRoot(p);
-        parseProcessFd(p, netStat);
         parseProcessExe(p);
         parseProcessCwd(p);
         parseProcessStat(p);
         parseProcessStatm(p);
-        parseProcIo(p);
 
         return p;
     }
 
-    Thread readThread(Pid_t pid, Pid_t tid) {
+    Thread readThread(Pid_t pid, Pid_t tid, bool parseIo) {
         Thread t;
 
         t.pid = pid;
         t.tid = tid;
 
         parseThreadStat(t);
-        parseThreadIo(t);
+
+        if (parseIo)
+            parseThreadIo(t);
 
         return t;
     }

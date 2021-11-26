@@ -165,6 +165,8 @@ void MainWindow::onOpenPropertiesRequest(Pid_t pid) {
     if (it != propertyDialogs.end()) {
         it->second->activateWindow();
     } else {
+        generator.setProcessReadFlags(pid, READ_PROCESS_IO | READ_PROCESS_FD | READ_PROCESS_THREADS | READ_THREAD_IO);
+
         auto *dialog = new ProcessPropertiesDialog(this, pid);
         connect(dialog,
                 &QDialog::finished,
@@ -174,6 +176,8 @@ void MainWindow::onOpenPropertiesRequest(Pid_t pid) {
                     // in the closeEvent handler of the window we check if the dialog was already erased.
                     if (propertyDialogs.find(pid) != propertyDialogs.end())
                         propertyDialogs.erase(pid);
+
+                    generator.clearProcessReadFlags(pid);
                 });
         propertyDialogs.insert(std::pair<Pid_t, ProcessPropertiesDialog *>(pid, dialog));
         connect(this, SIGNAL(signalSnapshot(const Snapshot &)), dialog, SLOT(onSnapshot(const Snapshot &)));

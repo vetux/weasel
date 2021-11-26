@@ -23,11 +23,13 @@
 #include <filesystem>
 #include <stdexcept>
 #include <map>
+#include <set>
 
 #include "weasel/thread.hpp"
 #include "weasel/process.hpp"
 #include "weasel/cpustate.hpp"
 #include "weasel/memorystate.hpp"
+#include "weasel/processreadflags.hpp"
 
 namespace ProcReader {
     CpuState readCpuState();
@@ -39,20 +41,20 @@ namespace ProcReader {
     /**
      * @return The currently active processes from /proc/PID
      */
-    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat);
+    std::map<Pid_t, Process> readProcesses(const std::map<Inode_t, Socket> &netStat, const std::map<Pid_t, ProcessReadFlags> &flags);
 
     /**
      * @param pid The pid of the process to read.
      * @return The data for the process with pid
      */
-    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat);
+    Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat, ProcessReadFlags flags);
 
     /**
      * @param pid The pid of the process to read the thread of
      * @param tid The tid of the thread to read
      * @return The thread data for the thread tid in the process with pid
      */
-    Thread readThread(Pid_t pid, Pid_t tid);
+    Thread readThread(Pid_t pid, Pid_t tid, bool readIo);
 }
 
 #endif //WEASEL_PROCREADER_HPP

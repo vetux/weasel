@@ -81,7 +81,7 @@ const Snapshot &SnapshotGenerator::next() {
     currentSnapshot.cpu = ProcReader::readCpuState();
     currentSnapshot.memory = ProcReader::readMemoryState();
     currentSnapshot.sockets = ProcReader::readNetworkState();
-    currentSnapshot.processes = ProcReader::readProcesses(currentSnapshot.sockets);
+    currentSnapshot.processes = ProcReader::readProcesses(currentSnapshot.sockets, processReadFlags);
 
     for (auto &pair: currentSnapshot.processes) {
         auto &process = pair.second;
@@ -173,6 +173,7 @@ const Snapshot &SnapshotGenerator::next() {
         if (it == currentSnapshot.processes.end()) {
             //Process is dead.
             currentSnapshot.deadProcesses[pair.first] = pair.second;
+            processReadFlags.erase(pair.first);
         }
     }
 

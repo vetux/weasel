@@ -17,37 +17,20 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef WEASEL_SNAPSHOTGENERATOR_HPP
-#define WEASEL_SNAPSHOTGENERATOR_HPP
+#ifndef WEASEL_PROCESSREADFLAGS_HPP
+#define WEASEL_PROCESSREADFLAGS_HPP
 
-#include <chrono>
-#include <set>
-
-#include "weasel/snapshot.hpp"
-#include "weasel/processreadflags.hpp"
-
-class SnapshotGenerator {
-public:
-    const Snapshot &next();
-
-    /**
-     * Set the read flags for the process
-     *
-     * @param pid
-     */
-    void setProcessReadFlags(Pid_t pid, ProcessReadFlags flag) {
-        processReadFlags[pid] = flag;
-    }
-
-    void clearProcessReadFlags(Pid_t pid) {
-        processReadFlags.erase(pid);
-    }
-
-private:
-    std::chrono::high_resolution_clock::time_point lastCreate;
-    Snapshot currentSnapshot;
-
-    std::map<Pid_t, ProcessReadFlags> processReadFlags;
+enum ProcessReadFlags {
+    READ_NONE = 0,
+    READ_PROCESS_THREADS = 1, // Read all the threads of the process instead of just the main thread
+    READ_PROCESS_IO = 2, // Read the process io statistics
+    READ_PROCESS_FD = 4, // Read the process file descriptors (Open files and sockets)
+    READ_THREAD_IO = 8 // Read thread io for threads in the process
 };
 
-#endif //WEASEL_SNAPSHOTGENERATOR_HPP
+inline ProcessReadFlags operator|(ProcessReadFlags a,
+                                  ProcessReadFlags b) {
+    return static_cast<ProcessReadFlags>(static_cast<int>(a) | static_cast<int>(b));
+}
+
+#endif //WEASEL_PROCESSREADFLAGS_HPP
