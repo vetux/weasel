@@ -66,6 +66,8 @@ private:
     QStandardItemModel model;
 
     QTreeView *treeView;
+
+    std::map<Pid_t, ProcessTreeItem *> items;
 };
 
 #endif //WEASEL_PROCESSTREEWIDGET_HPP

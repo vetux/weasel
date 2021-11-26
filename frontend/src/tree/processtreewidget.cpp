@@ -24,67 +24,28 @@
 #include <QMenu>
 
 #include <set>
+#include <limits>
 
 #include "byteformatting.hpp"
 #include "strutil.hpp"
 #include "signalstring.hpp"
 
-static std::vector<Pid_t> getPidRecursive(QStandardItem &item) {
-    std::vector<Pid_t> ret;
+static std::vector<ProcessTreeItem *> getItemsRecursive(Pid_t pid, const std::map<Pid_t, ProcessTreeItem *> &items) {
+    std::vector<ProcessTreeItem *> ret;
 
-    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
+    auto *item = items.at(pid);
 
-    // If cast succeeded the item is a process tree item
-    if (node != nullptr) {
-        ret.emplace_back(node->getPid());
-    }
+    ret.emplace_back(item);
 
-    QStandardItem *child = item.child(0);
-    for (int row = 0; child != nullptr; child = item.child(row++)) {
-        auto tmp = getPidRecursive(*child);
-        for (auto t: tmp)
-            ret.emplace_back(t);
-    }
+    for (int i = 0; i < std::numeric_limits<int>::max(); i++) {
+        auto *child = dynamic_cast<ProcessTreeItem *>(item->child(i));
+        if (child == nullptr)
+            break;
 
-    return ret;
-}
-
-static bool findNodeRecursive(QStandardItem &item, Pid_t pid, ProcessTreeItem *&output) {
-    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
-
-    // If cast succeeded the item is a process tree item
-    if (node != nullptr) {
-        if (node->getPid() == pid) {
-            output = node;
-            return true;
-        }
-    }
-
-    QStandardItem *child = item.child(0);
-    for (int row = 0; child != nullptr; child = item.child(row++)) {
-        if (findNodeRecursive(*child, pid, output)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-static std::map<Pid_t, ProcessTreeItem *> getItemsRecursive(QStandardItem &item) {
-    std::map<Pid_t, ProcessTreeItem *> ret;
-
-    auto *node = dynamic_cast<ProcessTreeItem *>(&item);
-
-    // If cast succeeded the item is a process tree item
-    if (node != nullptr) {
-        ret[node->getPid()] = node;
-    }
-
-    QStandardItem *child = item.child(0);
-    for (int row = 0; child != nullptr; child = item.child(row++)) {
-        auto r = getItemsRecursive(*child);
-        for (auto pair: r) {
-            ret[pair.first] = pair.second;
+        ret.emplace_back(child);
+        auto recurse = getItemsRecursive(child->getPid(), items);
+        for (auto recurseItem: recurse) {
+            ret.emplace_back(recurseItem);
         }
     }
 
@@ -151,20 +112,19 @@ ProcessTreeWidget::~ProcessTreeWidget() = default;
 void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
     auto *tree = model.invisibleRootItem();
 
-    std::map<Pid_t, ProcessTreeItem *> items = getItemsRecursive(*tree);
-
     //Destroy dead process items
     for (auto &deadProcess: snapshot.deadProcesses) {
         auto deadPid = deadProcess.first;
+
         auto it = items.find(deadPid);
 
-        //Check if item was already removed because removal is recursive.
+        //Check if item was already removed because the inner loop recursively erases all child items
         if (it != items.end()) {
-            auto pids = getPidRecursive(*it->second);
-            for (Pid_t pid: pids) {
-                items.erase(pid);
+            auto rItems = getItemsRecursive(it->second->getPid(), items);
+            for (auto rItem: rItems) {
+                items.erase(rItem->getPid()); //Remove item pid mapping
             }
-            it->second->parent()->removeRow(it->second->row());
+            it->second->parent()->removeRow(it->second->row()); // Deallocate the item objects
         }
     }
 
@@ -187,12 +147,15 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
                 items[pair.first] = item;
             } else {
                 // Parent
-                ProcessTreeItem *parent;
-                if (findNodeRecursive(*tree, pair.second, parent)) {
-                    auto *item = new ProcessTreeItem(pair.first);
+                auto it = items.find(pair.second);
+
+                //Check if the parent was already created
+                if (it != items.end()) {
+                    auto parent = it->second;
+                    auto *item = new ProcessTreeItem(pair.first); // Allocate item object
                     parent->appendRow(item->getRowItems());
                     del.emplace_back(pair.first);
-                    items[pair.first] = item;
+                    items[pair.first] = item; // Create item pid mapping
                 }
             }
         }
@@ -238,24 +201,39 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
             }
 
             contextMenu->addSeparator();
+            contextMenu->addAction("Expand All");
+            contextMenu->addAction("Collapse All");
+
+            contextMenu->addSeparator();
             contextMenu->addAction("Properties");
 
-            // Seems to compile regardless of static type related compile error shown in IDE when using lambda as slot.
             connect(contextMenu,
                     &QMenu::triggered,
                     [=](QAction *action) {
                         if (action->text() == "Terminate") {
                             emit processSignalRequested(item->getPid(), Thread::SIGNAL_SIGTERM);
+                        } else if (action->text() == "Signal") {
+                            emit processSignalRequested(item->getPid(), stringToSignal(action->text().toStdString()));
+                        } else if (action->text() == "Expand All") {
+                            treeView->expandRecursively(item->index());
+                        } else if (action->text() == "Collapse All") {
+                            auto recursiveItems = getItemsRecursive(item->getPid(), items);
+                            for (auto rItem = recursiveItems.begin(); rItem != recursiveItems.end(); rItem++) {
+                                treeView->collapse((*rItem)->index());
+                                treeView->update();
+                            }
                         } else if (action->text() == "Properties") {
                             emit processPropertiesRequested(item->getPid());
                         } else {
-                            emit processSignalRequested(item->getPid(), stringToSignal(action->text().toStdString()));
+                            assert(false);
                         }
-                    });
+                    }
+            );
 
             contextMenu->exec(treeView->viewport()->mapToGlobal(pos));
 
             delete contextMenu;
         }
     }
+
 }
