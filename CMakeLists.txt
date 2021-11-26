@@ -8,5 +8,5 @@ else()
     message(FATAL_ERROR "Weasel only works on linux.")
 endif()
 
-include(cmake/system.cmake)
+include(cmake/library.cmake)
 include(cmake/frontend-qt.cmake)

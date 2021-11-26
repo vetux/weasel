@@ -17,29 +17,29 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "weasel/fileio.hpp"
+#include "strformat.hpp"
 
-#include <fstream>
-#include <sstream>
+Pid_t stringToPid(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
+}
 
-#include <cstring>
+Uid_t stringToUid(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
+}
 
-namespace FileIO {
-    std::string readText(const std::string &filePath, const std::string &newLine) {
-        std::string ret;
-        std::ifstream stream;
+Mem_t stringToMem(const std::string &str) {
+    if (str.empty())
+        return 0;
+    else
+        return std::stol(str);
+}
 
-        stream.open(filePath);
-
-        if (stream.fail()) {
-            throw std::runtime_error("Failed to read text at " + filePath + " error: " + strerror(errno));
-        }
-
-        std::string tmp;
-        while (std::getline(stream, tmp)) {
-            ret += tmp + newLine;
-        }
-
-        return ret;
-    }
+Inode_t stringToInode(const std::string &str) {
+    return std::stoul(str);
 }

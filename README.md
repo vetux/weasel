@@ -1,6 +1,6 @@
 # Weasel
 
-A gui process manager for linux.
+A process manager library for linux with a qt frontend.
 
 ## Building
 

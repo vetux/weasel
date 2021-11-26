@@ -27,7 +27,7 @@
 
 #include <sys/resource.h>
 
-#include "weasel/syscalls.hpp"
+#include "syscalls.hpp"
 
 static pid_t convertPID(Pid_t pid) {
     if (pid > std::numeric_limits<pid_t>::max() || pid < std::numeric_limits<pid_t>::min())

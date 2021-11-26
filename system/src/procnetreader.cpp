@@ -17,15 +17,15 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "weasel/procnetreader.hpp"
+#include "procnetreader.hpp"
 
 #include <stdexcept>
 #include <sstream>
 
-#include "weasel/procpath.hpp"
-#include "weasel/fileio.hpp"
-#include "weasel/stringutil.hpp"
-#include "weasel/strformat.hpp"
+#include "procpath.hpp"
+#include "fileio.hpp"
+#include "stringutil.hpp"
+#include "strformat.hpp"
 
 struct ProcNetEntry {
     std::string localAddress;

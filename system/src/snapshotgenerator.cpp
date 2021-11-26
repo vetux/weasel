@@ -19,7 +19,7 @@
 
 #include "weasel/snapshotgenerator.hpp"
 
-#include "weasel/procreader.hpp"
+#include "procreader.hpp"
 
 unsigned long getRate(float delta,
                       unsigned long current,

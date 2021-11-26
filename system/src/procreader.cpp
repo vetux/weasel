@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "weasel/procreader.hpp"
+#include "procreader.hpp"
 
 #include <map>
 #include <fstream>
@@ -31,13 +31,13 @@
 
 #include <sys/stat.h>
 
-#include "weasel/procpath.hpp"
-#include "weasel/syscalls.hpp"
-#include "weasel/procnetreader.hpp"
-#include "weasel/fileio.hpp"
-#include "weasel/stringutil.hpp"
-#include "weasel/user.hpp"
-#include "weasel/strformat.hpp"
+#include "procpath.hpp"
+#include "syscalls.hpp"
+#include "procnetreader.hpp"
+#include "fileio.hpp"
+#include "stringutil.hpp"
+#include "user.hpp"
+#include "strformat.hpp"
 
 #define READLINK_BUFFER_SIZE 512
 
