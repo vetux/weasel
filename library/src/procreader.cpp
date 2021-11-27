@@ -667,9 +667,14 @@ namespace ProcReader {
     }
 
     Process readProcess(Pid_t pid, const std::map<Inode_t, Socket> &netStat, ProcessReadFlags flags) {
+        auto processDir = ProcPath::getProcessDirectory(pid);
+
+        if (!std::filesystem::exists(processDir))
+            throw std::runtime_error("");
+
         Process p;
         p.pid = pid;
-        p.uid = getFileOwnerUid(ProcPath::getProcessDirectory(pid));
+        p.uid = getFileOwnerUid(processDir);
         p.userName = User::getUserName(p.uid);
 
         bool parseThreadIo = (flags & READ_THREAD_IO) == READ_THREAD_IO;
@@ -702,6 +707,12 @@ namespace ProcReader {
         parseProcessCwd(p);
         parseProcessStat(p);
         parseProcessStatm(p);
+
+        // Prevent returning partially read dead processes
+        // This does not detect pid reuse between the filesystem::exists calls at the start and end of the function
+        if (!std::filesystem::exists(processDir)) {
+            throw std::runtime_error("Process Dead");
+        }
 
         return p;
     }
