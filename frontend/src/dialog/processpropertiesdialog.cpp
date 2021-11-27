@@ -72,7 +72,7 @@ void ProcessPropertiesDialog::onSnapshot(const Snapshot &snapshot) {
         tabGeneral->setRootDirectory("");
         tabGeneral->setEnvironment({});
 
-        tabNetwork->setSockets({});
+        tabNetwork->clearSockets();
         tabNetwork->setReadBytes("");
         tabNetwork->setWriteBytes("");
         tabNetwork->setReadRate("");
@@ -95,7 +95,15 @@ void ProcessPropertiesDialog::onSnapshot(const Snapshot &snapshot) {
         tabGeneral->setRootDirectory(process.rootDirectory);
         tabGeneral->setEnvironment(process.environ);
 
-        tabNetwork->setSockets(process.sockets);
+
+        for (auto &pSocket: snapshot.deadSockets) {
+            tabNetwork->removeSocket(pSocket.second);
+        }
+
+        for (auto &pSocket: process.sockets) {
+            tabNetwork->setSocket(pSocket);
+        }
+
         tabNetwork->setReadBytes(getFormattedSizeString(process.network_read_bytes));
         tabNetwork->setWriteBytes(getFormattedSizeString(process.network_write_bytes));
         tabNetwork->setReadRate(getFormattedRateString(process.network_read_rate));

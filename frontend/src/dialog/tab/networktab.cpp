@@ -20,45 +20,100 @@
 #include "dialog/tab/networktab.hpp"
 
 #include <QVBoxLayout>
+#include <QLabel>
+#include <QHeaderView>
 
-static QString getFormattedConnectionString(const Socket &sock) {
-    std::string prefix;
-    if (sock.protocol == TCP)
-        prefix = "TCP\t";
-    else
-        prefix = "UDP\t";
-    return (prefix
-            + sock.localEndpoint.address + ":" + std::to_string(sock.localEndpoint.port)
-            + "\t->\t"
-            + sock.remoteEndpoint.address + ":" +
-            std::to_string(sock.remoteEndpoint.port)).c_str();
+static QString getProtocolString(SocketProtocol protocol) {
+    switch (protocol) {
+        case UDP:
+            return "UDP";
+        case TCP:
+            return "TCP";
+        default:
+            assert(false);
+    }
 }
 
 NetworkTab::NetworkTab(QWidget *parent) {
     setLayout(new QVBoxLayout());
-    socketsList = new QListWidget(this);
-    layout()->addWidget(socketsList);
+    socketsTree = new QTreeView(this);
+    socketsModel = new QStandardItemModel();
+    socketsTree->setModel(socketsModel);
+    layout()->addWidget(new QLabel("Connections"));
+    layout()->addWidget(socketsTree);
+
+    socketsTree->setIndentation(0);
+
+    socketsModel->setColumnCount(1);
+    socketsTree->header()->hide();
+    socketsModel->insertRow(0, new QStandardItem("No Connections"));
 }
 
-void NetworkTab::setSockets(const std::vector<Socket> &sockets) {
-    socketsList->clear();
-    for (auto &socket: sockets) {
-        socketsList->addItem(getFormattedConnectionString(socket));
+void NetworkTab::setSocket(const Socket &socket) {
+    if (rowMapping.find(socket.inode) != rowMapping.end())
+        return;
+
+    auto row = 0;
+
+    if (rowMapping.empty()) {
+        socketsModel->clear();
+        socketsModel->setColumnCount(3);
+        socketsTree->header()->show();
+        socketsTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        socketsTree->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+        socketsTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        socketsModel->setHorizontalHeaderLabels({"Local Endpoint", "Remote Endpoint", "Protocol"});
+    } else {
+        row = socketsModel->rowCount();
+    }
+
+    socketsModel->insertRow(row,
+                            {
+                                    new QStandardItem(socket.localEndpoint.toString().c_str()),
+                                    new QStandardItem(socket.remoteEndpoint.toString().c_str()),
+                                    new QStandardItem(getProtocolString(socket.protocol))
+                            });
+    rowMapping[socket.inode] = row;
+}
+
+void NetworkTab::removeSocket(const Socket &socket) {
+    bool startDecrement = false;
+    for (auto &pair: rowMapping) {
+        if (startDecrement) {
+            pair.second--;
+        }
+        if (pair.first == socket.inode) {
+            startDecrement = true;
+        }
+    }
+    if (rowMapping.find(socket.inode) != rowMapping.end()) {
+        socketsModel->removeRow(rowMapping.at(socket.inode));
+        rowMapping.erase(socket.inode);
+    }
+    if (rowMapping.empty()) {
+        socketsModel->clear();
+        socketsModel->setColumnCount(1);
+        socketsTree->header()->hide();
+        socketsModel->insertRow(0, new QStandardItem("No Connections"));
     }
 }
 
-void NetworkTab::setReadBytes(const std::string& bytes) {
+void NetworkTab::clearSockets() {
+    socketsModel->clear();
+}
+
+void NetworkTab::setReadBytes(const std::string &bytes) {
 
 }
 
-void NetworkTab::setWriteBytes(const std::string& bytes) {
+void NetworkTab::setWriteBytes(const std::string &bytes) {
 
 }
 
-void NetworkTab::setReadRate(const std::string& rate) {
+void NetworkTab::setReadRate(const std::string &rate) {
 
 }
 
-void NetworkTab::setWriteRate(const std::string& rate) {
+void NetworkTab::setWriteRate(const std::string &rate) {
 
 }

@@ -20,8 +20,8 @@
 #ifndef WEASEL_NETWORKTAB_HPP
 #define WEASEL_NETWORKTAB_HPP
 
-#include <qt5/QtWidgets/QWidget>
-#include <qt5/QtWidgets/QListWidget>
+#include <QTreeView>
+#include <QStandardItemModel>
 
 #include "weasel/process.hpp"
 
@@ -32,18 +32,25 @@ public:
 
 public slots:
 
-    void setSockets(const std::vector<Socket> &sockets);
+    void setSocket(const Socket &sockets);
 
-    void setReadBytes(const std::string& bytes);
+    void removeSocket(const Socket &socket);
 
-    void setWriteBytes(const std::string& bytes);
+    void clearSockets();
 
-    void setReadRate(const std::string& rate);
+    void setReadBytes(const std::string &bytes);
 
-    void setWriteRate(const std::string& rate);
+    void setWriteBytes(const std::string &bytes);
+
+    void setReadRate(const std::string &rate);
+
+    void setWriteRate(const std::string &rate);
 
 private:
-    QListWidget *socketsList;
+    QStandardItemModel *socketsModel;
+    QTreeView *socketsTree;
+
+    std::map<Inode_t, int> rowMapping;
 };
 
 #endif //WEASEL_NETWORKTAB_HPP

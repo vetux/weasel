@@ -88,16 +88,8 @@ const Snapshot &SnapshotGenerator::next() {
 
         auto it = oldSnapshot.processes.find(pair.first);
         if (it != oldSnapshot.processes.end()) {
+            // Does not check for pid reuse between snapshots.
             auto &oldProcess = it->second;
-
-            if (process.starttime != oldProcess.starttime) {
-                // The process was newly spawned and is not the same process as in the old snapshot.
-                currentSnapshot.deadProcesses[process.pid] = oldProcess;
-                for (auto &thread: oldProcess.threads) {
-                    currentSnapshot.deadThreads[thread.first] = thread.second;
-                }
-                continue;
-            }
 
             //Set the rate data and check for spawned/dead threads
             for (auto &threadPair: process.threads) {
@@ -179,18 +171,11 @@ const Snapshot &SnapshotGenerator::next() {
 
     //Find dead sockets
     for (auto &pair: oldSnapshot.sockets) {
+        // Does not check reuse of a socket inode between snapshots.
         auto it = currentSnapshot.sockets.find(pair.first);
         if (it == currentSnapshot.sockets.end()) {
             // Socket is dead
             currentSnapshot.deadSockets[pair.first] = pair.second;
-        } else {
-            // This check only verifies endpoint, protocol and inode
-            // if a socket with the same endpoint protocol and inode is spawned this wont be detected but this should suffice.
-            if (pair.second != it->second) {
-                // Newly spawned socket with same inode
-                currentSnapshot.deadSockets[pair.first] = pair.second;
-                currentSnapshot.spawnedSockets.insert(pair.first);
-            }
         }
     }
 

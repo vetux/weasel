@@ -35,6 +35,10 @@ struct IpEndpoint {
                && port == other.port;
     }
 
+    std::string toString() const {
+        return address + ":" + std::to_string(port);
+    }
+
     std::string address;
     int port;
 };
