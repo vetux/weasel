@@ -9,4 +9,4 @@ else()
 endif()
 
 include(cmake/library.cmake)
-include(cmake/frontend-qt.cmake)
+include(cmake/frontend.cmake)

@@ -1,14 +1,18 @@
-file(GLOB_RECURSE System.Source system/src/*.cpp)
+file(GLOB_RECURSE Weasel.Source library/src/*.cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(weasel SHARED ${System.Source})
+add_library(weasel-library SHARED ${Weasel.Source})
 
-target_include_directories(weasel PUBLIC system/include/)
-target_include_directories(weasel PRIVATE system/src/)
+target_include_directories(weasel-library PUBLIC library/include/)
+target_include_directories(weasel-library PRIVATE library/src/)
 
-add_library(weasel-static STATIC ${System.Source})
+set_target_properties(weasel-library PROPERTIES OUTPUT_NAME weasel)
 
-target_include_directories(weasel-static PUBLIC system/include/)
-target_include_directories(weasel-static PRIVATE system/src/)
+add_library(weasel-library-static STATIC ${Weasel.Source})
+
+target_include_directories(weasel-library-static PUBLIC library/include/)
+target_include_directories(weasel-library-static PRIVATE library/src/)
+
+set_target_properties(weasel-library-static PROPERTIES OUTPUT_NAME weasel)

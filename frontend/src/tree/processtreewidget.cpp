@@ -125,6 +125,8 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
             for (auto rItem: rItems) {
                 items.erase(rItem->getPid()); //Remove item pid mapping
             }
+
+            //Segfault because process was only partially read because exceptions are caught in the procreader for process components.
             it->second->parent()->removeRow(it->second->row()); // Deallocate the item objects
         }
     }
