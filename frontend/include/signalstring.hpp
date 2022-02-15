@@ -20,7 +20,11 @@
 #ifndef WEASEL_SIGNALSTRING_HPP
 #define WEASEL_SIGNALSTRING_HPP
 
+#include <vector>
+
 #include "weasel/thread.hpp"
+
+const std::vector<std::string> &getSignalStrings();
 
 std::string signalToString(Thread::Signal sig);
 

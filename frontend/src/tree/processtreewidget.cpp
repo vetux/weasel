@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
+#include <QMessageBox>
 
 #include <set>
 #include <limits>
@@ -113,6 +114,8 @@ ProcessTreeWidget::~ProcessTreeWidget() = default;
 void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
     auto *tree = model.invisibleRootItem();
 
+    std::set<Pid_t> reparentedProcesses;
+
     //Destroy dead process items
     for (auto &deadProcess: snapshot.deadProcesses) {
         auto deadPid = deadProcess.first;
@@ -123,10 +126,16 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
         if (it != items.end()) {
             auto rItems = getItemsRecursive(it->second->getPid(), items);
             for (auto rItem: rItems) {
+                auto childPid = rItem->getPid();
+                if (snapshot.deadProcesses.find(childPid) == snapshot.deadProcesses.end()) {
+                    // The child process is still alive and has been reparented
+                    reparentedProcesses.insert(rItem->getPid());
+                }
                 items.erase(rItem->getPid()); //Remove item pid mapping
             }
 
-            it->second->parent()->removeRow(it->second->row()); // Deallocate the item objects
+            // Remove the process row item, all child rows are removed as well.
+            it->second->parent()->removeRow(it->second->row());
         }
     }
 
@@ -138,14 +147,16 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
     }
 
     // Bruteforce method to create items in hierarchical order, wastes cycles a better approach would be sorting.
-    std::vector<Pid_t> del;
+    std::set<Pid_t> delNew;
+    std::set<Pid_t> delReparent;
     while (!newProcesses.empty()) {
+        // Create items of new processes
         for (auto pair: newProcesses) {
             if (pair.second == 0) {
                 // No Parent
                 auto *item = new ProcessTreeItem(pair.first);
                 tree->appendRow(item->getRowItems());
-                del.emplace_back(pair.first);
+                delNew.insert(pair.first);
                 items[pair.first] = item;
             } else {
                 // Parent
@@ -156,17 +167,46 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
                     auto parent = it->second;
                     auto *item = new ProcessTreeItem(pair.first); // Allocate item object
                     parent->appendRow(item->getRowItems());
-                    del.emplace_back(pair.first);
+                    delNew.insert(pair.first);
                     items[pair.first] = item; // Create item pid mapping
                 }
             }
         }
 
-        for (auto pid: del) {
+        // Create items of reparented processes
+        for (auto pid: reparentedProcesses) {
+            auto process = snapshot.processes.at(pid);
+            if (process.ppid == 0) {
+                // No Parent
+                auto *item = new ProcessTreeItem(pid);
+                tree->appendRow(item->getRowItems());
+                delReparent.insert(pid);
+                items[pid] = item;
+            } else {
+                // Parent
+                auto it = items.find(process.ppid);
+
+                //Check if the parent was already created
+                if (it != items.end()) {
+                    auto parent = it->second;
+                    auto *item = new ProcessTreeItem(pid); // Allocate item object
+                    parent->appendRow(item->getRowItems());
+                    delReparent.insert(pid);
+                    items[pid] = item; // Create item pid mapping
+                }
+            }
+        }
+
+        for (auto pid: delNew) {
             newProcesses.erase(pid);
         }
 
-        del.clear();
+        for (auto pid: delReparent) {
+            reparentedProcesses.erase(pid);
+        }
+
+        delNew.clear();
+        delReparent.clear();
     }
 
     //Update item values
@@ -212,22 +252,32 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
             connect(contextMenu,
                     &QMenu::triggered,
                     [=](QAction *action) {
-                        if (action->text() == "Terminate") {
+                        //TODO: Redesign action handling
+                        auto text = action->text().toStdString();
+                        if (text == "Terminate") {
                             emit processSignalRequested(item->getPid(), Thread::SIGNAL_SIGTERM);
-                        } else if (action->text() == "Signal") {
-                            emit processSignalRequested(item->getPid(), stringToSignal(action->text().toStdString()));
-                        } else if (action->text() == "Expand All") {
+                        } else if (text == "Expand All") {
                             treeView->expandRecursively(item->index());
-                        } else if (action->text() == "Collapse All") {
+                        } else if (text == "Collapse All") {
                             auto recursiveItems = getItemsRecursive(item->getPid(), items);
                             for (auto rItem: recursiveItems) {
                                 treeView->collapse(rItem->index());
                                 treeView->update();
                             }
-                        } else if (action->text() == "Properties") {
+                        } else if (text == "Properties") {
                             emit processPropertiesRequested(item->getPid());
                         } else {
-                            assert(false);
+                            auto &signalStrings = getSignalStrings();
+                            if (std::find(signalStrings.begin(),
+                                          signalStrings.end(),
+                                          text) != signalStrings.end()) {
+                                emit processSignalRequested(item->getPid(),
+                                                            stringToSignal(text));
+                            } else {
+                                QMessageBox::critical(this,
+                                                      "Error",
+                                                      QString::fromStdString("Unhandled action: " + text));
+                            }
                         }
                     }
             );

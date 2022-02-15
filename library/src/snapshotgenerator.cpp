@@ -83,6 +83,7 @@ const Snapshot &SnapshotGenerator::next() {
     currentSnapshot.sockets = ProcReader::readNetworkState();
     currentSnapshot.processes = ProcReader::readProcesses(currentSnapshot.sockets, processReadFlags, defaultReadFlags);
 
+    std::set<Pid_t> failedProcesses; //The list of processes which have a nonexistent parent
     for (auto &pair: currentSnapshot.processes) {
         auto &process = pair.second;
 
@@ -157,6 +158,17 @@ const Snapshot &SnapshotGenerator::next() {
                 currentSnapshot.spawnedThreads.insert(thread.first);
             }
         }
+
+        // Check if process parent exists in case the kernel allows this to happen
+        if (process.ppid != 0 && currentSnapshot.processes.find(process.ppid) == currentSnapshot.processes.end()) {
+            failedProcesses.insert(process.pid);
+        }
+    }
+
+    // Treat processes with parent ids which do not exist as dead.
+    for (auto pid: failedProcesses) {
+        currentSnapshot.deadProcesses[pid] = currentSnapshot.processes.at(pid);
+        currentSnapshot.processes.erase(pid);
     }
 
     //Find dead processes, processes with identical pid are checked above.

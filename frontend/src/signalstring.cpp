@@ -21,6 +21,31 @@
 
 #include "signalstring.hpp"
 
+const std::vector<std::string> &getSignalStrings() {
+    static const std::vector<std::string> ret = {
+            "SIGHUP",
+            "SIGINT",
+            "SIGQUIT",
+            "SIGILL",
+            "SIGABRT",
+            "SIGFPE",
+            "SIGKILL",
+            "SIGSEGV",
+            "SIGPIPE",
+            "SIGALRM",
+            "SIGTERM",
+            "SIGUSR1",
+            "SIGUSR2",
+            "SIGCHLD",
+            "SIGCONT",
+            "SIGSTOP",
+            "SIGTSTP",
+            "SIGTTIN",
+            "SIGTTOU"
+    };
+    return ret;
+}
+
 std::string signalToString(Thread::Signal sig) {
     switch (sig) {
         case Thread::SIGNAL_SIGHUP:
@@ -33,7 +58,7 @@ std::string signalToString(Thread::Signal sig) {
             return "SIGILL";
         case Thread::SIGNAL_SIGABRT:
             return "SIGABRT";
-        case Thread:: SIGNAL_SIGFPE:
+        case Thread::SIGNAL_SIGFPE:
             return "SIGFPE";
         case Thread::SIGNAL_SIGKILL:
             return "SIGKILL";
