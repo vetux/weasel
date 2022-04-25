@@ -20,12 +20,12 @@
 #ifndef WEASEL_GENERALTAB_HPP
 #define WEASEL_GENERALTAB_HPP
 
-#include <qt5/QtWidgets/QWidget>
+#include <QWidget>
 
-#include <qt5/QtWidgets/QLineEdit>
-#include <qt5/QtWidgets/QLabel>
-#include <qt5/QtWidgets/QPushButton>
-#include <qt5/QtWidgets/QListWidget>
+#include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
+#include <QListWidget>
 
 #include "weasel/process.hpp"
 

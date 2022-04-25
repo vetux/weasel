@@ -20,9 +20,9 @@
 #ifndef WEASEL_MEMORYBARWIDGET_HPP
 #define WEASEL_MEMORYBARWIDGET_HPP
 
-#include <qt5/QtWidgets/QWidget>
-#include <qt5/QtWidgets/QProgressBar>
-#include <qt5/QtWidgets/QLabel>
+#include <QWidget>
+#include <QProgressBar>
+#include <QLabel>
 
 class MemoryBarWidget : public QWidget {
 Q_OBJECT

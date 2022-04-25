@@ -20,7 +20,7 @@
 #ifndef WEASEL_THREADSTAB_HPP
 #define WEASEL_THREADSTAB_HPP
 
-#include <qt5/QtWidgets/QWidget>
+#include <QWidget>
 
 #include "weasel/process.hpp"
 

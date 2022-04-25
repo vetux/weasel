@@ -20,8 +20,9 @@
 #ifndef WEASEL_MAINWINDOW_HPP
 #define WEASEL_MAINWINDOW_HPP
 
-#include <qt5/QtWidgets/QMainWindow>
-#include <qt5/QtCore/QTimer>
+#include <QMainWindow>
+#include <QTimer>
+#include <QAction>
 
 #include "weasel/snapshotgenerator.hpp"
 

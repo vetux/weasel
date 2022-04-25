@@ -20,11 +20,11 @@
 #ifndef WEASEL_TOOLBARWIDGET_HPP
 #define WEASEL_TOOLBARWIDGET_HPP
 
-#include <qt5/QtWidgets/QWidget>
-#include <qt5/QtWidgets/QProgressBar>
-#include <qt5/QtWidgets/QHBoxLayout>
-#include <qt5/QtWidgets/QLabel>
-#include <qt5/QtWidgets/QPushButton>
+#include <QWidget>
+#include <QProgressBar>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 #include "weasel/snapshot.hpp"
 

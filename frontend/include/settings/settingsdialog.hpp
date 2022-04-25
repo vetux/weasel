@@ -20,7 +20,7 @@
 #ifndef WEASEL_SETTINGSDIALOG_HPP
 #define WEASEL_SETTINGSDIALOG_HPP
 
-#include <qt5/QtWidgets/QDialog>
+#include <QDialog>
 
 class SettingsDialog : public QDialog {
 Q_OBJECT

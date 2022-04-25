@@ -22,9 +22,9 @@
 
 #include <set>
 
-#include <qt5/QtWidgets/QWidget>
-#include <qt5/QtWidgets/QTreeView>
-#include <qt5/QtGui/QStandardItemModel>
+#include <QWidget>
+#include <QTreeView>
+#include <QStandardItemModel>
 
 #include "weasel/process.hpp"
 #include "weasel/snapshot.hpp"

@@ -20,8 +20,8 @@
 #ifndef WEASEL_CPUBARWIDGET_HPP
 #define WEASEL_CPUBARWIDGET_HPP
 
-#include <qt5/QtWidgets/QProgressBar>
-#include <qt5/QtWidgets/QLabel>
+#include <QProgressBar>
+#include <QLabel>
 
 #include "weasel/cpustate.hpp"
 

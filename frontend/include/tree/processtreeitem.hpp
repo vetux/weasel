@@ -20,7 +20,7 @@
 #ifndef WEASEL_PROCESSTREEITEM_HPP
 #define WEASEL_PROCESSTREEITEM_HPP
 
-#include <qt5/QtGui/QStandardItem>
+#include <QStandardItem>
 
 #include "weasel/process.hpp"
 

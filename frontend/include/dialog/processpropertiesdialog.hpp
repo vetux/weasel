@@ -20,8 +20,8 @@
 #ifndef WEASEL_PROCESSPROPERTIESDIALOG_HPP
 #define WEASEL_PROCESSPROPERTIESDIALOG_HPP
 
-#include <qt5/QtWidgets/QDialog>
-#include <qt5/QtWidgets/QTabWidget>
+#include <QDialog>
+#include <QTabWidget>
 
 #include <utility>
 
