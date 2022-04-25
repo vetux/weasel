@@ -27,9 +27,12 @@
 #include <set>
 #include <limits>
 
+#include "typecheck.hpp"
 #include "byteformatting.hpp"
 #include "strutil.hpp"
 #include "signalstring.hpp"
+
+#include "mainwindow.hpp"
 
 static std::vector<ProcessTreeItem *> getItemsRecursive(Pid_t pid, const std::map<Pid_t, ProcessTreeItem *> &items) {
     std::vector<ProcessTreeItem *> ret;
@@ -235,48 +238,53 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
         if (item != nullptr) {
             auto *contextMenu = new QMenu(treeView);
 
-            contextMenu->addAction("Terminate");
+            contextMenu->addAction(new ProcessAction(SIGNAL_PROCESS,
+                                                     item->getPid(),
+                                                     Thread::SIGNAL_SIGTERM,
+                                                     "Terminate"));
 
             auto *menu = contextMenu->addMenu("Signal");
-            for (int i = Thread::SIGNAL_SIGHUP; i < Thread::SIGNAL_SIGTTOU; i++) {
-                menu->addAction(signalToString(static_cast<Thread::Signal>(i)).c_str());
+            for (auto i = Thread::SIGNAL_SIGHUP; i < Thread::SIGNAL_SIGTTOU; i = static_cast<Thread::Signal>(i + 1)) {
+                menu->addAction(new ProcessAction(SIGNAL_PROCESS,
+                                                  item->getPid(),
+                                                  i,
+                                                  signalToString(static_cast<Thread::Signal>(i)).c_str()));
             }
 
             contextMenu->addSeparator();
-            contextMenu->addAction("Expand All");
-            contextMenu->addAction("Collapse All");
+            contextMenu->addAction(new ProcessAction(EXPAND_ALL, "Expand All"));
+            contextMenu->addAction(new ProcessAction(COLLAPSE_ALL, "Collapse All"));
 
             contextMenu->addSeparator();
-            contextMenu->addAction("Properties");
+            contextMenu->addAction(new ProcessAction(OPEN_PROCESS_DIALOG, "Properties"));
 
             connect(contextMenu,
                     &QMenu::triggered,
                     [=](QAction *action) {
-                        //TODO: Redesign action handling
-                        auto text = action->text().toStdString();
-                        if (text == "Terminate") {
-                            emit processSignalRequested(item->getPid(), Thread::SIGNAL_SIGTERM);
-                        } else if (text == "Expand All") {
-                            treeView->expandRecursively(item->index());
-                        } else if (text == "Collapse All") {
-                            auto recursiveItems = getItemsRecursive(item->getPid(), items);
-                            for (auto rItem: recursiveItems) {
-                                treeView->collapse(rItem->index());
-                                treeView->update();
-                            }
-                        } else if (text == "Properties") {
-                            emit processPropertiesRequested(item->getPid());
-                        } else {
-                            auto &signalStrings = getSignalStrings();
-                            if (std::find(signalStrings.begin(),
-                                          signalStrings.end(),
-                                          text) != signalStrings.end()) {
-                                emit processSignalRequested(item->getPid(),
-                                                            stringToSignal(text));
-                            } else {
-                                QMessageBox::critical(this,
-                                                      "Error",
-                                                      QString::fromStdString("Unhandled action: " + text));
+                        if (TypeCheck::checkCast<QAction, ProcessAction>(*action)) {
+                            auto &pa = dynamic_cast<ProcessAction &>(*action);
+                            switch (pa.getType()) {
+                                case SIGNAL_PROCESS:
+                                    emit processSignalRequested(pa.getPid(), pa.getSignal());
+                                    break;
+                                case SIGNAL_THREAD:
+                                    break;
+                                case OPEN_PROCESS_DIALOG:
+                                    emit processPropertiesRequested(item->getPid());
+                                    break;
+                                case EXPAND_ALL:
+                                    treeView->expandRecursively(item->index());
+                                    break;
+                                case COLLAPSE_ALL: {
+                                    auto recursiveItems = getItemsRecursive(item->getPid(), items);
+                                    for (auto rItem: recursiveItems) {
+                                        treeView->collapse(rItem->index());
+                                        treeView->update();
+                                    }
+                                }
+                                    break;
+                                case NONE:
+                                    break;
                             }
                         }
                     }

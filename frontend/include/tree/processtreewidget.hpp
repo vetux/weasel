@@ -25,6 +25,7 @@
 #include <QWidget>
 #include <QTreeView>
 #include <QStandardItemModel>
+#include <QAction>
 
 #include "weasel/process.hpp"
 #include "weasel/snapshot.hpp"
@@ -34,6 +35,52 @@
 class ProcessTreeWidget : public QWidget {
 Q_OBJECT
 public:
+    enum ActionType {
+        SIGNAL_PROCESS,
+        SIGNAL_THREAD,
+        OPEN_PROCESS_DIALOG,
+        EXPAND_ALL,
+        COLLAPSE_ALL,
+        NONE
+    };
+
+    class ProcessAction : public QAction {
+    public:
+        ProcessAction() = default;
+
+        ProcessAction(ActionType type, Pid_t pid, const QString &text)
+                : type(type), pid(pid) {
+            setText(text);
+        }
+
+        ProcessAction(ActionType type, const QString &text)
+                : type(type) {
+            setText(text);
+        }
+
+        ProcessAction(ActionType type, Pid_t pid, Thread::Signal signal, const QString &text)
+                : type(type), pid(pid), signal(signal) {
+            setText(text);
+        }
+
+        const ActionType &getType() const { return type; }
+
+        const Pid_t &getPid() const { return pid; }
+
+        const Thread::Signal &getSignal() const { return signal; }
+
+        void setType(ActionType t) { type = t; }
+
+        void setPid(Pid_t v) { pid = v; }
+
+        void setSignal(Thread::Signal s) { signal = s; }
+
+    private:
+        ActionType type = NONE;
+        Pid_t pid = 0;
+        Thread::Signal signal = Thread::SIGNAL_SIGHUP;
+    };
+
     explicit ProcessTreeWidget(QWidget *parent = nullptr);
 
     ~ProcessTreeWidget() override;
