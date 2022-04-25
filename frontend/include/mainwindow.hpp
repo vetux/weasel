@@ -29,7 +29,7 @@
 #include "dialog/processpropertiesdialog.hpp"
 #include "settings/settingsdialog.hpp"
 #include "toolbar/toolbarwidget.hpp"
-#include "tree/processtreewidget.hpp"
+#include "tabs/tree/processtreewidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT

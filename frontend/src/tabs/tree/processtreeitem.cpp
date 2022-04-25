@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "tree/processtreeitem.hpp"
+#include "tabs/tree/processtreeitem.hpp"
 
 #include "strutil.hpp"
 #include "byteformatting.hpp"
