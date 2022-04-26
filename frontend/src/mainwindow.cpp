@@ -107,10 +107,11 @@ void MainWindow::onActionTriggered(QAction *action) {
 void MainWindow::onProcessSignalRequest(Pid_t pid, Thread::Signal signal) {
     if (QMessageBox::question(this,
                               QString("Signal Process"),
-                              QString(("Do you want to send the signal "
+                              QString(("Do you want to send "
                                        + signalToString(signal)
-                                       + " to the process "
-                                       + std::to_string(pid)).c_str()))
+                                       + " to "
+                                       + std::to_string(pid)
+                                         + " ?").c_str()))
         != QMessageBox::Yes) {
         return;
     }
@@ -125,10 +126,11 @@ void MainWindow::onProcessSignalRequest(Pid_t pid, Thread::Signal signal) {
 void MainWindow::onThreadSignalRequest(Pid_t tid, Thread::Signal signal) {
     if (QMessageBox::question(this,
                               QString("Signal Thread"),
-                              QString(("Do you want to send the signal "
+                              QString(("Do you want to send "
                                        + signalToString(signal)
-                                       + " to the thread "
-                                       + std::to_string(tid)).c_str()))
+                                       + " to thread "
+                                       + std::to_string(tid)
+                                       + "?").c_str()))
         != QMessageBox::Yes) {
         return;
     }
