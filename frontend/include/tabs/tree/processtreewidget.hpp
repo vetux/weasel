@@ -85,6 +85,8 @@ public:
 
     ~ProcessTreeWidget() override;
 
+    void selectProcess(Pid_t pid);
+
 public slots:
 
     void onSnapshot(const Snapshot &snapshot);

@@ -12,7 +12,8 @@ set(Weasel.Frontend.Qt.GuiHeaders
         frontend/include/toolbar/cpubarwidget.hpp
         frontend/include/toolbar/memorybarwidget.hpp
         frontend/include/toolbar/toolbarwidget.hpp
-        frontend/include/tabs/tree/processtreewidget.hpp)
+        frontend/include/tabs/tree/processtreewidget.hpp
+        frontend/include/tabs/nettable/nettablewidget.hpp)
 
 file(GLOB_RECURSE Weasel.Frontend.Qt.Source frontend/src/*.cpp)
 

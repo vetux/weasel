@@ -21,18 +21,26 @@
 
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QTabWidget>
 
 #include "signalstring.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
     auto *mainWidget = new QWidget();
     auto *toolbar = new ToolbarWidget();
-    auto *procTree = new ProcessTreeWidget();
 
     auto *l = new QVBoxLayout();
 
+    tabWidget = new QTabWidget();
+
+    procTree = new ProcessTreeWidget();
+    netTable = new NetTableWidget();
+
+    tabWidget->addTab(procTree, "Process");
+    tabWidget->addTab(netTable, "Network");
+
     l->addWidget(toolbar);
-    l->addWidget(procTree, 1);
+    l->addWidget(tabWidget, 1);
 
     mainWidget->setLayout(l);
 
@@ -69,8 +77,14 @@ MainWindow::MainWindow(int pollingInterval) {
             this,
             SLOT(onOpenPropertiesRequest(Pid_t)));
 
+    connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
+
+    connect(netTable, SIGNAL(terminateProcess(Pid_t)), this, SLOT(onTerminateProcess(Pid_t)));
+    connect(netTable, SIGNAL(viewProcess(Pid_t)), this, SLOT(onViewProcess(Pid_t)));
+
     connect(this, SIGNAL(signalSnapshot(const Snapshot &)), toolbar, SLOT(onSnapshot(const Snapshot &)));
     connect(this, SIGNAL(signalSnapshot(const Snapshot &)), procTree, SLOT(onSnapshot(const Snapshot &)));
+    connect(this, SIGNAL(signalSnapshot(const Snapshot &)), netTable, SLOT(onSnapshot(const Snapshot &)));
 
     onPollTimeOut();
 
@@ -184,4 +198,22 @@ void MainWindow::onOpenPropertiesRequest(Pid_t pid) {
         onPollTimeOut(); //Cause a poll timeout to populate the dialog before showing.
         dialog->show();
     }
+}
+
+void MainWindow::onTabChanged(int index) {
+    if (index > 0) {
+        generator.setDefaultReadFlags(READ_THREAD_IO | READ_PROCESS_FD | READ_PROCESS_THREADS | READ_THREAD_IO);
+    } else {
+        generator.setDefaultReadFlags(READ_NONE);
+    }
+    onPollTimeOut();
+}
+
+void MainWindow::onViewProcess(Pid_t pid) {
+    tabWidget->setCurrentIndex(0);
+    procTree->selectProcess(pid);
+}
+
+void MainWindow::onTerminateProcess(Pid_t pid) {
+    onProcessSignalRequest(pid, Thread::SIGNAL_SIGTERM);
 }

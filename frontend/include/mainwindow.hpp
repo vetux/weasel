@@ -30,6 +30,7 @@
 #include "settings/settingsdialog.hpp"
 #include "toolbar/toolbarwidget.hpp"
 #include "tabs/tree/processtreewidget.hpp"
+#include "tabs/nettable/nettablewidget.hpp"
 
 class MainWindow : public QMainWindow {
 Q_OBJECT
@@ -58,12 +59,22 @@ public slots:
 
     void onOpenPropertiesRequest(Pid_t);
 
+    void onTabChanged(int index);
+
+    void onViewProcess(Pid_t pid);
+
+    void onTerminateProcess(Pid_t pid);
+
 private:
     QTimer pollTimer;
 
     SnapshotGenerator generator;
 
     std::map<Pid_t, ProcessPropertiesDialog *> propertyDialogs;
+
+    QTabWidget *tabWidget;
+    ProcessTreeWidget *procTree;
+    NetTableWidget *netTable;
 };
 
 #endif //WEASEL_MAINWINDOW_HPP

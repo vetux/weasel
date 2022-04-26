@@ -295,5 +295,10 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
             delete contextMenu;
         }
     }
+}
 
+void ProcessTreeWidget::selectProcess(Pid_t pid) {
+    auto index = items.at(pid)->index();
+    treeView->scrollTo(index);
+    treeView->setCurrentIndex(index);
 }
