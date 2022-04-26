@@ -34,6 +34,7 @@ public slots:
     void setCpus(const std::vector<CpuState::Core> &cores);
 
 private:
+    std::vector<QWidget*> widgets;
     std::vector<QProgressBar *> cpuBars;
     std::vector<QLabel *> cpuLabels;
     std::vector<QLabel *> percentageLabels;

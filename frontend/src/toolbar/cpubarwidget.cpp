@@ -22,41 +22,70 @@
 #include <QHBoxLayout>
 
 CpuBarWidget::CpuBarWidget(QWidget *parent) : QWidget(parent) {
-    setLayout(new QHBoxLayout());
+    setLayout(new QVBoxLayout());
     layout()->setMargin(0);
 }
 
 void CpuBarWidget::setCpus(const std::vector<CpuState::Core> &cores) {
-    while (cpuBars.size() > cores.size()) {
+    int maxLine = cores.size() / 2;
+    if (maxLine < 1)
+        maxLine = 1;
+
+    if (cpuBars.size() > cores.size()) {
         auto *p = cpuBars.at(cpuBars.size() - 1);
         delete p;
         cpuBars.pop_back();
+        widgets.resize(cores.size() / maxLine);
     }
 
-    while (cpuBars.size() < cores.size()) {
-        auto *progressBar = new QProgressBar();
-        auto *label = new QLabel;
-        auto *plabel = new QLabel;
+    if (cpuBars.size() < cores.size()) {
+        auto *layout = new QHBoxLayout();
+        layout->setMargin(0);
 
-        progressBar->setRange(0, 100);
+        int count = 0;
 
-        label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
-        label->setContentsMargins(0, 0, 6, 0);
+        while (cpuBars.size() < cores.size()) {
+            auto *progressBar = new QProgressBar();
+            auto *label = new QLabel;
+            auto *plabel = new QLabel;
 
-        plabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-        plabel->setContentsMargins(6, 0, 0, 0);
+            progressBar->setRange(0, 100);
 
-        progressBar->setLayout(new QHBoxLayout());
-        progressBar->layout()->addWidget(plabel);
-        progressBar->layout()->addWidget(label);
-        progressBar->layout()->setMargin(0);
-        progressBar->setTextVisible(false);
+            label->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+            label->setContentsMargins(0, 0, 6, 0);
 
-        layout()->addWidget(progressBar);
+            plabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+            plabel->setContentsMargins(6, 0, 0, 0);
 
-        cpuBars.emplace_back(progressBar);
-        cpuLabels.emplace_back(label);
-        percentageLabels.emplace_back(plabel);
+            progressBar->setLayout(new QHBoxLayout());
+            progressBar->layout()->addWidget(plabel);
+            progressBar->layout()->addWidget(label);
+            progressBar->layout()->setMargin(0);
+            progressBar->setTextVisible(false);
+
+            count++;
+
+            if (count > maxLine) {
+                count = 0;
+                auto *w = new QWidget();
+                w->setLayout(layout);
+                this->layout()->addWidget(w);
+                layout = new QHBoxLayout();
+                layout->setMargin(0);
+                widgets.emplace_back(w);
+            }
+
+            layout->addWidget(progressBar);
+
+            cpuBars.emplace_back(progressBar);
+            cpuLabels.emplace_back(label);
+            percentageLabels.emplace_back(plabel);
+        }
+
+        auto *w = new QWidget();
+        w->setLayout(layout);
+        this->layout()->addWidget(w);
+        widgets.emplace_back(w);
     }
 
     for (int i = 0; i < cores.size(); i++) {
