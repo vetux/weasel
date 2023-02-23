@@ -22,6 +22,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QTabWidget>
+#include <QApplication>
 
 #include "signalstring.hpp"
 
@@ -36,6 +37,12 @@ MainWindow::MainWindow(int pollingInterval) {
     procTree = new ProcessTreeWidget();
     netTable = new NetTableWidget();
 
+    exitAction = new QAction();
+    exitAction->setText("Exit");
+
+    aboutAction = new QAction();
+    aboutAction->setText("About Weasel");
+
     tabWidget->addTab(procTree, "Process");
     tabWidget->addTab(netTable, "Network");
 
@@ -47,14 +54,15 @@ MainWindow::MainWindow(int pollingInterval) {
     setCentralWidget(mainWidget);
 
     auto *menu = menuBar()->addMenu("Weasel");
-    menu->addAction("Preferences");
+    menu->addAction(exitAction);
 
-    menu = menuBar()->addMenu("View");
-    menu = menuBar()->addMenu("Tools");
     menu = menuBar()->addMenu("Help");
+    menu->addAction(aboutAction);
 
-    connect(menuBar(), SIGNAL(triggered(QAction * )), this, SLOT(onActionTriggered(QAction * )));
     connect(&pollTimer, SIGNAL(timeout()), this, SLOT(onPollTimeOut()));
+
+    connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
+    connect(aboutAction, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
 
     connect(procTree,
             SIGNAL(processSignalRequested(Pid_t, Thread::Signal)),
@@ -111,7 +119,7 @@ void MainWindow::onProcessSignalRequest(Pid_t pid, Thread::Signal signal) {
                                        + signalToString(signal)
                                        + " to "
                                        + std::to_string(pid)
-                                         + " ?").c_str()))
+                                       + " ?").c_str()))
         != QMessageBox::Yes) {
         return;
     }
@@ -218,4 +226,20 @@ void MainWindow::onViewProcess(Pid_t pid) {
 
 void MainWindow::onTerminateProcess(Pid_t pid) {
     onProcessSignalRequest(pid, Thread::SIGNAL_SIGTERM);
+}
+
+void MainWindow::onActionExit() {
+    close();
+}
+
+void MainWindow::onActionAbout() {
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("About Weasel");
+    msgBox.setTextFormat(Qt::RichText);
+    msgBox.setText("<h1>" + QApplication::applicationDisplayName() + " " + QApplication::applicationVersion() + "</h1>\n"
+                   + "Copyright (C) 2023 Julian Zampiccoli\n"
+                   +
+                   "<p>Weasel comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute it under certain conditions; check <a href=\"https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GPL-2.0</a> for details</p>\n"
+                   + "<p><a href=\"https://www.github.com/vetux/weasel\">Source Code</a></p>");
+    msgBox.exec();
 }

@@ -65,6 +65,10 @@ public slots:
 
     void onTerminateProcess(Pid_t pid);
 
+    void onActionExit();
+
+    void onActionAbout();
+
 private:
     QTimer pollTimer;
 
@@ -75,6 +79,9 @@ private:
     QTabWidget *tabWidget;
     ProcessTreeWidget *procTree;
     NetTableWidget *netTable;
+
+    QAction *exitAction;
+    QAction *aboutAction;
 };
 
 #endif //WEASEL_MAINWINDOW_HPP
