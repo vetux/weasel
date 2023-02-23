@@ -7,6 +7,3 @@ A process manager library for linux with a qt frontend.
 See [BUILDING.md](BUILDING.md)
 
 ## Screenshots
-
-## Known Issues
-- The mainthread / gui freezes sometimes (Deadlock)
