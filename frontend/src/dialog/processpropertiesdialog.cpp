@@ -44,6 +44,8 @@ ProcessPropertiesDialog::ProcessPropertiesDialog(QWidget *parent, Pid_t pid)
     resize(640, 320);
 
     setWindowTitle(("Properties " + std::to_string(pid)).c_str());
+
+    connect(tabGeneral, SIGNAL(openPath(const QString &)), this, SIGNAL(openPath(const QString &)));
 }
 
 Pid_t ProcessPropertiesDialog::getPid() const {

@@ -25,6 +25,7 @@
 #include <QApplication>
 
 #include "signalstring.hpp"
+#include "filebrowser.hpp"
 
 MainWindow::MainWindow(int pollingInterval) {
     auto *mainWidget = new QWidget();
@@ -34,7 +35,7 @@ MainWindow::MainWindow(int pollingInterval) {
 
     tabWidget = new QTabWidget();
 
-    procTree = new ProcessTreeWidget();
+    processTreeWidget = new ProcessTreeWidget();
     netTable = new NetTableWidget();
 
     exitAction = new QAction();
@@ -43,7 +44,7 @@ MainWindow::MainWindow(int pollingInterval) {
     aboutAction = new QAction();
     aboutAction->setText("About Weasel");
 
-    tabWidget->addTab(procTree, "Process");
+    tabWidget->addTab(processTreeWidget, "Process");
     tabWidget->addTab(netTable, "Network");
 
     l->addWidget(toolbar);
@@ -64,34 +65,38 @@ MainWindow::MainWindow(int pollingInterval) {
     connect(exitAction, SIGNAL(triggered(bool)), this, SLOT(onActionExit()));
     connect(aboutAction, SIGNAL(triggered(bool)), this, SLOT(onActionAbout()));
 
-    connect(procTree,
+    connect(processTreeWidget,
             SIGNAL(processSignalRequested(Pid_t, Thread::Signal)),
             this,
             SLOT(onProcessSignalRequest(Pid_t, Thread::Signal)));
-    connect(procTree,
+    connect(processTreeWidget,
             SIGNAL(threadSignalRequested(Pid_t, Thread::Signal)),
             this,
             SLOT(onThreadSignalRequest(Pid_t, Thread::Signal)));
-    connect(procTree,
+    connect(processTreeWidget,
             SIGNAL(processPriorityChangeRequested(Pid_t, int)),
             this,
             SLOT(onProcessPriorityChangeRequest(Pid_t, int)));
-    connect(procTree,
+    connect(processTreeWidget,
             SIGNAL(threadPriorityChangeRequested(Pid_t, int)),
             this,
             SLOT(onThreadPriorityChangeRequest(Pid_t, int)));
-    connect(procTree,
+    connect(processTreeWidget,
             SIGNAL(processPropertiesRequested(Pid_t)),
             this,
             SLOT(onOpenPropertiesRequest(Pid_t)));
+    connect(processTreeWidget,
+            SIGNAL(processViewInFileBrowser(Pid_t)),
+            this,
+            SLOT(onOpenFileLocation(Pid_t)));
 
     connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(onTabChanged(int)));
 
     connect(netTable, SIGNAL(terminateProcess(Pid_t)), this, SLOT(onTerminateProcess(Pid_t)));
-    connect(netTable, SIGNAL(viewProcess(Pid_t)), this, SLOT(onViewProcess(Pid_t)));
+    connect(netTable, SIGNAL(viewProcess(Pid_t)), this, SLOT(onSelectCurrentProcess(Pid_t)));
 
     connect(this, SIGNAL(signalSnapshot(const Snapshot &)), toolbar, SLOT(onSnapshot(const Snapshot &)));
-    connect(this, SIGNAL(signalSnapshot(const Snapshot &)), procTree, SLOT(onSnapshot(const Snapshot &)));
+    connect(this, SIGNAL(signalSnapshot(const Snapshot &)), processTreeWidget, SLOT(onSnapshot(const Snapshot &)));
     connect(this, SIGNAL(signalSnapshot(const Snapshot &)), netTable, SLOT(onSnapshot(const Snapshot &)));
 
     onPollTimeOut();
@@ -102,7 +107,8 @@ MainWindow::MainWindow(int pollingInterval) {
 MainWindow::~MainWindow() = default;
 
 void MainWindow::onPollTimeOut() {
-    emit signalSnapshot(generator.next());
+    currentSnapshot = generator.next();
+    emit signalSnapshot(currentSnapshot);
 }
 
 void MainWindow::onActionTriggered(QAction *action) {
@@ -203,6 +209,10 @@ void MainWindow::onOpenPropertiesRequest(Pid_t pid) {
 
                     generator.clearProcessReadFlags(pid);
                 });
+        connect(dialog,
+                SIGNAL(openPath(const QString &)),
+                this,
+                SLOT(onOpenPath(const QString &)));
         propertyDialogs.insert(std::pair<Pid_t, ProcessPropertiesDialog *>(pid, dialog));
         connect(this, SIGNAL(signalSnapshot(const Snapshot &)), dialog, SLOT(onSnapshot(const Snapshot &)));
         onPollTimeOut(); //Cause a poll timeout to populate the dialog before showing.
@@ -219,9 +229,9 @@ void MainWindow::onTabChanged(int index) {
     onPollTimeOut();
 }
 
-void MainWindow::onViewProcess(Pid_t pid) {
+void MainWindow::onSelectCurrentProcess(Pid_t pid) {
     tabWidget->setCurrentIndex(0);
-    procTree->selectProcess(pid);
+    processTreeWidget->selectProcess(pid);
 }
 
 void MainWindow::onTerminateProcess(Pid_t pid) {
@@ -236,10 +246,28 @@ void MainWindow::onActionAbout() {
     QMessageBox msgBox(this);
     msgBox.setWindowTitle("About Weasel");
     msgBox.setTextFormat(Qt::RichText);
-    msgBox.setText("<h1>" + QApplication::applicationDisplayName() + " " + QApplication::applicationVersion() + "</h1>\n"
-                   + "Copyright (C) 2023 Julian Zampiccoli\n"
-                   +
-                   "<p>Weasel comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute it under certain conditions; check <a href=\"https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GPL-2.0</a> for details</p>\n"
-                   + "<p><a href=\"https://www.github.com/vetux/weasel\">Source Code</a></p>");
+    msgBox.setText(
+            "<h1>" + QApplication::applicationDisplayName() + " " + QApplication::applicationVersion() + "</h1>\n"
+            + "Copyright (C) 2023 Julian Zampiccoli\n"
+            +
+            "<p>Weasel comes with ABSOLUTELY NO WARRANTY; This is free software, and you are welcome to redistribute it under certain conditions; check <a href=\"https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt\">GPL-2.0</a> for details</p>\n"
+            + "<p><a href=\"https://www.github.com/vetux/weasel\">Source Code</a></p>");
     msgBox.exec();
+}
+
+void MainWindow::onOpenPath(const QString &path) {
+    try {
+        FileBrowser::openDetached(path.toStdString());
+    } catch (const std::exception &e) {
+        QMessageBox::warning(this,
+                             "Failed to open path",
+                             ("Failed to open " + path.toStdString() + " Error: " + e.what()).c_str());
+    }
+}
+
+void MainWindow::onOpenFileLocation(Pid_t pid) {
+    if (currentSnapshot.processes.find(pid) != currentSnapshot.processes.end()) {
+        auto process = currentSnapshot.processes.at(pid);
+        onOpenPath(process.executablePath.c_str());
+    }
 }

@@ -22,6 +22,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+#include "filebrowser.hpp"
 #include "strutil.hpp"
 
 GeneralTab::GeneralTab(QWidget *parent)
@@ -65,8 +66,8 @@ GeneralTab::GeneralTab(QWidget *parent)
     rootDirTitleLabel->setText("Root Directory");
     environTitleLabel->setText("Environment");
 
-    executablePathOpenPushButton->setText("Open");
-    rootDirOpenPushButton->setText("Open");
+    executablePathOpenPushButton->setText("Open File Location");
+    rootDirOpenPushButton->setText("Open File Location");
 
     auto *layoutWidget = new QWidget(this);
     layoutWidget->setLayout(new QVBoxLayout());
@@ -143,6 +144,9 @@ GeneralTab::GeneralTab(QWidget *parent)
     layoutWidget->layout()->addWidget(environListWidget);
 
     layout()->addWidget(layoutWidget);
+
+    connect(executablePathOpenPushButton, SIGNAL(clicked(bool)), this, SLOT(onExecutablePathOpenClicked()));
+    connect(rootDirOpenPushButton, SIGNAL(clicked(bool)), this, SLOT(onRootDirOpenClicked()));
 }
 
 void GeneralTab::setName(const std::string &name) {
@@ -180,4 +184,12 @@ void GeneralTab::setEnvironment(const std::vector<std::string> &environ) {
     for (auto &e: environ) {
         environListWidget->addItem(e.c_str());
     }
+}
+
+void GeneralTab::onExecutablePathOpenClicked() {
+    emit openPath(executablePathLabel->text());
+}
+
+void GeneralTab::onRootDirOpenClicked() {
+    emit openPath(rootDirLabel->text());
 }

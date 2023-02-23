@@ -61,13 +61,17 @@ public slots:
 
     void onTabChanged(int index);
 
-    void onViewProcess(Pid_t pid);
+    void onSelectCurrentProcess(Pid_t pid);
 
     void onTerminateProcess(Pid_t pid);
 
     void onActionExit();
 
     void onActionAbout();
+
+    void onOpenPath(const QString &path);
+
+    void onOpenFileLocation(Pid_t pid);
 
 private:
     QTimer pollTimer;
@@ -77,11 +81,13 @@ private:
     std::map<Pid_t, ProcessPropertiesDialog *> propertyDialogs;
 
     QTabWidget *tabWidget;
-    ProcessTreeWidget *procTree;
+    ProcessTreeWidget *processTreeWidget;
     NetTableWidget *netTable;
 
     QAction *exitAction;
     QAction *aboutAction;
+
+    Snapshot currentSnapshot;
 };
 
 #endif //WEASEL_MAINWINDOW_HPP

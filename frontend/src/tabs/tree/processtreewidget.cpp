@@ -240,17 +240,18 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
     if (index.isValid()) {
         auto *item = dynamic_cast<ProcessTreeItem *>(model.itemFromIndex(model.index(index.row(), 0, index.parent())));
         if (item != nullptr) {
+            auto itemPid = item->getPid();
+            auto itemIndex = item->index();
+
             auto *contextMenu = new QMenu(treeView);
 
             contextMenu->addAction(new ProcessAction(SIGNAL_PROCESS,
-                                                     item->getPid(),
                                                      Thread::SIGNAL_SIGTERM,
                                                      "Terminate"));
 
             auto *menu = contextMenu->addMenu("Signal");
             for (auto i = Thread::SIGNAL_SIGHUP; i < Thread::SIGNAL_SIGTTOU; i = static_cast<Thread::Signal>(i + 1)) {
                 menu->addAction(new ProcessAction(SIGNAL_PROCESS,
-                                                  item->getPid(),
                                                   i,
                                                   signalToString(static_cast<Thread::Signal>(i)).c_str()));
             }
@@ -260,27 +261,36 @@ void ProcessTreeWidget::customContextMenu(const QPoint &pos) {
             contextMenu->addAction(new ProcessAction(COLLAPSE_ALL, "Collapse All"));
 
             contextMenu->addSeparator();
+            contextMenu->addAction(new ProcessAction(VIEW_IN_FILE_BROWSER, "Open File Location"));
+
+            contextMenu->addSeparator();
             contextMenu->addAction(new ProcessAction(OPEN_PROCESS_DIALOG, "Properties"));
 
             connect(contextMenu,
                     &QMenu::triggered,
                     [=](QAction *action) {
+                        if (items.find(itemPid)== items.end()){
+                            return; // Process does not exist anymore
+                        }
                         if (TypeCheck::checkCast<QAction, ProcessAction>(*action)) {
                             auto &pa = dynamic_cast<ProcessAction &>(*action);
                             switch (pa.getType()) {
                                 case SIGNAL_PROCESS:
-                                    emit processSignalRequested(pa.getPid(), pa.getSignal());
+                                    emit processSignalRequested(itemPid, pa.getSignal());
                                     break;
                                 case SIGNAL_THREAD:
                                     break;
                                 case OPEN_PROCESS_DIALOG:
-                                    emit processPropertiesRequested(item->getPid());
+                                    emit processPropertiesRequested(itemPid);
+                                    break;
+                                case VIEW_IN_FILE_BROWSER:
+                                    emit processViewInFileBrowser(itemPid);
                                     break;
                                 case EXPAND_ALL:
-                                    treeView->expandRecursively(item->index());
+                                    treeView->expandRecursively(itemIndex);
                                     break;
                                 case COLLAPSE_ALL: {
-                                    auto recursiveItems = getItemsRecursive(item->getPid(), items);
+                                    auto recursiveItems = getItemsRecursive(itemPid, items);
                                     for (auto rItem: recursiveItems) {
                                         treeView->collapse(rItem->index());
                                         treeView->update();

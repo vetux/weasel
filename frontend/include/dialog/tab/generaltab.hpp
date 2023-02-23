@@ -34,6 +34,10 @@ Q_OBJECT
 public:
     explicit GeneralTab(QWidget *parent = nullptr);
 
+signals:
+
+    void openPath(const QString &path);
+
 public slots:
 
     void setName(const std::string &name);
@@ -51,6 +55,11 @@ public slots:
     void setRootDirectory(const std::string &path);
 
     void setEnvironment(const std::vector<std::string> &environ);
+
+private slots:
+    void onExecutablePathOpenClicked();
+
+    void onRootDirOpenClicked();
 
 private:
     QLabel *processTitleLabel;

@@ -41,6 +41,7 @@ public:
         OPEN_PROCESS_DIALOG,
         EXPAND_ALL,
         COLLAPSE_ALL,
+        VIEW_IN_FILE_BROWSER,
         NONE
     };
 
@@ -48,36 +49,26 @@ public:
     public:
         ProcessAction() = default;
 
-        ProcessAction(ActionType type, Pid_t pid, const QString &text)
-                : type(type), pid(pid) {
-            setText(text);
-        }
-
-        ProcessAction(ActionType type, const QString &text)
+        ProcessAction(ActionType type,  const QString &text)
                 : type(type) {
             setText(text);
         }
 
-        ProcessAction(ActionType type, Pid_t pid, Thread::Signal signal, const QString &text)
-                : type(type), pid(pid), signal(signal) {
+        ProcessAction(ActionType type, Thread::Signal signal, const QString &text)
+                : type(type), signal(signal) {
             setText(text);
         }
 
         const ActionType &getType() const { return type; }
 
-        const Pid_t &getPid() const { return pid; }
-
         const Thread::Signal &getSignal() const { return signal; }
 
         void setType(ActionType t) { type = t; }
-
-        void setPid(Pid_t v) { pid = v; }
 
         void setSignal(Thread::Signal s) { signal = s; }
 
     private:
         ActionType type = NONE;
-        Pid_t pid = 0;
         Thread::Signal signal = Thread::SIGNAL_SIGHUP;
     };
 
@@ -102,6 +93,8 @@ signals:
     void threadPriorityChangeRequested(Pid_t tid, int priority);
 
     void processPropertiesRequested(Pid_t pid);
+
+    void processViewInFileBrowser(Pid_t pid);
 
 private slots:
 

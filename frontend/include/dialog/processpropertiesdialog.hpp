@@ -39,6 +39,10 @@ public:
 
     Pid_t getPid() const;
 
+signals:
+
+    void openPath(const QString &path);
+
 protected:
     void closeEvent(QCloseEvent *event) override;
 
