@@ -57,12 +57,14 @@ void NetworkTab::setSocket(const Socket &socket) {
 
     if (rowMapping.empty()) {
         socketsModel->clear();
-        socketsModel->setColumnCount(3);
+        socketsModel->setColumnCount(4);
         socketsTree->header()->show();
         socketsTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
         socketsTree->header()->setSectionResizeMode(1, QHeaderView::Stretch);
         socketsTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-        socketsModel->setHorizontalHeaderLabels({"Local Endpoint", "Remote Endpoint", "Protocol"});
+        socketsTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+        socketsTree->header()->setStretchLastSection(false);
+        socketsModel->setHorizontalHeaderLabels({"Local Endpoint", "Remote Endpoint", "Protocol", "State"});
     } else {
         row = socketsModel->rowCount();
     }
@@ -71,7 +73,8 @@ void NetworkTab::setSocket(const Socket &socket) {
                             {
                                     new QStandardItem(socket.localEndpoint.toString().c_str()),
                                     new QStandardItem(socket.remoteEndpoint.toString().c_str()),
-                                    new QStandardItem(getProtocolString(socket.protocol))
+                                    new QStandardItem(getProtocolString(socket.protocol)),
+                                    new QStandardItem(socket.state.c_str())
                             });
     rowMapping[socket.inode] = row;
 }

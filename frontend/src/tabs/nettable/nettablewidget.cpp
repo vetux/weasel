@@ -31,9 +31,14 @@
 NetTableWidget::NetTableWidget() {
     tableWidget = new QTableWidget();
 
-    tableWidget->setColumnCount(5);
-    tableWidget->setHorizontalHeaderLabels({"Local", "Remote", "Protocol", "Pid", "Executable"});
-    tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeMode::Stretch);
+    tableWidget->setColumnCount(6);
+    tableWidget->setHorizontalHeaderLabels({"Local", "Remote", "Protocol", "State", "Pid", "Executable"});
+    tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Stretch);
+    tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+    tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeMode::Stretch);
+    tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+    tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeMode::Stretch); // ResizeToContents causes the columns to be randomly resized correctly to the largest content width or resized to column header width when switching between tree tab and network tab.
+    tableWidget->horizontalHeader()->setStretchLastSection(true);
     tableWidget->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
     tableWidget->verticalHeader()->hide();
 
@@ -63,8 +68,10 @@ void NetTableWidget::onSnapshot(const Snapshot &snapshot) {
                 tableWidget->setCellWidget(tableWidget->rowCount() - 1, 2,
                                            new QLabel(socket.protocol == TCP ? "TCP" : "UDP"));
                 tableWidget->setCellWidget(tableWidget->rowCount() - 1, 3,
-                                           new QLabel(std::to_string(p.first).c_str()));
+                                           new QLabel(socket.state.c_str()));
                 tableWidget->setCellWidget(tableWidget->rowCount() - 1, 4,
+                                           new QLabel(std::to_string(p.first).c_str()));
+                tableWidget->setCellWidget(tableWidget->rowCount() - 1, 5,
                                            new QLabel(p.second.executablePath.c_str()));
                 processes.emplace_back(p.first);
             }
