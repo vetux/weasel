@@ -1,5 +1,4 @@
 # Weasel
-
 A process manager library for linux with a qt frontend.
 
 # Features
@@ -18,9 +17,15 @@ A process manager library for linux with a qt frontend.
 - Show icons for processes
 - Window Manager interface
 - Allow changing of process priorities
+- Allow configuration of refresh interval
+
+## Screenshots
+
+# Permissions
+Running Gui applications as a privileged user (Eg. <code>sudo</code>) is not advised because Gui libraries contain a lot of code which increases the likelihood of possibly exploitable bugs in the library code.
+
+Weasel should be run as an unprivileged user, in which case it can still access the process tree and total system usage without elevated privileges. Details of processes running under a different user might not be available as an unprivileged user.
 
 ## Building
 
 See [BUILDING.md](BUILDING.md)
-
-## Screenshots
