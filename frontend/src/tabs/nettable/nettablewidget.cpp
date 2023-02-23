@@ -79,6 +79,9 @@ void NetTableWidget::customContextMenu(const QPoint &pos) {
         auto *item = dynamic_cast<QLabel *>(tableWidget->indexWidget(index));
         auto *contextMenu = new QMenu(tableWidget);
 
+        auto pid = processes.at(index.row());
+        auto itemText = item->text();
+
         contextMenu->addAction(new Action("Copy To Clipboard", COPY));
         contextMenu->addSeparator();
         contextMenu->addAction(new Action("Go To Process", VIEW_PROCESS));
@@ -86,18 +89,21 @@ void NetTableWidget::customContextMenu(const QPoint &pos) {
 
         connect(contextMenu,
                 &QMenu::triggered,
-                [this, index, item](QAction *action) {
+                [this, pid, itemText](QAction *action) {
                     if (TypeCheck::checkCast<QAction, Action>(*action)) {
+                        if (std::find(processes.begin(), processes.end(), pid) == processes.end()){
+                            return; //Process / Network connection does not exist anymore
+                        }
                         auto &pa = dynamic_cast<Action &>(*action);
                         switch (pa.type) {
                             case TERMINATE:
-                                emit terminateProcess(processes.at(index.row()));
+                                emit terminateProcess(pid);
                                 break;
                             case VIEW_PROCESS:
-                                emit viewProcess(processes.at(index.row()));
+                                emit viewProcess(pid);
                                 break;
                             case COPY:
-                                QGuiApplication::clipboard()->setText(item->text());
+                                QGuiApplication::clipboard()->setText(itemText);
                                 break;
                         }
                     }
