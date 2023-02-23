@@ -83,8 +83,68 @@ static IpEndpoint getEndpoint(const std::string &address) {
     return {convertHexAddress(split.at(0)), convertHexPort(split.at(1))};
 }
 
+//https://unix.stackexchange.com/a/470527
+enum TCPStates : int {
+    TCP_ESTABLISHED = 1,
+    TCP_SYN_SENT,
+    TCP_SYN_RECV,
+    TCP_FIN_WAIT1,
+    TCP_FIN_WAIT2,
+    TCP_TIME_WAIT,
+    TCP_CLOSE,
+    TCP_CLOSE_WAIT,
+    TCP_LAST_ACK,
+    TCP_LISTEN,
+    TCP_CLOSING,
+    TCP_NEW_SYN_RECV
+};
+
+enum UDPStates : int {
+    UDP_OPEN = 1,
+    UDP_CLOSED = TCPStates::TCP_CLOSE // https://github.com/torvalds/linux/blob/a5c95ca18a98d742d0a4a04063c32556b5b66378/net/ipv4/udp.c#L1975
+};
+
 static std::string getStateName(SocketProtocol protocol, std::string state) {
-    return "ERR"; //TODO: Convert state name
+    auto value = std::stoi(state);
+    if (protocol == UDP) {
+        switch (value) {
+            case UDP_OPEN:
+                return "UDP_OPEN";
+            case UDP_CLOSED:
+                return "UDP_CLOSED";
+            default:
+                return "ERR";
+        }
+    } else {
+        switch (value) {
+            case TCP_ESTABLISHED:
+                return "TCP_ESTABLISHED";
+            case TCP_SYN_SENT:
+                return "TCP_SYN_SENT";
+            case TCP_SYN_RECV:
+                return "TCP_SYN_RECV";
+            case TCP_FIN_WAIT1:
+                return "TCP_FIN_WAIT1";
+            case TCP_FIN_WAIT2:
+                return "TCP_FIN_WAIT2";
+            case TCP_TIME_WAIT:
+                return "TCP_TIME_WAIT";
+            case TCP_CLOSE:
+                return "TCP_CLOSE";
+            case TCP_CLOSE_WAIT:
+                return "TCP_CLOSE_WAIT";
+            case TCP_LAST_ACK:
+                return "TCP_LAST_ACK";
+            case TCP_LISTEN:
+                return "TCP_LISTEN";
+            case TCP_CLOSING:
+                return "TCP_CLOSING";
+            case TCP_NEW_SYN_RECV:
+                return "TCP_NEW_SYN_RECV";
+            default:
+                return "ERR";
+        }
+    }
 }
 
 namespace ProcNetReader {
@@ -92,7 +152,7 @@ namespace ProcNetReader {
         std::map<Inode_t, Socket> ret;
 
         auto entries = readEntries(FileIO::readText(ProcPath::getProcNetTcp()));
-        for (auto &entry : entries) {
+        for (auto &entry: entries) {
             Socket socket;
             socket.protocol = TCP;
             socket.localEndpoint = getEndpoint(entry.localAddress);
@@ -103,7 +163,7 @@ namespace ProcNetReader {
         }
 
         entries = readEntries(FileIO::readText(ProcPath::getProcNetUdp()));
-        for (auto &entry : entries) {
+        for (auto &entry: entries) {
             Socket socket;
             socket.protocol = UDP;
             socket.localEndpoint = getEndpoint(entry.localAddress);
