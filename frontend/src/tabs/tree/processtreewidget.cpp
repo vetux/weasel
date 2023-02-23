@@ -152,7 +152,11 @@ void ProcessTreeWidget::onSnapshot(const Snapshot &snapshot) {
     // Bruteforce method to create items in hierarchical order, wastes cycles a better approach would be sorting.
     std::set<Pid_t> delNew;
     std::set<Pid_t> delReparent;
-    while (!newProcesses.empty()) {
+    while (true) {
+        if (newProcesses.empty() && reparentedProcesses.empty()) {
+            break;
+        }
+
         // Create items of new processes
         for (auto pair: newProcesses) {
             if (pair.second == 0) {
